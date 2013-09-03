@@ -1,0 +1,66 @@
+---Portabel---
+
+
+-	I mappen GitHub skapa en mapp vid namn  "home".
+ 	Skapa en map med erat namn i  den mappen.
+
+-	Hitta sedan mappen "etc" och öppna  "profile" med notepad.
+ 	Leta efter koden 
+
+ 	HOME="$(cd "$HOME" ; pwd)" 
+
+ 	och skriv  detta innan den koden.
+
+ 	HOME="/home/dittnamn"
+
+-	Kopiera profilen som ligger i etc och spara den i /home/ sedan öppna den och töm den på text. Viktigt att den är Helt tom.
+
+-	kopiera denna text och använd den i profile filen. Kopiera ALLT mellan den första och sista fluggskiten men inte dom. 
+	"
+SSH_ENV="$HOME/.ssh/environment" # start the ssh-agent function start_agent { echo "Initializing new SSH agent..." # spawn ssh-agent ssh-agent | sed 's/^echo/#echo/' > "$SSH_ENV" echo succeeded chmod 600 "$SSH_ENV" . "$SSH_ENV" > /dev/null ssh-add } # test for identities function test_identities { # test whether standard identities have been added to the agent already ssh-add -l | grep "The agent has no identities" > /dev/null if [ $? -eq 0 ]; then ssh-add # $SSH_AUTH_SOCK broken so we start a new proper agent if [ $? -eq 2 ];then start_agent fi fi } # check for running ssh-agent with proper $SSH_AGENT_PID if [ -n "$SSH_AGENT_PID" ]; then ps -ef | grep "$SSH_AGENT_PID" | grep ssh-agent > /dev/null if [ $? -eq 0 ]; then test_identities fi # if $SSH_AGENT_PID is not properly set, we might be able to load one from # $SSH_ENV else if [ -f "$SSH_ENV" ]; then . "$SSH_ENV" > /dev/null fi ps -ef | grep "$SSH_AGENT_PID" | grep -v grep | grep ssh-agent > /dev/null if [ $? -eq 0 ]; then test_identities else start_agent fi fi "
+
+-	Öppna nu din github-bash fil och skriv in echo $HOME och kolla vart den hamnar.
+
+-	Skriv detta i ditt github fönster när allt annat är klart.
+	
+	git config --global user.name "Your Name"
+	
+	git config --global user.email you@yourdomain.com
+
+-	Efter detta är klart skriv in 
+
+	"cd ~/.ssh"
+
+	och invänta svar.
+
+	Ifall svaret är "NO such directory of file" hoppa nästa punkt.
+
+-	Ifall det redan finns en fil så sparar vi den som "Key_Backup" skriv följande rader i promten
+
+	 ls
+
+	 mkdir key_backup		//Skapar en mapp "Key_Backup"
+	
+	 cp id_rsa* key_backup		//Kopierar och flyttar
+	
+	 rm id_rsa*			//Tar bort dina id filer 
+
+-	Nu ska vi skapa en nyckel som vi ansluter till nätet med. Skriv följande:
+	
+	ssh-keygen -t rsa -C "your_email@youremail.com"
+
+	tryck enter. EN GÅNG.
+
+-	Nu vill den ha in en kod som identifierar dig. Skriv vad du vill som kod och sedan repetera det igen.
+	Skit skrivs ut sedan kan ni skriva exit så stängs bash.
+
+-	.ssh filen ligger nu där du sagt till den att hamna, om du nu velat spara den på annan plats. 
+	men annars ska den finnas i din home/dittnamn mapp. öppna filen med ".pub" som ändelse.
+	
+	kopiera allt som finns i denna filen. logga sedan in på internet och lägg till din nyckel under 
+	“Account Settings” > Click “SSH Keys” > Click “Add SSH key” pasta in skiten och du är klar.
+
+
+
+Av: Domd BTH 12-04-06
+	
