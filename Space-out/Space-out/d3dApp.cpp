@@ -236,11 +236,11 @@ void D3DApp::updateScene(float dt)
 
 		std::wostringstream outs;   
 		outs.precision(6);
-		outs << mMainWndCaption << L"    "
+		outs << (LPCTSTR)mMainWndCaption.c_str() << L"    "
 			<< L"FPS: " << fps << L"    " 
 			<< L"Frame Time: " << mspf << L" (ms)";
 
-		//SetWindowText(mhMainWnd, outs.str().c_str());
+		SetWindowTextW(mhMainWnd, outs.str().c_str());
 
 		// Reset for next average.
 		frameCnt = 0;
