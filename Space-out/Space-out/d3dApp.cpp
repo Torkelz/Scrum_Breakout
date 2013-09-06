@@ -407,7 +407,6 @@ void D3DApp::initMainWindow()
 
 	mhMainWnd = CreateWindow((LPCSTR)"D3DWndClassName",(LPCTSTR)mMainWndCaption.c_str(), 
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, mhAppInst, this); 
-
 	if( !mhMainWnd )
 	{
 		MessageBox(0, (LPCTSTR)"CreateWindow FAILED", 0, 0);
