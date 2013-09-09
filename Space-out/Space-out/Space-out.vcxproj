@@ -79,20 +79,15 @@
   <ItemGroup>
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="d3dApp.cpp" />
-    <ClCompile Include="d3dUtil.cpp" />
     <ClCompile Include="Direct3D.cpp" />
-    <ClCompile Include="DirectX11.cpp" />
     <ClCompile Include="GameTimer.cpp" />
-    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="d3dApp.h" />
     <ClInclude Include="d3dUtil.h" />
-    <ClInclude Include="DirectX11.h" />
+    <ClInclude Include="Direct3D.h" />
     <ClInclude Include="GameTimer.h" />
-    <ClInclude Include="Global.h" />
-    <ClInclude Include="Graphics.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
