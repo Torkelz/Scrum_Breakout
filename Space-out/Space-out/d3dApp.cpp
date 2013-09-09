@@ -5,7 +5,6 @@
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static D3DApp* app = 0;
 	static Direct3D* dd = 0;
 
 	switch( msg )
@@ -14,16 +13,10 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			// Get the 'this' pointer we passed to CreateWindow via the lpParam parameter.
 			CREATESTRUCT* cs = (CREATESTRUCT*)lParam;
-			app = (D3DApp*)cs->lpCreateParams;
 			dd = (Direct3D*)cs->lpCreateParams;
 			return 0;
 		}
 	}
-
-	if(app == dd)
-		int i = 0;
-
-	int u = 0;
 
 	// Don't start processing messages until after WM_CREATE.
 	if( dd )
@@ -65,11 +58,6 @@ D3DApp::~D3DApp()
 	ReleaseCOM(m_pDepthStencilView);
 	ReleaseCOM(m_pSwapChain);
 	ReleaseCOM(m_pDepthStencilBuffer);
-
-	// Restore all default settings.
-	if( m_pDeviceContext )
-		m_pDeviceContext->ClearState();
-
 	ReleaseCOM(m_pDeviceContext);
 	ReleaseCOM(m_pDevice);
 }
@@ -129,14 +117,12 @@ void D3DApp::onResize()
 	ReleaseCOM(m_pDepthStencilView);
 	ReleaseCOM(m_pDepthStencilBuffer);
 
-
 	// Resize the swap chain and recreate the render target view.
 	m_pSwapChain->ResizeBuffers(1, m_ClientWidth, m_ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 	ID3D11Texture2D* backBuffer;
 	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
 	m_pDevice->CreateRenderTargetView(backBuffer, 0, &m_pRenderTargetView);
 	ReleaseCOM(backBuffer);
-
 
 	// Create the depth/stencil buffer and view.
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
@@ -413,7 +399,6 @@ void D3DApp::initDirect3D()
 	assert( m_4xMsaaQuality > 0 );
 
 	// Fill out a DXGI_SWAP_CHAIN_DESC to describe our swap chain.
-
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width  = m_ClientWidth;
 	sd.BufferDesc.Height = m_ClientHeight;
@@ -443,7 +428,6 @@ void D3DApp::initDirect3D()
 	sd.SwapEffect   = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags        = 0;
 
-
 	// To correctly create the swap chain, we must use the IDXGIFactory that was
 	// used to create the device.  If we tried to use a different IDXGIFactory instance
 	// (by calling CreateDXGIFactory), we get an error: "IDXGIFactory::CreateSwapChain: 
@@ -463,7 +447,6 @@ void D3DApp::initDirect3D()
 	ReleaseCOM(dxgiDevice);
 	ReleaseCOM(dxgiAdapter);
 	ReleaseCOM(dxgiFactory);
-
 
 	// The remaining steps that need to be carried out for d3d creation
 	// also need to be executed every time the window is resized.  So
