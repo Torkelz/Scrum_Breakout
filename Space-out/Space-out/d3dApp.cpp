@@ -1,14 +1,12 @@
-//=======================================================================================
-// d3dApp.cpp by Frank Luna (C) 2008 All Rights Reserved.
-//=======================================================================================
-
 #include "d3dApp.h"
 #include <sstream>
+#include "Direct3D.h"
 
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static D3DApp* app = 0;
+	static Direct3D* dd = 0;
 
 	switch( msg )
 	{
@@ -17,93 +15,82 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			// Get the 'this' pointer we passed to CreateWindow via the lpParam parameter.
 			CREATESTRUCT* cs = (CREATESTRUCT*)lParam;
 			app = (D3DApp*)cs->lpCreateParams;
+			dd = (Direct3D*)cs->lpCreateParams;
 			return 0;
 		}
 	}
 
+	if(app == dd)
+		int i = 0;
+
+	int u = 0;
+
 	// Don't start processing messages until after WM_CREATE.
-	if( app )
-		return app->msgProc(msg, wParam, lParam);
+	if( dd )
+		return dd->msgProc(msg, wParam, lParam);
 	else
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 D3DApp::D3DApp(HINSTANCE hInstance)
 {
-	mhAppInst   = hInstance;
-	mhMainWnd   = 0;
-	mAppPaused  = false;
-	mMinimized  = false;
-	mMaximized  = false;
-	mResizing   = false;
+	m_hAppInst   = hInstance;
+	m_hMainWnd   = 0;
+	m_AppPaused  = false;
+	m_Minimized  = false;
+	m_Maximized  = false;
+	m_Resizing   = false;
 
-	mFrameStats = (LPCWSTR)"";
+	m_FrameStats = (LPCWSTR)"";
  
-	md3dDevice          = 0;
-	mSwapChain          = 0;
-	mDepthStencilBuffer = 0;
-	mRenderTargetView   = 0;
-	mDepthStencilView   = 0;
-	//mFont               = 0;
+	m_pDevice          = 0;
+	m_pSwapChain          = 0;
+	m_pDepthStencilBuffer = 0;
+	m_pRenderTargetView   = 0;
+	m_pDepthStencilView   = 0;
 
-	mMainWndCaption = (LPCWSTR)"Space-out";
-	md3dDriverType  = D3D_DRIVER_TYPE_HARDWARE;
-	mClearColor[0] = 0.0f; mClearColor[1] = 0.0f; mClearColor[2] = 1.0f; mClearColor[3]  = 1.0f;
-	mClientWidth    = 800;
-	mClientHeight   = 600;
+	m_MainWndTitle = (LPCWSTR)"Space-out";
+	m_DriverType  = D3D_DRIVER_TYPE_HARDWARE;
+	m_ClearColor[0] = 0.0f; m_ClearColor[1] = 0.0f; m_ClearColor[2] = 1.0f; m_ClearColor[3]  = 1.0f;
+	m_ClientWidth    = 800;
+	m_ClientHeight   = 600;
 
-	m4xMsaaQuality = 0;
-	md3dImmediateContext = 0;
+	m_4xMsaaQuality = 0;
+	m_pDeviceContext = 0;
 
 	m_buffer = Buffer();
 }
 
 D3DApp::~D3DApp()
 {
-	ReleaseCOM(mRenderTargetView);
-	ReleaseCOM(mDepthStencilView);
-	ReleaseCOM(mSwapChain);
-	ReleaseCOM(mDepthStencilBuffer);
+	ReleaseCOM(m_pRenderTargetView);
+	ReleaseCOM(m_pDepthStencilView);
+	ReleaseCOM(m_pSwapChain);
+	ReleaseCOM(m_pDepthStencilBuffer);
 
 	// Restore all default settings.
-	if( md3dImmediateContext )
-		md3dImmediateContext->ClearState();
+	if( m_pDeviceContext )
+		m_pDeviceContext->ClearState();
 
-	ReleaseCOM(md3dImmediateContext);
-	ReleaseCOM(md3dDevice);
-	//ReleaseCOM(mFont);
+	ReleaseCOM(m_pDeviceContext);
+	ReleaseCOM(m_pDevice);
 }
 
 HINSTANCE D3DApp::getAppInst()
 {
-	return mhAppInst;
+	return m_hAppInst;
 }
 
 HWND D3DApp::getMainWnd()
 {
-	return mhMainWnd;
+	return m_hMainWnd;
 }
-
-//void D3DApp::resetOMTargetsAndViewport()
-//{
-//	md3dDevice->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
-//
-//	D3D10_VIEWPORT vp;
-//	vp.TopLeftX = 0;
-//	vp.TopLeftY = 0;
-//	vp.Width    = mClientWidth;
-//	vp.Height   = mClientHeight;
-//	vp.MinDepth = 0.0f;
-//	vp.MaxDepth = 1.0f;
-//
-//	md3dDevice->RSSetViewports(1, &vp);
-//}
 
 int D3DApp::run()
 {
 	MSG msg = {0};
  
-	mTimer.reset();
+	m_Timer.reset();
 
 	while(msg.message != WM_QUIT)
 	{
@@ -116,17 +103,15 @@ int D3DApp::run()
 		// Otherwise, do animation/game stuff.
 		else
         {	
-			mTimer.tick();
+			m_Timer.tick();
 
-			if( !mAppPaused )
+			if( !m_AppPaused )
 			{
-				updateScene(mTimer.getDeltaTime());
+				updateScene(m_Timer.getDeltaTime());
 				drawScene();
 			}
 			else
 				Sleep(100);
-
-			
         }
     }
 	return (int)msg.wParam;
@@ -158,56 +143,39 @@ void D3DApp::initApp()
 
 	//m_buffer.init(md3dDevice, md3dImmediateContext, initDesc);
 	
-
-	/*D3DX10_FONT_DESC fontDesc;
-	fontDesc.Height          = 24;
-	fontDesc.Width           = 0;
-	fontDesc.Weight          = 0;
-	fontDesc.MipLevels       = 1;
-	fontDesc.Italic          = false;
-	fontDesc.CharSet         = DEFAULT_CHARSET;
-	fontDesc.OutputPrecision = OUT_DEFAULT_PRECIS;
-	fontDesc.Quality         = DEFAULT_QUALITY;
-	fontDesc.PitchAndFamily  = DEFAULT_PITCH | FF_DONTCARE;
-	wcscpy_s((wchar_t *)fontDesc.FaceName, 5, (LPCWSTR)"Arial");
-
-	D3DX10CreateFontIndirect(md3dDevice, &fontDesc, &mFont);*/
 }
  
 void D3DApp::onResize()
 {
 	// Release the old views, as they hold references to the buffers we
 	// will be destroying.  Also release the old depth/stencil buffer.
-
-	ReleaseCOM(mRenderTargetView);
-	ReleaseCOM(mDepthStencilView);
-	ReleaseCOM(mDepthStencilBuffer);
+	ReleaseCOM(m_pRenderTargetView);
+	ReleaseCOM(m_pDepthStencilView);
+	ReleaseCOM(m_pDepthStencilBuffer);
 
 
 	// Resize the swap chain and recreate the render target view.
-
-	mSwapChain->ResizeBuffers(1, mClientWidth, mClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+	m_pSwapChain->ResizeBuffers(1, m_ClientWidth, m_ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 	ID3D11Texture2D* backBuffer;
-	mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
-	md3dDevice->CreateRenderTargetView(backBuffer, 0, &mRenderTargetView);
+	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
+	m_pDevice->CreateRenderTargetView(backBuffer, 0, &m_pRenderTargetView);
 	ReleaseCOM(backBuffer);
 
 
 	// Create the depth/stencil buffer and view.
-
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 
-	depthStencilDesc.Width     = mClientWidth;
-	depthStencilDesc.Height    = mClientHeight;
+	depthStencilDesc.Width     = m_ClientWidth;
+	depthStencilDesc.Height    = m_ClientHeight;
 	depthStencilDesc.MipLevels = 1;
 	depthStencilDesc.ArraySize = 1;
 	depthStencilDesc.Format    = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	// Use 4X MSAA? --must match swap chain MSAA values.
-	if( mEnable4xMsaa )
+	if( m_Enable4xMsaa )
 	{
 		depthStencilDesc.SampleDesc.Count   = 4;
-		depthStencilDesc.SampleDesc.Quality = m4xMsaaQuality-1;
+		depthStencilDesc.SampleDesc.Quality = m_4xMsaaQuality-1;
 	}
 	// No MSAA
 	else
@@ -221,25 +189,21 @@ void D3DApp::onResize()
 	depthStencilDesc.CPUAccessFlags = 0; 
 	depthStencilDesc.MiscFlags      = 0;
 
-	md3dDevice->CreateTexture2D(&depthStencilDesc, 0, &mDepthStencilBuffer);
-	md3dDevice->CreateDepthStencilView(mDepthStencilBuffer, 0, &mDepthStencilView);
-
+	m_pDevice->CreateTexture2D(&depthStencilDesc, 0, &m_pDepthStencilBuffer);
+	m_pDevice->CreateDepthStencilView(m_pDepthStencilBuffer, 0, &m_pDepthStencilView);
 
 	// Bind the render target view and depth/stencil view to the pipeline.
-
-	md3dImmediateContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
-
+	m_pDeviceContext->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
 
 	// Set the viewport transform.
+	m_ScreenViewport.TopLeftX = 0;
+	m_ScreenViewport.TopLeftY = 0;
+	m_ScreenViewport.Width    = static_cast<float>(m_ClientWidth);
+	m_ScreenViewport.Height   = static_cast<float>(m_ClientHeight);
+	m_ScreenViewport.MinDepth = 0.0f;
+	m_ScreenViewport.MaxDepth = 1.0f;
 
-	mScreenViewport.TopLeftX = 0;
-	mScreenViewport.TopLeftY = 0;
-	mScreenViewport.Width    = static_cast<float>(mClientWidth);
-	mScreenViewport.Height   = static_cast<float>(mClientHeight);
-	mScreenViewport.MinDepth = 0.0f;
-	mScreenViewport.MaxDepth = 1.0f;
-
-	md3dImmediateContext->RSSetViewports(1, &mScreenViewport);
+	m_pDeviceContext->RSSetViewports(1, &m_ScreenViewport);
 }
 
 void D3DApp::updateScene(float dt)
@@ -253,18 +217,18 @@ void D3DApp::updateScene(float dt)
 	frameCnt++;
 
 	// Compute averages over one second period.
-	if( (mTimer.getGameTime() - t_base) >= 1.0f )
+	if( (m_Timer.getGameTime() - t_base) >= 1.0f )
 	{
 		float fps = (float)frameCnt; // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;
 
 		std::wostringstream outs;   
 		outs.precision(6);
-		outs << (LPCTSTR)mMainWndCaption.c_str() << L"    "
+		outs << (LPCTSTR)m_MainWndTitle.c_str() << L"    "
 			<< L"FPS: " << fps << L"    " 
 			<< L"Frame Time: " << mspf << L" (ms)";
 
-		SetWindowTextW(mhMainWnd, outs.str().c_str());
+		SetWindowTextW(m_hMainWnd, outs.str().c_str());
 
 		// Reset for next average.
 		frameCnt = 0;
@@ -274,8 +238,8 @@ void D3DApp::updateScene(float dt)
 
 void D3DApp::drawScene()
 {
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, mClearColor);
-	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, m_ClearColor);
+	m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
@@ -288,55 +252,55 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_ACTIVATE:
 		if( LOWORD(wParam) == WA_INACTIVE )
 		{
-			mAppPaused = true;
-			mTimer.stop();
+			m_AppPaused = true;
+			m_Timer.stop();
 		}
 		else
 		{
-			mAppPaused = false;
-			mTimer.start();
+			m_AppPaused = false;
+			m_Timer.start();
 		}
 		return 0;
 
 	// WM_SIZE is sent when the user resizes the window.  
 	case WM_SIZE:
 		// Save the new client area dimensions.
-		mClientWidth  = LOWORD(lParam);
-		mClientHeight = HIWORD(lParam);
-		if( md3dDevice )
+		m_ClientWidth  = LOWORD(lParam);
+		m_ClientHeight = HIWORD(lParam);
+		if( m_pDevice )
 		{
 			if( wParam == SIZE_MINIMIZED )
 			{
-				mAppPaused = true;
-				mMinimized = true;
-				mMaximized = false;
+				m_AppPaused = true;
+				m_Minimized = true;
+				m_Maximized = false;
 			}
 			else if( wParam == SIZE_MAXIMIZED )
 			{
-				mAppPaused = false;
-				mMinimized = false;
-				mMaximized = true;
+				m_AppPaused = false;
+				m_Minimized = false;
+				m_Maximized = true;
 				onResize();
 			}
 			else if( wParam == SIZE_RESTORED )
 			{
 				
 				// Restoring from minimized state?
-				if( mMinimized )
+				if( m_Minimized )
 				{
-					mAppPaused = false;
-					mMinimized = false;
+					m_AppPaused = false;
+					m_Minimized = false;
 					onResize();
 				}
 
 				// Restoring from maximized state?
-				else if( mMaximized )
+				else if( m_Maximized )
 				{
-					mAppPaused = false;
-					mMaximized = false;
+					m_AppPaused = false;
+					m_Maximized = false;
 					onResize();
 				}
-				else if( mResizing )
+				else if( m_Resizing )
 				{
 					// If user is dragging the resize bars, we do not resize 
 					// the buffers here because as the user continuously 
@@ -347,7 +311,7 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 					// done resizing the window and releases the resize bars, which 
 					// sends a WM_EXITSIZEMOVE message.
 				}
-				else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
+				else // API call such as SetWindowPos or m_pSwapChain->SetFullscreenState.
 				{
 					onResize();
 				}
@@ -357,17 +321,17 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 
 	// WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
 	case WM_ENTERSIZEMOVE:
-		mAppPaused = true;
-		mResizing  = true;
-		mTimer.stop();
+		m_AppPaused = true;
+		m_Resizing  = true;
+		m_Timer.stop();
 		return 0;
 
 	// WM_EXITSIZEMOVE is sent when the user releases the resize bars.
 	// Here we reset everything based on the new window dimensions.
 	case WM_EXITSIZEMOVE:
-		mAppPaused = false;
-		mResizing  = false;
-		mTimer.start();
+		m_AppPaused = false;
+		m_Resizing  = false;
+		m_Timer.start();
 		onResize();
 		return 0;
  
@@ -387,19 +351,9 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
 		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200; 
 		return 0;
-
-	case WM_KEYDOWN:
-
-		switch(wParam)
-		{
-		case VK_ESCAPE:
-			PostQuitMessage(0);
-			break;
-		}
-		return 0;
 	}
 
-	return DefWindowProc(mhMainWnd, msg, wParam, lParam);
+	return DefWindowProc(m_hMainWnd, msg, wParam, lParam);
 }
 
 
@@ -410,7 +364,7 @@ void D3DApp::initMainWindow()
 	wc.lpfnWndProc   = MainWndProc; 
 	wc.cbClsExtra    = 0;
 	wc.cbWndExtra    = 0;
-	wc.hInstance     = mhAppInst;
+	wc.hInstance     = m_hAppInst;
 	wc.hIcon         = LoadIcon(0, IDI_APPLICATION);
 	wc.hCursor       = LoadCursor(0, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
@@ -424,22 +378,21 @@ void D3DApp::initMainWindow()
 	}
 
 	// Compute window rectangle dimensions based on requested client area dimensions.
-	RECT R = { 0, 0, mClientWidth, mClientHeight };
+	RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
     AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
 	int width  = R.right - R.left;
 	int height = R.bottom - R.top;
 
-	mhMainWnd = CreateWindow((LPCSTR)"D3DWndClassName",(LPCTSTR)mMainWndCaption.c_str(), 
-		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, mhAppInst, this); 
-
-	if( !mhMainWnd )
+	m_hMainWnd = CreateWindow((LPCSTR)"D3DWndClassName",(LPCTSTR)m_MainWndTitle.c_str(), 
+		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, m_hAppInst, this); 
+	if( !m_hMainWnd )
 	{
 		MessageBox(0, (LPCTSTR)"CreateWindow FAILED", 0, 0);
 		PostQuitMessage(0);
 	}
 
-	ShowWindow(mhMainWnd, SW_SHOW);
-	UpdateWindow(mhMainWnd);
+	ShowWindow(m_hMainWnd, SW_SHOW);
+	UpdateWindow(m_hMainWnd);
 }
 
 void D3DApp::initDirect3D()
@@ -456,14 +409,14 @@ void D3DApp::initDirect3D()
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT hr = D3D11CreateDevice(
 		0,                 // default adapter
-		md3dDriverType,
+		m_DriverType,
 		0,                 // no software device
 		createDeviceFlags, 
 		0, 0,              // default feature level array
 		D3D11_SDK_VERSION,
-		&md3dDevice,
+		&m_pDevice,
 		&featureLevel,
-		&md3dImmediateContext);
+		&m_pDeviceContext);
 
 	if( FAILED(hr) )
 	{
@@ -481,15 +434,15 @@ void D3DApp::initDirect3D()
 	// All Direct3D 11 capable devices support 4X MSAA for all render 
 	// target formats, so we only need to check quality support.
 
-	md3dDevice->CheckMultisampleQualityLevels(
-		DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m4xMsaaQuality);
-	assert( m4xMsaaQuality > 0 );
+	m_pDevice->CheckMultisampleQualityLevels(
+		DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m_4xMsaaQuality);
+	assert( m_4xMsaaQuality > 0 );
 
 	// Fill out a DXGI_SWAP_CHAIN_DESC to describe our swap chain.
 
 	DXGI_SWAP_CHAIN_DESC sd;
-	sd.BufferDesc.Width  = mClientWidth;
-	sd.BufferDesc.Height = mClientHeight;
+	sd.BufferDesc.Width  = m_ClientWidth;
+	sd.BufferDesc.Height = m_ClientHeight;
 	sd.BufferDesc.RefreshRate.Numerator = 60;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -497,10 +450,10 @@ void D3DApp::initDirect3D()
 	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
 	// Use 4X MSAA? 
-	if( mEnable4xMsaa )
+	if( m_Enable4xMsaa )
 	{
 		sd.SampleDesc.Count   = 4;
-		sd.SampleDesc.Quality = m4xMsaaQuality-1;
+		sd.SampleDesc.Quality = m_4xMsaaQuality-1;
 	}
 	// No MSAA
 	else
@@ -511,7 +464,7 @@ void D3DApp::initDirect3D()
 
 	sd.BufferUsage  = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.BufferCount  = 1;
-	sd.OutputWindow = mhMainWnd;
+	sd.OutputWindow = m_hMainWnd;
 	sd.Windowed     = true;
 	sd.SwapEffect   = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags        = 0;
@@ -523,7 +476,7 @@ void D3DApp::initDirect3D()
 	// This function is being called with a device from a different IDXGIFactory."
 
 	IDXGIDevice* dxgiDevice = 0;
-	md3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
+	m_pDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
 
 	IDXGIAdapter* dxgiAdapter = 0;
 	dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter);
@@ -531,7 +484,7 @@ void D3DApp::initDirect3D()
 	IDXGIFactory* dxgiFactory = 0;
 	dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory);
 
-	dxgiFactory->CreateSwapChain(md3dDevice, &sd, &mSwapChain);
+	dxgiFactory->CreateSwapChain(m_pDevice, &sd, &m_pSwapChain);
 
 	ReleaseCOM(dxgiDevice);
 	ReleaseCOM(dxgiAdapter);
@@ -544,5 +497,3 @@ void D3DApp::initDirect3D()
 	
 	onResize();
 }
-
-
