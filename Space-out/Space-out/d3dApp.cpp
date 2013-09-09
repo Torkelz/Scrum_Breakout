@@ -17,7 +17,6 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 	}
-
 	// Don't start processing messages until after WM_CREATE.
 	if( dd )
 		return dd->msgProc(msg, wParam, lParam);
