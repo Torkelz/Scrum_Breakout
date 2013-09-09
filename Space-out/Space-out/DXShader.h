@@ -4,6 +4,9 @@
 #include "d3dApp.h"
 #include <d3dcompiler.h>
 #include <D3D11Shader.h>
+#include <DirectXMath.h>
+
+using namespace DirectX;
 
 enum ShaderType
 {
@@ -34,18 +37,24 @@ public:
 	~DXShader();
 
 	HRESULT InitShader(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, char* p_pFilename,
-		char* pVSEntryPoint, char* pPSEntryPoint , char* pVShaderModel, char* pPShaderModel,
+		char* p_pVSEntryPoint, char* p_pPSEntryPoint , char* p_pVShaderModel, char* p_pPShaderModel,
 		const D3D11_INPUT_ELEMENT_DESC* p_pVertyexLayout, unsigned int p_NumElements);
 
-	HRESULT CompileAndCreateShaderFromFile(char* pFileName, char* pEntryPoint, char* pShaderModel, 
-		ShaderType sType, const D3D11_INPUT_ELEMENT_DESC* pVertexLayout );
+	HRESULT CompileAndCreateShaderFromFile(char* p_pFileName, char* p_pEntryPoint, char* p_pShaderModel, 
+		ShaderType p_ShaderType, const D3D11_INPUT_ELEMENT_DESC* p_pVertexLayout );
 	
 	void CreateHullShader( char* pFileName, char* pEntryPoint, char* pShaderModel );
 
 	void CreateDomainShader( char* pFileName, char* pEntryPoint, char* pShaderModel );
 	
-	//set/get Functions
+	void SetShaders();
 
+	void SetResource(ShaderType p_pShaderType, UINT p_StartSpot, UINT p_NumViews, ID3D11ShaderResourceView* p_pShaderResource);
+
+	void GetConstBuffer();
+	
+	void SetConstBuffer();
+	
 };
 
 
