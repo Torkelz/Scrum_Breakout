@@ -1,41 +1,6 @@
-//=============================================================================
-// Init Direct3D.cpp by Frank Luna (C) 2008 All Rights Reserved.
-//
-// Demonstrates the sample framework by initializing Direct3D, clearing 
-// the screen, and displaying frame stats.
-//
-//=============================================================================
+#include "Direct3D.h"
 
-#include "d3dApp.h"
-#include <D3D11Shader.h>
-#include <DirectXMath.h>
-#include <DirectXColors.h>
-#include <DirectXCollision.h>
-#include <DirectXPackedVector.h>
-#include <d3dCompiler.h>
-#include <string>
 
-using namespace DirectX;
- 
-class Direct3D : public D3DApp
-{
-public:
-	Direct3D(HINSTANCE hInstance);
-	~Direct3D();
-
-	void initApp();
-	void onResize();
-	void updateScene(float dt);
-	void drawScene();
-
-private:
-	XMMATRIX camView;
-	XMMATRIX camProjection;
-	
-	XMVECTOR camPosition;
-	XMVECTOR camTarget;
-	XMVECTOR camUp;
-};
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
@@ -60,8 +25,12 @@ Direct3D::Direct3D(HINSTANCE hInstance)
 
 Direct3D::~Direct3D()
 {
-	/*if( md3dDevice )
-		md3dDevice->ClearState();*/
+	ReleaseCOM(m_pDevice);
+	ReleaseCOM(m_pDeviceContext);
+	ReleaseCOM(m_pSwapChain);
+	ReleaseCOM(m_pDepthStencilBuffer);
+	ReleaseCOM(m_pRenderTargetView);
+	ReleaseCOM(m_pDepthStencilView);
 }
 
 void Direct3D::initApp()
@@ -76,7 +45,9 @@ void Direct3D::initApp()
 
 	camView = XMMatrixLookAtLH( camPosition, camTarget, camUp );
 
-	camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)mClientWidth/mClientHeight, 1.0f, 1000.0f);
+	camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
+
+	test = 10;
 }
 
 void Direct3D::onResize()
@@ -93,5 +64,24 @@ void Direct3D::drawScene()
 {
 	D3DApp::drawScene();
 
-	mSwapChain->Present(0, 0);
+	m_pSwapChain->Present(0, 0);
+}
+
+LRESULT Direct3D::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
+{
+
+	switch( msg )
+	{
+		case WM_KEYDOWN:
+
+			switch(wParam)
+			{
+				case VK_ESCAPE:
+					PostQuitMessage(0);
+					break;
+			}
+		return 0;
+	}
+
+	return D3DApp::msgProc(msg, wParam, lParam);;
 }
