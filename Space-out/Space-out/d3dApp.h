@@ -60,7 +60,5 @@ protected:
 	int m_ClientWidth;
 	int m_ClientHeight;
 	bool m_Enable4xMsaa;
-	
-private:
 };
 #endif // D3DAPP_H
