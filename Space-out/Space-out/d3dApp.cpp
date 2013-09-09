@@ -54,6 +54,8 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 
 	m4xMsaaQuality = 0;
 	md3dImmediateContext = 0;
+
+	m_buffer = Buffer();
 }
 
 D3DApp::~D3DApp()
@@ -134,6 +136,28 @@ void D3DApp::initApp()
 {
 	initMainWindow();
 	initDirect3D();
+
+	//TESTING THE BUFFER
+	//VertexTest vertexTests[] =
+	//{
+	//	DirectX::XMFLOAT3( 0.0f, 0.5f, 0.5f ),
+	//	DirectX::XMFLOAT3( 0.0f, 0.0f, 0.5f ),
+	//	DirectX::XMFLOAT3( 0.5f, -0.5f, 0.5f ),
+	//	DirectX::XMFLOAT3( 0.5f, 0.0f, 0.0f ),
+	//	DirectX::XMFLOAT3( -0.5f, -0.5f, 0.5f ),
+	//	DirectX::XMFLOAT3( 0.0f, 0.5f, 0.0f ),
+	//};
+
+	//BufferInitDesc initDesc;
+
+	//initDesc.elementSize = sizeof(VertexTest);
+	//initDesc.numElements = sizeof(vertexTest) / sizeof(VertexTest);
+	//initDesc.type = VERTEX_BUFFER;
+	//initDesc.usage = BUFFER_DEFAULT;
+	//initDesc.initData = vertexTest;
+
+	//m_buffer.init(md3dDevice, md3dImmediateContext, initDesc);
+	
 
 	/*D3DX10_FONT_DESC fontDesc;
 	fontDesc.Height          = 24;
@@ -420,6 +444,8 @@ void D3DApp::initMainWindow()
 
 void D3DApp::initDirect3D()
 {
+	
+
 	// Create the device.
 
 	UINT createDeviceFlags = 0;

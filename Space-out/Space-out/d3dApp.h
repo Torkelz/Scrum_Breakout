@@ -12,9 +12,19 @@
 
 
 #include "d3dUtil.h"
-#include "GameTimer.h"
-#include <string>
 
+#include "GameTimer.h"
+#include "Buffer.h"
+
+#include <string>
+#include <DirectXMath.h>
+
+//FOR TESTING THE BUFFER
+//struct VertexTest
+//{
+//	DirectX::XMFLOAT3 pos;
+//	DirectX::XMFLOAT3 col;
+//};
 
 class D3DApp
 {
@@ -50,6 +60,8 @@ protected:
 	bool      mMinimized;
 	bool      mMaximized;
 	bool      mResizing;
+
+	Buffer m_buffer;
 
 	UINT      m4xMsaaQuality;
 
