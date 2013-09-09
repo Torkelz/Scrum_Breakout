@@ -5,7 +5,6 @@
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static D3DApp* app = 0;
 	static Direct3D* dd = 0;
 
 	switch( msg )
@@ -14,17 +13,10 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			// Get the 'this' pointer we passed to CreateWindow via the lpParam parameter.
 			CREATESTRUCT* cs = (CREATESTRUCT*)lParam;
-			app = (D3DApp*)cs->lpCreateParams;
 			dd = (Direct3D*)cs->lpCreateParams;
 			return 0;
 		}
 	}
-
-	if(app == dd)
-		int i = 0;
-
-	int u = 0;
-
 	// Don't start processing messages until after WM_CREATE.
 	if( dd )
 		return dd->msgProc(msg, wParam, lParam);
