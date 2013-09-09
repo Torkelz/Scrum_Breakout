@@ -46,8 +46,6 @@ void Direct3D::initApp()
 	camView = XMMatrixLookAtLH( camPosition, camTarget, camUp );
 
 	camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
-
-	test = 10;
 }
 
 void Direct3D::onResize()

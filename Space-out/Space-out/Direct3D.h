@@ -27,7 +27,5 @@ private:
 	XMVECTOR camPosition;
 	XMVECTOR camTarget;
 	XMVECTOR camUp;
-
-	int test;
 };
 #endif
