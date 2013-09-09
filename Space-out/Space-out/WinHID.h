@@ -1,15 +1,16 @@
 #ifndef HID_H
 #define HID_H
 
-#include "stdafx.h"
+#include <Windows.h>
 
-#include "Keyboard.h"
-#include "Mouse.h"
+#include "WinKeyboard.h"
+#include "WinMouse.h"
 #include "HIDObservable.h"
 
 class HID
 {
 public:
+	HID();
 	HID( HWND p_hwnd );
 	~HID();
 

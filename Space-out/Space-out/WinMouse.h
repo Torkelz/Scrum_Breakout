@@ -8,7 +8,7 @@
 #ifndef MOUSE_H
 #define	MOUSE_H
 
-#include "stdafx.h"
+#include <Windows.h>
 
 class Mouse
 {

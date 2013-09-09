@@ -1,7 +1,5 @@
 #include "Direct3D.h"
 
-
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
 {
@@ -21,6 +19,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 Direct3D::Direct3D(HINSTANCE hInstance)
 : D3DApp(hInstance) 
 {
+	m_HID = HID( getMainWnd() );
 }
 
 Direct3D::~Direct3D()
@@ -48,6 +47,12 @@ void Direct3D::initApp()
 	camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
 
 	test = 10;
+
+	m_game = Game();
+	m_game.init();
+
+	// Add subscriber to the HID component. 
+	m_HID.getObservable()->addSubscriber(m_game.getObserver());
 }
 
 void Direct3D::onResize()
@@ -58,6 +63,7 @@ void Direct3D::onResize()
 void Direct3D::updateScene(float dt)
 {
 	D3DApp::updateScene(dt);
+	m_game.update();
 }
 
 void Direct3D::drawScene()
@@ -69,19 +75,11 @@ void Direct3D::drawScene()
 
 LRESULT Direct3D::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 {
-
-	switch( msg )
+	m_HID.update(msg, lParam);
+	/*switch( msg )
 	{
-		case WM_KEYDOWN:
-
-			switch(wParam)
-			{
-				case VK_ESCAPE:
-					PostQuitMessage(0);
-					break;
-			}
 		return 0;
-	}
+	}*/
 
-	return D3DApp::msgProc(msg, wParam, lParam);;
+	return D3DApp::msgProc(msg, wParam, lParam);
 }

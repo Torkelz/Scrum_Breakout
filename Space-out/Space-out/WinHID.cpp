@@ -1,10 +1,12 @@
-#include "HID.h"
+#include "WinHID.h"
 
+HID::HID(){}
 
 HID::HID( HWND p_hwnd )
 {
 	m_keyboard		= Keyboard( p_hwnd );
 	m_mouse			= Mouse( p_hwnd );
+	m_observable	= HIDObservable();
 }
 
 HID::~HID()

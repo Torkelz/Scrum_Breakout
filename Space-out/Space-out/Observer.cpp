@@ -1,8 +1,9 @@
 #include "Observer.h"
+#include "Game.h"
 
-Observer::Observer(Scene* p_scene)
+Observer::Observer(Game* p_pGame)
 {
-	m_scene = p_scene;
+	m_pGame = p_pGame;
 }
 
 int Observer::getIndex()
@@ -17,20 +18,30 @@ bool Observer::compair( Observer* p_observer )
 
 void Observer::broadcastLeftClick( POINT p_mousePosition )
 {
-	m_scene->leftMouseClick(p_mousePosition);
+	Vector2 t_point;
+	t_point.x = p_mousePosition.x;
+	t_point.x = p_mousePosition.x;
+
+	m_pGame->leftMouseClick( t_point );
 }
 
 void Observer::broadcastRightClick( POINT p_mousePosition )
 {
-	m_scene->rightMouseClick(p_mousePosition);
+	Vector2 t_point;
+	t_point.x = p_mousePosition.x;
+	t_point.x = p_mousePosition.x;
+	m_pGame->rightMouseClick( t_point );
 }
 
 void Observer::broadcastMousePos( POINT p_mousePosition )
 {
-	m_scene->mouseMove( p_mousePosition );
+	Vector2 t_point;
+	t_point.x = p_mousePosition.x;
+	t_point.x = p_mousePosition.x;
+	m_pGame->mouseMove( t_point );
 }
 
 void Observer::broadcastKeyPress( USHORT p_key )
 { 
-	m_scene->keyEvent(p_key);
+	m_pGame->keyEvent(p_key);
 }

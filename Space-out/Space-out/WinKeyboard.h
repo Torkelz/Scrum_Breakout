@@ -7,8 +7,7 @@
 
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
-
-#include "stdafx.h"
+#include <Windows.h>
 
 class Keyboard
 {

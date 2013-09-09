@@ -5,6 +5,10 @@
 #include <DirectXPackedVector.h>
 #include <string>
 
+#include "WinHID.h"
+#include "Game.h"
+#include "Observer.h"
+
 using namespace DirectX;
  
 class Direct3D : public D3DApp
@@ -29,5 +33,8 @@ private:
 	XMVECTOR camUp;
 
 	int test;
+
+	HID			m_HID;
+	Game		m_game;
 };
 #endif

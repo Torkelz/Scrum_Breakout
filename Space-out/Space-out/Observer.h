@@ -1,14 +1,14 @@
 #ifndef OBSERVER_H
 #define OBSERVER_H
 
-#include "stdafx.h"
-#include "Scene.h"
+#include <Windows.h>
+
+class Game;
 
 class Observer
 {
 public:
-
-	Observer(Scene* p_scene);
+	Observer(Game* p_pGame);
 	
 	void		broadcastLeftClick( POINT p_mousePosition );
 	void		broadcastRightClick( POINT p_mousePosition );
@@ -20,7 +20,7 @@ public:
 private:
 	int			m_index;
 protected:
-	Scene*		m_scene;
+	Game*		m_pGame;
 };
 
 #endif

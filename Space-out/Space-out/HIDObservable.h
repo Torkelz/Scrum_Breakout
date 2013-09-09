@@ -1,7 +1,7 @@
 #ifndef HIDOBS_H
 #define HIDOBS_H
 
-#include "stdafx.h"
+#include <Windows.h>
 #include <vector>
 
 class Observer;
