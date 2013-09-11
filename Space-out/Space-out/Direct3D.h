@@ -51,5 +51,7 @@ private:
 	Shader m_shader;
 	//Shader m_PS;
 	//Shader m_GS;
+	//TEST
+	ID3D11Buffer* mVB;
 };
 #endif

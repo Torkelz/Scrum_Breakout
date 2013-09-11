@@ -58,6 +58,9 @@ HRESULT Buffer::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceCont
 	
 	D3D11_BUFFER_DESC bufferDesc;
 
+	//TEST
+	bufferDesc.StructureByteStride = 0;
+
 	m_type = p_refInitDesc.type;
 	switch(m_type)
 	{
@@ -107,6 +110,11 @@ HRESULT Buffer::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceCont
 	{
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		bufferDesc.CPUAccessFlags |= D3D11_CPU_ACCESS_WRITE;
+	}
+	else if(m_usage == BUFFER_USAGE_IMMUTABLE )
+	{
+		bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+		bufferDesc.CPUAccessFlags = 0;
 	}
 
 	//Desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;

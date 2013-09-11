@@ -22,7 +22,7 @@ class Shader
 private:
 	ID3D11Device*			m_pDevice;
 	ID3D11DeviceContext*	m_pDeviceContext;
-	ID3D11InputLayout*		m_pInputLayout;
+	//ID3D11InputLayout*		m_pInputLayout;
 	ID3D11HullShader*		m_pHullShader;
 	ID3D11DomainShader*		m_pDomainShader;
 	ID3D11GeometryShader*	m_pGeometryShader;

@@ -1,7 +1,7 @@
 #include "Shader.h"
 
 Shader::Shader()
-:	m_pDevice(0),	 m_pDeviceContext(0),	 m_pInputLayout(0),	 m_pHullShader(0),	 m_pDomainShader(0),	 m_pGeometryShader(0),	 m_pPixelShader(0),	 m_pVertexShader(0)
+:	m_pDevice(0),	 m_pDeviceContext(0),	 m_pVertexLayout(0),	 m_pHullShader(0),	 m_pDomainShader(0),	 m_pGeometryShader(0),	 m_pPixelShader(0),	 m_pVertexShader(0)
 {
 
 }
@@ -107,8 +107,9 @@ void Shader::setShaders()
 {
 	if(m_pVertexShader)
 	{
-		m_pDeviceContext->VSSetShader(m_pVertexShader,NULL,0);
-		m_pDeviceContext->IASetInputLayout(m_pInputLayout);
+		//m_pDeviceContext->IASetInputLayout(m_pInputLayout);
+		m_pDeviceContext->IASetInputLayout(m_pVertexLayout);
+		m_pDeviceContext->VSSetShader(m_pVertexShader,0,0);
 	}
 	else{m_pDeviceContext->VSSetShader(NULL,NULL,0);}
 
