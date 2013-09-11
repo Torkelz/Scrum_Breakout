@@ -51,6 +51,8 @@ private:
 	ID3D11Device*			m_pDevice;
 	ID3D11DeviceContext*	m_pDeviceContext;
 
+	D3D11_MAPPED_SUBRESOURCE m_mappedResource;
+
 public:
 	Buffer();
 	~Buffer();
@@ -61,6 +63,8 @@ public:
 
 	void* map();
 	void unmap();
+
+	D3D11_MAPPED_SUBRESOURCE getMappedResource();
 
 	ID3D11Buffer* getBufferPointer();
 	UINT32 getVertexSize();

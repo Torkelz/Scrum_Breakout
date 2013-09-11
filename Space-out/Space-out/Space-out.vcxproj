@@ -84,6 +84,8 @@
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="HIDObservable.cpp" />
     <ClCompile Include="Observer.cpp" />
+    <ClCompile Include="Pad.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="WinHID.cpp" />
     <ClCompile Include="WinKeyboard.cpp" />
     <ClCompile Include="WinMouse.cpp" />
@@ -97,6 +99,8 @@
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="HIDObservable.h" />
     <ClInclude Include="Observer.h" />
+    <ClInclude Include="Pad.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="WinHID.h" />
     <ClInclude Include="WinKeyboard.h" />
     <ClInclude Include="WinMouse.h" />

@@ -21,12 +21,15 @@ void Game::keyEvent(unsigned short key)
 	}
 	if(key == 0x44) // D
 	{
+
 	}
 	if(key == 0x57) // W
 	{
+
 	}
 	if(key == 0x53) // S
 	{
+
 	}
 	
 

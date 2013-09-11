@@ -142,7 +142,7 @@ void* Buffer::map()
 	void* ret = NULL;
 	if(m_usage == BUFFER_CPU_WRITE || m_usage == BUFFER_CPU_READ || m_usage == BUFFER_CPU_WRITE_DISCARD)
 	{
-		D3D11_MAPPED_SUBRESOURCE MappedResource;
+		
 		UINT32 mapType = 0;
 
 		if(m_usage == BUFFER_CPU_READ)	mapType = D3D11_MAP_READ;
@@ -155,13 +155,13 @@ void* Buffer::map()
 												0,
 												(D3D11_MAP)mapType,
 												0,
-												&MappedResource ) ) )
+												&m_mappedResource ) ) )
 		{
 			ret = NULL;
 		}
 		else
 		{
-			ret = MappedResource.pData;
+			ret = m_mappedResource.pData;
 		}
 	}
 
@@ -171,6 +171,11 @@ void* Buffer::map()
 void Buffer::unmap()
 {
 	m_pDeviceContext->Unmap( m_pBuffer, 0 );
+}
+
+D3D11_MAPPED_SUBRESOURCE Buffer::getMappedResource()
+{
+	return m_mappedResource;
 }
 
 ID3D11Buffer* Buffer::getBufferPointer()

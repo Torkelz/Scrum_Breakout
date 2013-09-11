@@ -19,7 +19,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 Direct3D::Direct3D(HINSTANCE hInstance)
 : D3DApp(hInstance) 
 {
-	m_HID = HID( getMainWnd() );
+
 }
 
 Direct3D::~Direct3D()
@@ -36,8 +36,10 @@ void Direct3D::initApp()
 {
 	D3DApp::initApp();
 	HRESULT hr = S_OK;
+
+	m_HID = HID( getMainWnd() );
 	
-	//Set up world view proj
+	//Set up world view projdf
 	camPosition = XMVectorSet( 0.0f, 0.0f, -20.f, 0.0f );
 	camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
 	camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
