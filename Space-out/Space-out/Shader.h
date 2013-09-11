@@ -17,7 +17,7 @@ enum ShaderType
 	PIXEL_SHADER
 };
 
-class DXShader
+class Shader
 {
 private:
 	ID3D11Device*			m_pDevice;
@@ -33,8 +33,8 @@ private:
 	UINT					m_NumElements;
 
 public:	
-	DXShader();
-	~DXShader();
+	Shader();
+	~Shader();
 
 	HRESULT InitShader(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, char* p_pFilename,
 		char* p_pVSEntryPoint, char* p_pPSEntryPoint , char* p_pVShaderModel, char* p_pPShaderModel,
@@ -54,7 +54,6 @@ public:
 	void GetConstBuffer();
 	
 	void SetConstBuffer();
-	
 };
 
 

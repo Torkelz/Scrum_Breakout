@@ -1,15 +1,15 @@
-#include "DXShader.h"
+#include "Shader.h"
 
-DXShader::DXShader()
+DXShader::Shader()
 :	m_pDevice(0),	 m_pDeviceContext(0),	 m_pInputLayout(0),	 m_pHullShader(0),	 m_pDomainShader(0),	 m_pGeometryShader(0),	 m_pPixelShader(0),	 m_pVertexShader(0)
 {
 }
 
-DXShader::~DXShader()
+DXShader::~Shader()
 {	
 }
 
-HRESULT DXShader::InitShader(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, char* p_pFilename,
+HRESULT Shader::InitShader(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, char* p_pFilename,
 		char* p_pVSEntryPoint, char* p_pPSEntryPoint , char* p_pVShaderModel, char* p_pPShaderModel,
 		const D3D11_INPUT_ELEMENT_DESC* p_pVertexLayout, unsigned int p_NumElements)
 {
@@ -26,17 +26,17 @@ HRESULT DXShader::InitShader(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDe
 	return hr;
 }
 
-void DXShader::CreateHullShader( char* p_pFileName, char* p_pEntryPoint, char* p_pShaderModel )
+void Shader::CreateHullShader( char* p_pFileName, char* p_pEntryPoint, char* p_pShaderModel )
 {
 	CompileAndCreateShaderFromFile( p_pFileName, p_pEntryPoint, p_pShaderModel, HULL_SHADER, NULL);
 }
 
-void DXShader::CreateDomainShader( char* p_pFileName, char* p_pEntryPoint, char* p_pShaderModel )
+void Shader::CreateDomainShader( char* p_pFileName, char* p_pEntryPoint, char* p_pShaderModel )
 {
 	CompileAndCreateShaderFromFile( p_pFileName, p_pEntryPoint, p_pShaderModel, DOMAIN_SHADER, NULL);
 }
 
-HRESULT DXShader::CompileAndCreateShaderFromFile( char* p_pFileName, char* p_pEntryPoint, char* p_pShaderModel, ShaderType p_pShaderType, const D3D11_INPUT_ELEMENT_DESC* p_pVertexLayout)
+HRESULT Shader::CompileAndCreateShaderFromFile( char* p_pFileName, char* p_pEntryPoint, char* p_pShaderModel, ShaderType p_pShaderType, const D3D11_INPUT_ELEMENT_DESC* p_pVertexLayout)
 {
 	HRESULT hr = S_OK;
 	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
@@ -120,7 +120,7 @@ HRESULT DXShader::CompileAndCreateShaderFromFile( char* p_pFileName, char* p_pEn
 	return hr;
 }
 
-void DXShader::SetShaders()
+void Shader::SetShaders()
 {
 	if(m_pVertexShader){m_pDeviceContext->VSSetShader(m_pVertexShader,NULL,0);}
 	else{m_pDeviceContext->VSSetShader(NULL,NULL,0);}
@@ -138,7 +138,7 @@ void DXShader::SetShaders()
 	else{m_pDeviceContext->HSSetShader(NULL,NULL,0);}
 }
 
-void DXShader::SetResource(ShaderType p_pShaderType,UINT p_StartSpot,UINT p_NumViews, ID3D11ShaderResourceView* p_pShaderResource)
+void Shader::SetResource(ShaderType p_pShaderType,UINT p_StartSpot,UINT p_NumViews, ID3D11ShaderResourceView* p_pShaderResource)
 {
 	switch(p_pShaderType)
 	{
@@ -168,14 +168,4 @@ void DXShader::SetResource(ShaderType p_pShaderType,UINT p_StartSpot,UINT p_NumV
 				break;
 			}
 	}
-}
-
-void DXShader::GetConstBuffer()
-{
-
-}
-
-void DXShader::SetConstBuffer()
-{
-
 }

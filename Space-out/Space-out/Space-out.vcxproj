@@ -80,13 +80,13 @@
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="d3dUtil.cpp" />
     <ClCompile Include="Direct3D.cpp" />
-    <ClCompile Include="DXShader.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="GameTimer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dApp.h" />
     <ClInclude Include="d3dUtil.h" />
-    <ClInclude Include="DXShader.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="GameTimer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
