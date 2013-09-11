@@ -2,8 +2,8 @@
 
 
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
-				   PSTR cmdLine, int showCmd)
+int WINAPI WinMain(HINSTANCE p_hInstance, HINSTANCE p_prevInstance,
+				   PSTR p_cmdLine, int p_showCmd)
 {
 	// Enable run-time memory check for debug builds.
 #if defined(DEBUG) | defined(_DEBUG)
@@ -11,15 +11,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 #endif
 
 
-	Direct3D theApp(hInstance);
+	Direct3D theApp(p_hInstance);
 	
 	theApp.initApp();
 
 	return theApp.run();
 }
 
-Direct3D::Direct3D(HINSTANCE hInstance)
-: D3DApp(hInstance) 
+Direct3D::Direct3D(HINSTANCE p_hInstance)
+: D3DApp(p_hInstance) 
 {
 }
 
@@ -39,13 +39,13 @@ void Direct3D::initApp()
 	HRESULT hr = S_OK;
 	
 	//Set up world view proj
-	camPosition = XMVectorSet( 0.0f, 0.0f, -20.f, 0.0f );
-	camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
-	camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
+	m_camPosition = XMVectorSet( 0.0f, 0.0f, -20.f, 0.0f );
+	m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
+	m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
-	camView = XMMatrixLookAtLH( camPosition, camTarget, camUp );
+	m_camView = XMMatrixLookAtLH( m_camPosition, m_camTarget, m_camUp );
 
-	camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
+	m_camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
 }
 
 void Direct3D::onResize()
@@ -53,9 +53,9 @@ void Direct3D::onResize()
 	D3DApp::onResize();
 }
 
-void Direct3D::updateScene(float dt)
+void Direct3D::updateScene(float p_dt)
 {
-	D3DApp::updateScene(dt);
+	D3DApp::updateScene(p_dt);
 }
 
 void Direct3D::drawScene()
@@ -65,14 +65,14 @@ void Direct3D::drawScene()
 	m_pSwapChain->Present(0, 0);
 }
 
-LRESULT Direct3D::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Direct3D::msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
 {
 
-	switch( msg )
+	switch( p_msg )
 	{
 		case WM_KEYDOWN:
 
-			switch(wParam)
+			switch(p_wParam)
 			{
 				case VK_ESCAPE:
 					PostQuitMessage(0);
@@ -81,5 +81,5 @@ LRESULT Direct3D::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	return D3DApp::msgProc(msg, wParam, lParam);;
+	return D3DApp::msgProc(p_msg, p_wParam, p_lParam);;
 }
