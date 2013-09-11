@@ -8,7 +8,7 @@
 class D3DApp
 {
 public:
-	D3DApp(HINSTANCE hInstance);
+	D3DApp(HINSTANCE p_hInstance);
 	virtual ~D3DApp();
 
 	HINSTANCE getAppInst();
@@ -21,9 +21,9 @@ public:
 
 	virtual void initApp();
 	virtual void onResize();// reset projection/etc
-	virtual void updateScene(float dt);
+	virtual void updateScene(float p_dt);
 	virtual void drawScene(); 
-	virtual LRESULT msgProc(UINT msg, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
 
 protected:
 	void initMainWindow();

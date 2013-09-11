@@ -3,30 +3,30 @@
 #include "Direct3D.h"
 
 LRESULT CALLBACK
-MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+MainWndProc(HWND p_hwnd, UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
 {
 	static Direct3D* dd = 0;
 
-	switch( msg )
+	switch( p_msg )
 	{
 		case WM_CREATE:
 		{
 			// Get the 'this' pointer we passed to CreateWindow via the lpParam parameter.
-			CREATESTRUCT* cs = (CREATESTRUCT*)lParam;
+			CREATESTRUCT* cs = (CREATESTRUCT*)p_lParam;
 			dd = (Direct3D*)cs->lpCreateParams;
 			return 0;
 		}
 	}
 	// Don't start processing messages until after WM_CREATE.
 	if( dd )
-		return dd->msgProc(msg, wParam, lParam);
+		return dd->msgProc(p_msg, p_wParam, p_lParam);
 	else
-		return DefWindowProc(hwnd, msg, wParam, lParam);
+		return DefWindowProc(p_hwnd, p_msg, p_wParam, p_lParam);
 }
 
-D3DApp::D3DApp(HINSTANCE hInstance)
+D3DApp::D3DApp(HINSTANCE p_hInstance)
 {
-	m_hAppInst   = hInstance;
+	m_hAppInst   = p_hInstance;
 	m_hMainWnd   = 0;
 	m_AppPaused  = false;
 	m_Minimized  = false;
@@ -167,7 +167,7 @@ void D3DApp::onResize()
 	m_pDeviceContext->RSSetViewports(1, &m_ScreenViewport);
 }
 
-void D3DApp::updateScene(float dt)
+void D3DApp::updateScene(float p_dt)
 {
 	// Code computes the average frames per second, and also the 
 	// average time it takes to render one frame.
@@ -203,9 +203,9 @@ void D3DApp::drawScene()
 	m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
-LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT D3DApp::msgProc(UINT p_msg, WPARAM wParam, LPARAM lParam)
 {
-	switch( msg )
+	switch( p_msg )
 	{
 	// WM_ACTIVATE is sent when the window is activated or deactivated.  
 	// We pause the game when the window is deactivated and unpause it 
@@ -314,7 +314,7 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	return DefWindowProc(m_hMainWnd, msg, wParam, lParam);
+	return DefWindowProc(m_hMainWnd, p_msg, wParam, lParam);
 }
 
 

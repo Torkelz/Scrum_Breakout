@@ -10,22 +10,22 @@ using namespace DirectX;
 class Direct3D : public D3DApp
 {
 public:
-	Direct3D(HINSTANCE hInstance);
+	Direct3D(HINSTANCE p_hInstance);
 	~Direct3D();
 
 	void initApp();
 	void onResize();
-	void updateScene(float dt);
+	void updateScene(float p_dt);
 	void drawScene();
 
-	LRESULT msgProc(UINT msg, WPARAM wParam, LPARAM lParam);
+	LRESULT msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
 private:
 	//Camera Variables
-	XMMATRIX camView;
-	XMMATRIX camProjection;
+	XMMATRIX m_camView;
+	XMMATRIX m_camProjection;
 	
-	XMVECTOR camPosition;
-	XMVECTOR camTarget;
-	XMVECTOR camUp;
+	XMVECTOR m_camPosition;
+	XMVECTOR m_camTarget;
+	XMVECTOR m_camUp;
 };
 #endif
