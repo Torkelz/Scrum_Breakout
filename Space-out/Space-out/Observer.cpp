@@ -16,29 +16,19 @@ bool Observer::compair( Observer* p_observer )
 	return m_index == p_observer->getIndex(); 
 }
 
-void Observer::broadcastLeftClick( POINT p_mousePosition )
+void Observer::broadcastLeftClick( Vector2 p_mousePosition )
 {
-	Vector2 t_point;
-	t_point.x = p_mousePosition.x;
-	t_point.x = p_mousePosition.x;
-
-	m_pGame->leftMouseClick( t_point );
+	m_pGame->leftMouseClick( p_mousePosition );
 }
 
-void Observer::broadcastRightClick( POINT p_mousePosition )
+void Observer::broadcastRightClick( Vector2 p_mousePosition )
 {
-	Vector2 t_point;
-	t_point.x = p_mousePosition.x;
-	t_point.x = p_mousePosition.x;
-	m_pGame->rightMouseClick( t_point );
+	m_pGame->rightMouseClick( p_mousePosition );
 }
 
-void Observer::broadcastMousePos( POINT p_mousePosition )
+void Observer::broadcastMousePos( Vector2 p_mousePosition )
 {
-	Vector2 t_point;
-	t_point.x = p_mousePosition.x;
-	t_point.x = p_mousePosition.x;
-	m_pGame->mouseMove( t_point );
+	m_pGame->mouseMove( p_mousePosition );
 }
 
 void Observer::broadcastKeyPress( USHORT p_key )

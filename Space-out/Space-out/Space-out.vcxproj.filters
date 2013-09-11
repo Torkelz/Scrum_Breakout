@@ -31,6 +31,9 @@
     </ClCompile>
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Pad.cpp" />
+    <ClCompile Include="Shader.cpp">
+      <Filter>D3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -52,9 +55,6 @@
     <ClInclude Include="d3dUtil.h">
       <Filter>D3D\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Direct3D.h">
-      <Filter>D3D\Header</Filter>
-    </ClInclude>
     <ClInclude Include="HIDObservable.h">
       <Filter>Observer\Header</Filter>
     </ClInclude>
@@ -63,6 +63,15 @@
     </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Pad.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Shader.h">
+      <Filter>D3D\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2.h" />
+    <ClInclude Include="Direct3D.h">
+      <Filter>D3D\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -87,5 +96,19 @@
     <Filter Include="Game">
       <UniqueIdentifier>{9d23e35c-90e9-4622-b80c-57135522e446}</UniqueIdentifier>
     </Filter>
+    <Filter Include="D3D\HLSL">
+      <UniqueIdentifier>{7f76d2f9-d72b-4920-b2f7-39840a8e96dc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="GeometryShader.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShader.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShader.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

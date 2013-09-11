@@ -5,9 +5,17 @@
 #include <DirectXPackedVector.h>
 #include <string>
 
+#include "Buffer.h"
+#include "Shader.h"
+
 #include "WinHID.h"
 #include "Game.h"
 #include "Observer.h"
+
+struct Vertex
+{
+	XMFLOAT3 pos;
+};
 
 using namespace DirectX;
  
@@ -27,7 +35,8 @@ private:
 	//Camera Variables
 	XMMATRIX camView;
 	XMMATRIX camProjection;
-	
+	XMMATRIX world;
+	XMMATRIX WVP;
 	XMVECTOR camPosition;
 	XMVECTOR camTarget;
 	XMVECTOR camUp;
@@ -36,5 +45,11 @@ private:
 
 	HID			m_HID;
 	Game		m_game;
+
+	Buffer m_buffer;
+	Buffer m_cBuffer;
+	Shader m_shader;
+	//Shader m_PS;
+	//Shader m_GS;
 };
 #endif

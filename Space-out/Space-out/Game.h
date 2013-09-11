@@ -1,11 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-struct Vector2
-{
-	float x;
-	float y;
-};
+#include "Vector2.h"
 
 class Observer;
 

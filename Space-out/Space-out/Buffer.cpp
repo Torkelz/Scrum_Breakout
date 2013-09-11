@@ -183,6 +183,11 @@ ID3D11Buffer* Buffer::getBufferPointer()
 	return m_pBuffer;
 }
 
+void Buffer::setBuffer(ID3D11Buffer* p_pBuffer)
+{
+	m_pBuffer = p_pBuffer;
+}
+
 UINT32 Buffer::getVertexSize()
 {
 	return m_elementSize;

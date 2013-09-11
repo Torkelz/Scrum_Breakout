@@ -2,6 +2,7 @@
 #define OBSERVER_H
 
 #include <Windows.h>
+#include "Vector2.h"
 
 class Game;
 
@@ -10,9 +11,9 @@ class Observer
 public:
 	Observer(Game* p_pGame);
 	
-	void		broadcastLeftClick( POINT p_mousePosition );
-	void		broadcastRightClick( POINT p_mousePosition );
-	void		broadcastMousePos( POINT p_mousePosition );
+	void		broadcastLeftClick( Vector2 p_mousePosition );
+	void		broadcastRightClick( Vector2 p_mousePosition );
+	void		broadcastMousePos( Vector2 p_mousePosition );
 	void		broadcastKeyPress( USHORT p_key );
 
 	int			getIndex();

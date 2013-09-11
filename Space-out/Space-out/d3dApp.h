@@ -10,11 +10,12 @@
 #include <DirectXMath.h>
 
 //FOR TESTING THE BUFFER
-//struct VertexTest
-//{
-//	DirectX::XMFLOAT3 pos;
-//	DirectX::XMFLOAT3 col;
-//};
+struct VertexTest
+{
+	DirectX::XMFLOAT3 pos;
+	DirectX::XMFLOAT3 col;
+};
+
 class D3DApp
 {
 public:
@@ -48,8 +49,8 @@ protected:
 	bool      m_Maximized;
 	bool      m_Resizing;
 
-	Buffer m_buffer;
-
+	//Buffer m_buffer;
+	
 	UINT      m_4xMsaaQuality;
 
 	GameTimer m_Timer;

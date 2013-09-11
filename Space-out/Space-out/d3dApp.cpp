@@ -58,7 +58,8 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 	m_4xMsaaQuality = 0;
 	m_pDeviceContext = 0;
 
-	m_buffer = Buffer();
+	//m_buffer = Buffer();
+	//m_shader = Shader();
 }
 
 D3DApp::~D3DApp()
@@ -123,7 +124,7 @@ void D3DApp::initApp()
 	initDirect3D();
 
 	//TESTING THE BUFFER
-	//VertexTest vertexTests[] =
+	//VertexTest vertexTest[] =
 	//{
 	//	DirectX::XMFLOAT3( 0.0f, 0.5f, 0.5f ),
 	//	DirectX::XMFLOAT3( 0.0f, 0.0f, 0.5f ),
@@ -141,8 +142,7 @@ void D3DApp::initApp()
 	//initDesc.usage = BUFFER_DEFAULT;
 	//initDesc.initData = vertexTest;
 
-	//m_buffer.init(md3dDevice, md3dImmediateContext, initDesc);
-	
+	//m_buffer.init(m_pDevice, m_pDeviceContext, initDesc);
 }
  
 void D3DApp::onResize()

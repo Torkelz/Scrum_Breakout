@@ -3,6 +3,7 @@
 
 #include <Windows.h>
 #include <vector>
+#include "Vector2.h"
 
 class Observer;
 
@@ -12,9 +13,9 @@ public:
 	HIDObservable();
 	~HIDObservable();
 
-	void					broadcastLeftClick( POINT p_mousePosition );
-	void					broadcastRightClick( POINT p_mousePosition );
-	void					broadcastMousePos( POINT p_mousePosition );
+	void					broadcastLeftClick( Vector2 p_mousePosition );
+	void					broadcastRightClick( Vector2 p_mousePosition );
+	void					broadcastMousePos( Vector2 p_mousePosition );
 	void					broadcastKeyPress( USHORT p_key );
 	void					addSubscriber( Observer* p_observer );
 	void					removeSubscriber( Observer* p_observer );

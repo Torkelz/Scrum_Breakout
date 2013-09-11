@@ -11,10 +11,10 @@ using namespace DirectX;
 enum ShaderType
 {
 	VERTEX_SHADER,
-	HULL_SHADER,
-	DOMAIN_SHADER,
+	PIXEL_SHADER,
 	GEOMETRY_SHADER,
-	PIXEL_SHADER
+	HULL_SHADER,
+	DOMAIN_SHADER
 };
 
 class Shader
@@ -36,24 +36,15 @@ public:
 	Shader();
 	~Shader();
 
-	HRESULT InitShader(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, char* p_pFilename,
-		char* p_pVSEntryPoint, char* p_pPSEntryPoint , char* p_pVShaderModel, char* p_pPShaderModel,
-		const D3D11_INPUT_ELEMENT_DESC* p_pVertyexLayout, unsigned int p_NumElements);
+	void init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, unsigned int p_NumElements);
 
-	HRESULT CompileAndCreateShaderFromFile(char* p_pFileName, char* p_pEntryPoint, char* p_pShaderModel, 
+	HRESULT compileAndCreateShaderFromFile(LPCWSTR p_pFileName, char* p_pEntryPoint, char* p_pShaderModel, 
 		ShaderType p_ShaderType, const D3D11_INPUT_ELEMENT_DESC* p_pVertexLayout );
 	
-	void CreateHullShader( char* pFileName, char* pEntryPoint, char* pShaderModel );
-
-	void CreateDomainShader( char* pFileName, char* pEntryPoint, char* pShaderModel );
 	
-	void SetShaders();
+	void setShaders();
 
-	void SetResource(ShaderType p_pShaderType, UINT p_StartSpot, UINT p_NumViews, ID3D11ShaderResourceView* p_pShaderResource);
-
-	void GetConstBuffer();
-	
-	void SetConstBuffer();
+	void setResource(ShaderType p_pShaderType, UINT p_StartSpot, UINT p_NumViews, ID3D11ShaderResourceView* p_pShaderResource);
 };
 
 

@@ -6,6 +6,7 @@
 #include "WinKeyboard.h"
 #include "WinMouse.h"
 #include "HIDObservable.h"
+#include "Vector2.h"
 
 class HID
 {

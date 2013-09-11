@@ -67,6 +67,7 @@ public:
 	D3D11_MAPPED_SUBRESOURCE getMappedResource();
 
 	ID3D11Buffer* getBufferPointer();
+	void setBuffer(ID3D11Buffer* p_pBuffer);
 	UINT32 getVertexSize();
 	UINT32 getElementCount();
 

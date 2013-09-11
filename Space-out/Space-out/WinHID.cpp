@@ -37,15 +37,27 @@ void HID::update( UINT message, LPARAM lParam )
 			{
 				if ( m_mouse.click(raw, RI_MOUSE_LEFT_BUTTON_DOWN) )
 				{
-					m_observable.broadcastLeftClick(m_mouse.getPosition());
+					POINT t_point = m_mouse.getPosition();
+					Vector2 t_Vpoint;
+					t_Vpoint.x = t_point.x;
+					t_Vpoint.y = t_point.y;
+					m_observable.broadcastLeftClick( t_Vpoint );
 				}
 
 				if( m_mouse.click(raw, RI_MOUSE_RIGHT_BUTTON_DOWN) )
 				{
-					m_observable.broadcastRightClick(m_mouse.getPosition());
+					POINT t_point = m_mouse.getPosition();
+					Vector2 t_Vpoint;
+					t_Vpoint.x = t_point.x;
+					t_Vpoint.y = t_point.y;
+					m_observable.broadcastRightClick(t_Vpoint);
 				}
 
-				m_observable.broadcastMousePos(m_mouse.getPosition());
+				POINT t_point = m_mouse.getPosition();
+				Vector2 t_Vpoint;
+				t_Vpoint.x = t_point.x;
+				t_Vpoint.y = t_point.y;
+				m_observable.broadcastMousePos(t_Vpoint);
 			}
 
 			if (raw->header.dwType == RIM_TYPEKEYBOARD)
