@@ -1,41 +1,4 @@
-//=============================================================================
-// Init Direct3D.cpp by Frank Luna (C) 2008 All Rights Reserved.
-//
-// Demonstrates the sample framework by initializing Direct3D, clearing 
-// the screen, and displaying frame stats.
-//
-//=============================================================================
-
-#include "d3dApp.h"
-#include <D3D11Shader.h>
-#include <DirectXMath.h>
-#include <DirectXColors.h>
-#include <DirectXCollision.h>
-#include <DirectXPackedVector.h>
-#include <d3dCompiler.h>
-#include <string>
-
-using namespace DirectX;
- 
-class Direct3D : public D3DApp
-{
-public:
-	Direct3D(HINSTANCE hInstance);
-	~Direct3D();
-
-	void initApp();
-	void onResize();
-	void updateScene(float dt);
-	void drawScene();
-
-private:
-	XMMATRIX camView;
-	XMMATRIX camProjection;
-	
-	XMVECTOR camPosition;
-	XMVECTOR camTarget;
-	XMVECTOR camUp;
-};
+#include "Direct3D.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
@@ -56,27 +19,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 Direct3D::Direct3D(HINSTANCE hInstance)
 : D3DApp(hInstance) 
 {
+
 }
 
 Direct3D::~Direct3D()
 {
-	/*if( md3dDevice )
-		md3dDevice->ClearState();*/
+	ReleaseCOM(m_pDevice);
+	ReleaseCOM(m_pDeviceContext);
+	ReleaseCOM(m_pSwapChain);
+	ReleaseCOM(m_pDepthStencilBuffer);
+	ReleaseCOM(m_pRenderTargetView);
+	ReleaseCOM(m_pDepthStencilView);
 }
 
 void Direct3D::initApp()
 {
 	D3DApp::initApp();
 	HRESULT hr = S_OK;
+
+	m_HID = HID( getMainWnd() );
 	
-	//Set up world view proj
+	//Set up world view projdf
 	camPosition = XMVectorSet( 0.0f, 0.0f, -20.f, 0.0f );
 	camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
 	camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
 	camView = XMMatrixLookAtLH( camPosition, camTarget, camUp );
 
-	camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)mClientWidth/mClientHeight, 1.0f, 1000.0f);
+	camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
+
+	test = 10;
+
+	m_game = Game();
+	m_game.init();
+
+	// Add subscriber to the HID component. 
+	m_HID.getObservable()->addSubscriber(m_game.getObserver());
 }
 
 void Direct3D::onResize()
@@ -87,11 +65,23 @@ void Direct3D::onResize()
 void Direct3D::updateScene(float dt)
 {
 	D3DApp::updateScene(dt);
+	m_game.update();
 }
 
 void Direct3D::drawScene()
 {
 	D3DApp::drawScene();
 
-	mSwapChain->Present(0, 0);
+	m_pSwapChain->Present(0, 0);
+}
+
+LRESULT Direct3D::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	m_HID.update(msg, lParam);
+	/*switch( msg )
+	{
+		return 0;
+	}*/
+
+	return D3DApp::msgProc(msg, wParam, lParam);
 }
