@@ -5,6 +5,15 @@
 #include <DirectXPackedVector.h>
 #include <string>
 
+#include "Buffer.h"
+#include "Shader.h"
+
+#include "WinHID.h"
+#include "Game.h"
+#include "Observer.h"
+
+class Object;
+
 using namespace DirectX;
  
 class Direct3D : public D3DApp
@@ -21,11 +30,21 @@ public:
 	LRESULT msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
 private:
 	//Camera Variables
-	XMMATRIX m_camView;
-	XMMATRIX m_camProjection;
-	
-	XMVECTOR m_camPosition;
-	XMVECTOR m_camTarget;
-	XMVECTOR m_camUp;
+	XMMATRIX	m_camView;
+	XMMATRIX	m_camProjection;
+	XMMATRIX	m_world;
+	XMMATRIX	m_WVP;
+	XMVECTOR	m_camPosition;
+	XMVECTOR	m_camTarget;
+	XMVECTOR	m_camUp;
+
+	HID			m_HID;
+	Game		m_game;
+
+	Buffer		m_buffer;
+	Buffer		m_cBuffer;
+	Shader		m_shader;
+	//TEST
+	ID3D11Buffer* mVB;
 };
 #endif
