@@ -35,16 +35,16 @@ void HIDObservable::broadcastKeyPress( USHORT p_key )
 	}
 }
 
-void HIDObservable::addSubscriber( Observer* p_observer )
+void HIDObservable::addSubscriber( Observer* p_pObserver )
 {
-	m_subscribers.push_back( p_observer );
+	m_subscribers.push_back( p_pObserver );
 }
 
-void HIDObservable::removeSubscriber( Observer* p_observer )
+void HIDObservable::removeSubscriber( Observer* p_pObserver )
 {
 	for ( UINT i = 0; i < m_subscribers.size(); i++ )
 	{
-		if (p_observer->compair( m_subscribers.at(i) ))
+		if (p_pObserver->compair( m_subscribers.at(i) ))
 		{
 			m_subscribers.erase( m_subscribers.begin() + i );
 			break;

@@ -17,8 +17,8 @@ public:
 	void					broadcastRightClick( Vector2 p_mousePosition );
 	void					broadcastMousePos( Vector2 p_mousePosition );
 	void					broadcastKeyPress( USHORT p_key );
-	void					addSubscriber( Observer* p_observer );
-	void					removeSubscriber( Observer* p_observer );
+	void					addSubscriber( Observer* p_pObserver );
+	void					removeSubscriber( Observer* p_pObserver );
 
 private:
 	std::vector<Observer*>	m_subscribers;

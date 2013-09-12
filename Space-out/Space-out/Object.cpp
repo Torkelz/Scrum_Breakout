@@ -16,6 +16,6 @@ Vector3* Object::getPos()
 
 std::vector<Vector3>* Object::getVertices()
 {
-	return &vertices;
+	return &m_vertices;
 }
 

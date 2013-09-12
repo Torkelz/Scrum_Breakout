@@ -17,7 +17,7 @@ public:
 	Mouse( HWND p_hwnd );
 	~Mouse();
 	
-	bool			click( RAWINPUT* raw, USHORT  p_flag );
+	bool			click( RAWINPUT* p_pRaw, USHORT  p_flag );
 	POINT			getPosition();
 	
 private:

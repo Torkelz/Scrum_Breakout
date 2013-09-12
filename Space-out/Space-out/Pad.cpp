@@ -1,11 +1,11 @@
 #include "Pad.h"
 
-Pad::Pad(Vector3* p_pos, Vector3* p_color, std::string p_objectName) : Object(p_pos, p_color, p_objectName)
+Pad::Pad(Vector3* p_pPos, Vector3* p_pColor, std::string p_objectName) : Object(p_pPos, p_pColor, p_objectName)
 {
-	vertices.push_back(Vector3(0.0f, 0.0f, 0.0f));
-	vertices.push_back(Vector3(0.0f, 10.0f, 0.0f));
-	vertices.push_back(Vector3(10.0f, 0.0f, 0.0f));
-	vertices.push_back(Vector3(10.0f, 10.0f, 0.0f));
+	m_vertices.push_back(Vector3(0.0f, 0.0f, 0.0f));
+	m_vertices.push_back(Vector3(0.0f, 10.0f, 0.0f));
+	m_vertices.push_back(Vector3(10.0f, 0.0f, 0.0f));
+	m_vertices.push_back(Vector3(10.0f, 10.0f, 0.0f));
 }
 
 Pad::~Pad(){}

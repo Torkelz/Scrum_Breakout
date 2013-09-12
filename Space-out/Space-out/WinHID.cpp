@@ -20,7 +20,7 @@ HID::~HID()
 void HID::update( UINT message, LPARAM lParam )
 {
 	UINT dwSize;
-	RAWINPUT* raw;
+	RAWINPUT* pRaw;
 
 	switch (message) 
 	{
@@ -31,11 +31,11 @@ void HID::update( UINT message, LPARAM lParam )
 			GetRawInputData( (HRAWINPUT)lParam, RID_INPUT, 
 							lpb, &dwSize, sizeof(RAWINPUTHEADER) );
     
-			raw = (RAWINPUT*)lpb;
+			pRaw = (RAWINPUT*)lpb;
     
-			if (raw->header.dwType == RIM_TYPEMOUSE) 
+			if (pRaw->header.dwType == RIM_TYPEMOUSE) 
 			{
-				if ( m_mouse.click(raw, RI_MOUSE_LEFT_BUTTON_DOWN) )
+				if ( m_mouse.click(pRaw, RI_MOUSE_LEFT_BUTTON_DOWN) )
 				{
 					POINT t_point = m_mouse.getPosition();
 					Vector2 t_Vpoint;
@@ -44,7 +44,7 @@ void HID::update( UINT message, LPARAM lParam )
 					m_observable.broadcastLeftClick( t_Vpoint );
 				}
 
-				if( m_mouse.click(raw, RI_MOUSE_RIGHT_BUTTON_DOWN) )
+				if( m_mouse.click(pRaw, RI_MOUSE_RIGHT_BUTTON_DOWN) )
 				{
 					POINT t_point = m_mouse.getPosition();
 					Vector2 t_Vpoint;
@@ -60,13 +60,11 @@ void HID::update( UINT message, LPARAM lParam )
 				m_observable.broadcastMousePos(t_Vpoint);
 			}
 
-			if (raw->header.dwType == RIM_TYPEKEYBOARD)
+			if (pRaw->header.dwType == RIM_TYPEKEYBOARD)
 			{
-				if(raw->data.keyboard.Flags == 0)
-					m_observable.broadcastKeyPress( m_keyboard.keyDown(raw) );
+				if(pRaw->data.keyboard.Flags == 0)
+					m_observable.broadcastKeyPress( m_keyboard.keyDown(pRaw) );
 			}
-
-			//delete[] lpb;
 			break;
 		default:
 			

@@ -1,14 +1,7 @@
 #include "Buffer.h"
 
-Buffer::Buffer()
-{
-	
-}
-
-Buffer::~Buffer()
-{
-	
-}
+Buffer::Buffer(){}
+Buffer::~Buffer(){}
 
 HRESULT Buffer::apply(UINT32 p_misc)
 {

@@ -17,7 +17,7 @@ public:
 	void		broadcastKeyPress( USHORT p_key );
 
 	int			getIndex();
-	bool		compair( Observer* p_observer );
+	bool		compair( Observer* p_pObserver );
 private:
 	int			m_index;
 protected:

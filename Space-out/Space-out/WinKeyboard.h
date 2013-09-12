@@ -16,7 +16,7 @@ public:
 	Keyboard(HWND p_hwnd);
 	~Keyboard();
 
-	USHORT keyDown( RAWINPUT* raw );
+	USHORT keyDown( RAWINPUT* p_pRaw );
 };
 
 #endif

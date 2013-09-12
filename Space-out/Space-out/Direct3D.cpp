@@ -8,7 +8,6 @@ int WINAPI WinMain(HINSTANCE p_hInstance, HINSTANCE p_prevInstance,
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
-
 	Direct3D theApp(p_hInstance);
 	
 	theApp.initApp();
@@ -20,10 +19,7 @@ struct cbPerObj
 	XMMATRIX WVP;
 };
 Direct3D::Direct3D(HINSTANCE p_hInstance)
-: D3DApp(p_hInstance) 
-{
-
-}
+: D3DApp(p_hInstance) {}
 
 Direct3D::~Direct3D()
 {
@@ -89,9 +85,9 @@ void Direct3D::initApp()
 
 	m_camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
 	
-	world = XMMatrixIdentity();
-	WVP	= world * camView * camProjection;
-	cBufferStruct.WVP = XMMatrixTranspose(WVP);
+	m_world = XMMatrixIdentity();
+	m_WVP	= m_world * m_camView * m_camProjection;
+	cBufferStruct.WVP = XMMatrixTranspose(m_WVP);
 
 	BufferInitDesc cbbd;	
 
@@ -105,9 +101,6 @@ void Direct3D::initApp()
 
 	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &cBufferStruct, 0, 0);
 	m_cBuffer.apply(0);
-
-
-	
 
 	// Add subscriber to the HID component. 
 	m_HID.getObservable()->addSubscriber(m_game.getObserver());
@@ -138,10 +131,10 @@ void Direct3D::drawScene()
 
 	translatePadMatrix = XMMatrixTranslation(tempX, t_pos->y, t_pos->z);
 
-	world = XMMatrixIdentity();
-	WVP = translatePadMatrix * world * camView * camProjection;
+	m_world = XMMatrixIdentity();
+	m_WVP = translatePadMatrix * m_world * m_camView * m_camProjection;
 
-	cBufferStruct.WVP = XMMatrixTranspose(WVP);
+	cBufferStruct.WVP = XMMatrixTranspose(m_WVP);
 	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &cBufferStruct, 0, 0); 
 	m_shader.setShaders();
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);

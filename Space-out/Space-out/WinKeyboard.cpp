@@ -14,9 +14,9 @@ Keyboard::Keyboard( HWND p_hwnd )
 
 Keyboard::~Keyboard(){}
 
-USHORT Keyboard::keyDown( RAWINPUT* raw )
+USHORT Keyboard::keyDown( RAWINPUT* p_pRaw )
 {
-	USHORT keyCode = raw->data.keyboard.VKey;
+	USHORT keyCode = p_pRaw->data.keyboard.VKey;
 
 	return keyCode;
 }

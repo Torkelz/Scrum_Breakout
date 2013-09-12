@@ -13,10 +13,10 @@ protected:
 	Vector3			m_color;
 	float			m_size;
 
-	std::vector<Vector3> vertices;
+	std::vector<Vector3> m_vertices;
 
 public:
-	Object(Vector3* p_pos, Vector3* p_color, std::string p_objectName);
+	Object(Vector3* p_pPos, Vector3* p_pColor, std::string p_objectName);
 	~Object();
 
 	Vector3*				getPos();

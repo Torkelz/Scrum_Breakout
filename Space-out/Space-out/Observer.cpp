@@ -11,9 +11,9 @@ int Observer::getIndex()
 	return m_index;
 }
 
-bool Observer::compair( Observer* p_observer )
+bool Observer::compair( Observer* p_pObserver )
 {
-	return m_index == p_observer->getIndex(); 
+	return m_index == p_pObserver->getIndex(); 
 }
 
 void Observer::broadcastLeftClick( Vector2 p_mousePosition )

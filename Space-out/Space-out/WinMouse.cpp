@@ -16,9 +16,9 @@ Mouse::Mouse( HWND p_hwnd )
 
 Mouse::~Mouse(){}
 
-bool Mouse::click(RAWINPUT* raw, USHORT p_flag)
+bool Mouse::click(RAWINPUT* p_pRaw, USHORT p_flag)
 {
-	return p_flag == raw->data.mouse.usButtonFlags;
+	return p_flag == p_pRaw->data.mouse.usButtonFlags;
 }
 
 POINT Mouse::getPosition()

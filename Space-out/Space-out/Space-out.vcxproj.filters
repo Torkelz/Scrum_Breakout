@@ -29,12 +29,18 @@
     <ClCompile Include="Game.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Pad.cpp" />
     <ClCompile Include="Shader.cpp">
       <Filter>D3D</Filter>
     </ClCompile>
-    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Pad.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -62,11 +68,6 @@
     <ClInclude Include="Observer.h">
       <Filter>Observer\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Pad.h" />
-    <ClInclude Include="Player.h" />
     <ClInclude Include="Shader.h">
       <Filter>D3D\Header</Filter>
     </ClInclude>
@@ -74,7 +75,18 @@
     <ClInclude Include="Direct3D.h">
       <Filter>D3D\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Object.h" />
+    <ClInclude Include="Game.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Pad.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="WinHID">
@@ -100,6 +112,15 @@
     </Filter>
     <Filter Include="D3D\HLSL">
       <UniqueIdentifier>{7f76d2f9-d72b-4920-b2f7-39840a8e96dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object">
+      <UniqueIdentifier>{0a4a4e6d-ba04-41ae-bfa0-9a14108d9b47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Header">
+      <UniqueIdentifier>{d4019c1a-f611-4ba5-a812-bf8f062851d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Header">
+      <UniqueIdentifier>{6b478a8c-7325-4c79-b254-b4a5160ae9e8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

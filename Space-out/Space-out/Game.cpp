@@ -51,13 +51,9 @@ void Game::keyEvent(unsigned short key)
 	}
 }
 
-void Game::leftMouseClick( Vector2 p_mousePosition )
-{ 
-}
+void Game::leftMouseClick( Vector2 p_mousePosition ){}
 
-void Game::rightMouseClick( Vector2 p_mousePosition )
-{
-}
+void Game::rightMouseClick( Vector2 p_mousePosition ){}
 
 void Game::mouseMove( Vector2 p_mousePosition )
 {
