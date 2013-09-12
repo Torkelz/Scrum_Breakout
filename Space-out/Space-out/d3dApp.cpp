@@ -358,6 +358,8 @@ void D3DApp::initMainWindow()
 
 void D3DApp::initDirect3D()
 {
+	
+
 	// Create the device.
 
 	UINT createDeviceFlags = 0;
