@@ -1,4 +1,5 @@
 #include "Direct3D.h"
+#include "Object.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
@@ -44,15 +45,22 @@ void Direct3D::initApp()
 	m_cBuffer = Buffer();
 	m_shader = Shader();
 
-	UINT32 const nrVertices = 3;
-	Vertex data[nrVertices];
-	data[0].pos = XMFLOAT3(0.0f,10.0f,0.0f);
-	data[1].pos = XMFLOAT3(10.0f,10.0f,0.0f);
-	data[2].pos = XMFLOAT3(-10.0f,-10.0f,0.0f);
-	//data[3].pos = XMFLOAT3(10.0f,10.0f,0.0f);
+	m_game = Game();
+	m_game.init();
+
+	
+	// PAD
+	UINT32 const nrVertices = 4;
+	Vector3 data[nrVertices];
+	std::vector<Vector3>* t_data = m_game.getPad()->getVertices();
+
+	for(int i = 0; i < nrVertices; i++)
+	{
+		data[i] = t_data->at(i);
+	}
 
 	BufferInitDesc bufferDesc;
-	bufferDesc.elementSize = sizeof(Vertex);
+	bufferDesc.elementSize = sizeof(Vector3);
 	bufferDesc.initData = &data;
 	bufferDesc.numElements = nrVertices;
 	bufferDesc.type = VERTEX_BUFFER;
@@ -69,10 +77,12 @@ void Direct3D::initApp()
 	m_shader.compileAndCreateShaderFromFile(L"VertexShader.fx", "main","vs_5_0", VERTEX_SHADER , desc);
 	m_shader.compileAndCreateShaderFromFile(L"PixelShader.fx", "main", "ps_5_0", PIXEL_SHADER, NULL);
 
+	// PAD END
+
 	m_HID = HID( getMainWnd() );
 	
 	//Set up world view projdf
-	camPosition = XMVectorSet( 0.0f, 0.0f, -20.f, 0.0f );
+	camPosition = XMVectorSet( 0.0f, 0.0f, -100.f, 0.0f );
 	camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
 	camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
@@ -98,8 +108,7 @@ void Direct3D::initApp()
 	m_cBuffer.apply(0);
 
 
-	m_game = Game();
-	m_game.init();
+	
 
 	// Add subscriber to the HID component. 
 	m_HID.getObservable()->addSubscriber(m_game.getObserver());
@@ -121,18 +130,26 @@ void Direct3D::drawScene()
 	D3DApp::drawScene();
 	cbPerObj cBufferStruct;
 
+	XMMATRIX translatePadMatrix;
+	
+	Vector3* t_pos = m_game.getPad()->getPos();
+
+	//Try to get the pad closer to the actual mouse.
+	float tempX = t_pos->x - m_ScreenViewport.Width/2;
+
+	translatePadMatrix = XMMatrixTranslation(tempX, t_pos->y, t_pos->z);
+
 	world = XMMatrixIdentity();
-	WVP = world * camView * camProjection;
+	WVP = translatePadMatrix * world * camView * camProjection;
 
 	cBufferStruct.WVP = XMMatrixTranspose(WVP);
-	//m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &cBufferStruct, 0, 0);
-	//m_cBuffer.apply(0);
+	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &cBufferStruct, 0, 0); 
 	m_shader.setShaders();
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 	m_buffer.apply(0);
-	
-	m_pDeviceContext->Draw(3, 0);
+
+	m_pDeviceContext->Draw(4, 0);
 
 	m_pSwapChain->Present(1, 0);
 }
@@ -140,16 +157,6 @@ void Direct3D::drawScene()
 LRESULT Direct3D::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	m_HID.update(msg, lParam);
-	switch( msg )
-	{
-	case WM_KEYDOWN:
-		switch(wParam)
-		{
-		case VK_ESCAPE:
-			PostQuitMessage(0);
-		}
-		return 0;
-	}
 
 	return D3DApp::msgProc(msg, wParam, lParam);
 }

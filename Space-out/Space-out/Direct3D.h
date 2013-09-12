@@ -12,10 +12,7 @@
 #include "Game.h"
 #include "Observer.h"
 
-struct Vertex
-{
-	XMFLOAT3 pos;
-};
+class Object;
 
 using namespace DirectX;
  
@@ -49,8 +46,6 @@ private:
 	Buffer m_buffer;
 	Buffer m_cBuffer;
 	Shader m_shader;
-	//Shader m_PS;
-	//Shader m_GS;
 	//TEST
 	ID3D11Buffer* mVB;
 };

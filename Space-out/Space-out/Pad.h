@@ -1,20 +1,17 @@
 #ifndef PAD_H
 #define PAD_H
 
-#include <DirectXMath.h>
-using namespace DirectX;
+#include "Vector2.h"
+#include <string.h>
+#include "Object.h"
 
-class Pad
+class Pad : public Object
 {
 private:
-	XMFLOAT3 m_pos;
-
 public:
-	Pad();
+	Pad(Vector3* p_pos, Vector3* p_color, std::string p_objectName);
 	~Pad();
-
-	void setPos(XMFLOAT3 p_pos);
-	XMFLOAT3 getPos();
+	void setPos(Vector2 p_pos);
 };
 
 #endif

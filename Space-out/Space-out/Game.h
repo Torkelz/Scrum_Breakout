@@ -4,6 +4,8 @@
 #include "Vector2.h"
 
 class Observer;
+class Object;
+class Pad;
 
 class Game
 {
@@ -19,8 +21,11 @@ public:
 	void mouseMove( Vector2 p_mousePosition );
 	void keyEvent( unsigned short p_key );
 	Observer* getObserver();
+	Object* getPad();
+
 private:
 	Observer*	m_pObserver;
+	Object*		m_pPad;
 };
 
 #endif	GAME_H

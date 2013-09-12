@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Observer.h"
+#include "Pad.h"
 
 Game::Game(){}
 Game::~Game(){}
@@ -7,6 +8,7 @@ Game::~Game(){}
 void Game::init()
 {
 	m_pObserver = new Observer(this);
+	m_pPad		= new Pad(&Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.56f, 0.56f, 0.56f), "Pad");
 }
 
 void Game::update()
@@ -25,12 +27,14 @@ void Game::keyEvent(unsigned short key)
 	}
 	if(key == 0x57) // W
 	{
-
+		
 	}
 	if(key == 0x53) // S
 	{
 
 	}
+	if(key == 0x1B) //ESC
+		PostQuitMessage(0);
 	
 
 	//if(key == 0x52) // R
@@ -57,9 +61,15 @@ void Game::rightMouseClick( Vector2 p_mousePosition )
 
 void Game::mouseMove( Vector2 p_mousePosition )
 {
+	((Pad*)m_pPad)->setPos( p_mousePosition );
 }
 
 Observer* Game::getObserver()
 {
 	return m_pObserver;
+}
+
+Object* Game::getPad()
+{
+	return m_pPad;
 }

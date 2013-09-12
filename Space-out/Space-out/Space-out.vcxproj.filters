@@ -34,6 +34,7 @@
     <ClCompile Include="Shader.cpp">
       <Filter>D3D</Filter>
     </ClCompile>
+    <ClCompile Include="Object.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -73,6 +74,7 @@
     <ClInclude Include="Direct3D.h">
       <Filter>D3D\Header</Filter>
     </ClInclude>
+    <ClInclude Include="Object.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="WinHID">
