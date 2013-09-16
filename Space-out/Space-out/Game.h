@@ -5,7 +5,6 @@
 
 class Observer;
 class Object;
-class Pad;
 
 class Game
 {
@@ -22,10 +21,12 @@ public:
 	void		keyEvent( unsigned short p_key );
 	Observer*	getObserver();
 	Object*		getPad();
+	Object*		getBall();
 
 private:
 	Observer*	m_pObserver;
 	Object*		m_pPad;
+	Object*		m_pBall;
 };
 
 #endif	GAME_H

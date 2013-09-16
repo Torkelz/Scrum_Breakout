@@ -36,6 +36,13 @@ HRESULT Buffer::apply(UINT32 p_misc)
 			m_pDeviceContext->PSSetConstantBuffers(p_misc, 1, &m_pBuffer);
 		}
 		break;
+	case ALL:
+	{
+		m_pDeviceContext->VSSetConstantBuffers(p_misc, 1, &m_pBuffer);
+		m_pDeviceContext->GSSetConstantBuffers(p_misc, 1, &m_pBuffer);
+		m_pDeviceContext->PSSetConstantBuffers(p_misc, 1, &m_pBuffer);
+	}
+	break;
 	default:
 		hr = E_FAIL;
 		break;
@@ -73,6 +80,7 @@ HRESULT Buffer::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceCont
 		case CONSTANT_BUFFER_VS:
 		case CONSTANT_BUFFER_GS:
 		case CONSTANT_BUFFER_PS:
+		case ALL:
 			{
 				bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 			}

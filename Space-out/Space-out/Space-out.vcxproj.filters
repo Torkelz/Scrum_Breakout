@@ -41,6 +41,9 @@
     <ClCompile Include="Player.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Ball.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -87,6 +90,10 @@
     <ClInclude Include="Pad.h">
       <Filter>Object\Header</Filter>
     </ClInclude>
+    <ClInclude Include="Ball.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="WinHID">
@@ -133,5 +140,11 @@
     <FxCompile Include="VertexShader.fx">
       <Filter>D3D\HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="Ball.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Space-out.rc" />
   </ItemGroup>
 </Project>

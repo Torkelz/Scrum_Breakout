@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Observer.h"
 #include "Pad.h"
+#include "Ball.h"
 
 Game::Game(){}
 Game::~Game(){}
@@ -9,6 +10,7 @@ void Game::init()
 {
 	m_pObserver = new Observer(this);
 	m_pPad		= new Pad(&Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.56f, 0.56f, 0.56f), "Pad");
+	m_pBall		= new Ball(&Vector3(0.0f, -20.0f, 0.0f), &Vector3(0.56f, 0.56f, 0.56f), "Ball");
 }
 
 void Game::update()
@@ -68,4 +70,9 @@ Observer* Game::getObserver()
 Object* Game::getPad()
 {
 	return m_pPad;
+}
+
+Object* Game::getBall()
+{
+	return m_pBall;
 }

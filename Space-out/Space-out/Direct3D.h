@@ -16,6 +16,18 @@ class Object;
 
 using namespace DirectX;
  
+struct CBPad
+{
+	XMMATRIX WVP;
+};
+
+struct CBBall
+{
+	XMVECTOR eyePosW;
+	XMMATRIX viewProj;
+	XMFLOAT2 size;
+};
+
 class Direct3D : public D3DApp
 {
 public:
@@ -44,6 +56,14 @@ private:
 	Buffer		m_buffer;
 	Buffer		m_cBuffer;
 	Shader		m_shader;
+	CBPad		m_cbPad;
+
+	//Ball
+	Buffer		m_ballBuffer;
+	Buffer		m_constantBallBuffer;
+	Shader		m_ballShader;
+	CBBall		m_cbBall;
+
 	//TEST
 	ID3D11Buffer* mVB;
 };
