@@ -1,0 +1,32 @@
+#include "Header/GLapp.h"
+
+GLApp::GLApp(HINSTANCE p_hInstance)
+{
+	m_hAppInst   = p_hInstance;
+	m_hMainWnd   = 0;
+	m_AppPaused  = false;
+	m_Minimized  = false;
+	m_Maximized  = false;
+	m_Resizing   = false;
+
+	m_FrameStats = (LPCWSTR)"";
+
+	m_pDevice          = 0;
+	m_pSwapChain          = 0;
+	m_pDepthStencilBuffer = 0;
+	m_pRenderTargetView   = 0;
+	m_pDepthStencilView   = 0;
+
+	m_MainWndTitle = (LPCWSTR)"Space-out";
+	m_DriverType  = D3D_DRIVER_TYPE_HARDWARE;
+	m_ClearColor[0] = 0.0f; m_ClearColor[1] = 0.0f; m_ClearColor[2] = 1.0f; m_ClearColor[3]  = 1.0f;
+	m_ClientWidth    = 800;
+	m_ClientHeight   = 600;
+
+	m_4xMsaaQuality = 0;
+	m_pDeviceContext = 0;
+}
+
+
+
+

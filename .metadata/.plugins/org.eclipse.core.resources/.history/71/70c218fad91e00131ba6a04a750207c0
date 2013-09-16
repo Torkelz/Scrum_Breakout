@@ -1,0 +1,30 @@
+#ifndef OPENGL_H_
+#define OPENGL_H_
+
+#include "GLUtil.h"
+#include "GLApp.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <string>
+
+using namespace glm;
+
+class OpenGL : public GLApp
+{
+public:
+	OpenGL();
+	~OpenGL();
+
+	void initApp();
+	void onResize();
+	void updateScene(float p_dt);
+	void drawScene();
+private:
+
+};
+
+#endif /* OPENGL_H_ */
