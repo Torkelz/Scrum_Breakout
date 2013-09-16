@@ -41,6 +41,11 @@ private:
 	HID			m_HID;
 	Game		m_game;
 
+	//Block Test
+	Buffer		m_blockBuffer;
+	Shader		m_blockShader;
+	Buffer		m_cBlockBuffer;
+
 	Buffer		m_buffer;
 	Buffer		m_cBuffer;
 	Shader		m_shader;

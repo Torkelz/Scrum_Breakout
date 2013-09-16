@@ -1,5 +1,7 @@
 #include "Direct3D.h"
 #include "Object.h"
+#include "ABlock.h"
+
 int WINAPI WinMain(HINSTANCE p_hInstance, HINSTANCE p_prevInstance,
 				   PSTR p_cmdLine, int p_showCmd)
 {
@@ -36,9 +38,13 @@ void Direct3D::initApp()
 	D3DApp::initApp();
 	HRESULT hr = S_OK;
 	cbPerObj cBufferStruct;
-	m_buffer = Buffer();
-	m_cBuffer = Buffer();
-	m_shader = Shader();
+
+	m_buffer		= Buffer();
+	m_cBuffer		= Buffer();
+	m_shader		= Shader();
+	m_blockBuffer	= Buffer();
+	m_blockShader	= Shader();
+	m_cBlockBuffer	= Buffer();
 
 	m_game = Game();
 	m_game.init();
@@ -48,6 +54,7 @@ void Direct3D::initApp()
 	UINT32 const nrVertices = 4;
 	Vector3 data[nrVertices];
 	std::vector<Vector3>* t_data = m_game.getPad()->getVertices();
+
 
 	for(int i = 0; i < nrVertices; i++)
 	{
@@ -74,6 +81,49 @@ void Direct3D::initApp()
 
 	// PAD END
 
+
+	//TEST BLOCK START!
+	BlockVertex blockData[2];
+	for (int i = 0; i < 2; i++)
+		blockData[i] = m_game.getBlocks().at(i)->getBlockVertex();
+
+	
+	BufferInitDesc blockBufferDesc;
+	blockBufferDesc.elementSize		= sizeof(Vector3);
+	blockBufferDesc.initData		= &blockData;
+	blockBufferDesc.numElements		= 2;
+	blockBufferDesc.type			= VERTEX_BUFFER;
+	blockBufferDesc.usage			= BUFFER_USAGE_IMMUTABLE;
+
+	m_blockBuffer.init(m_pDevice, m_pDeviceContext, blockBufferDesc);
+
+	D3D11_INPUT_ELEMENT_DESC blockInputdesc[] = 
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"COLOR",	 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	};
+	m_blockShader.init(m_pDevice, m_pDeviceContext, 2);
+	
+	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "VS", "vs_5_0", VERTEX_SHADER, blockInputdesc);
+	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "GS", "gs_5_0", GEOMETRY_SHADER, NULL);
+	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "PS", "ps_5_0", PIXEL_SHADER, NULL);
+
+
+	BufferInitDesc cBlockBufferDesc;	
+
+	cBlockBufferDesc.elementSize = sizeof(cbPerObj);
+	cBlockBufferDesc.initData = NULL;
+	cBlockBufferDesc.numElements = 1;
+	cBlockBufferDesc.type = CONSTANT_BUFFER_ALL;
+	cBlockBufferDesc.usage = BUFFER_DEFAULT;
+	
+	m_cBlockBuffer.init(m_pDevice, m_pDeviceContext, cBlockBufferDesc);
+
+	//TEST BLOCK END
+	
+
+
+
 	m_HID = HID( getMainWnd() );
 	
 	//Set up world view projdf
@@ -94,13 +144,15 @@ void Direct3D::initApp()
 	cbbd.elementSize = sizeof(cbPerObj);
 	cbbd.initData = NULL;
 	cbbd.numElements = 1;
-	cbbd.type = CONSTANT_BUFFER_VS;
+	cbbd.type = CONSTANT_BUFFER_ALL;
 	cbbd.usage = BUFFER_DEFAULT;
 	
 	m_cBuffer.init(m_pDevice, m_pDeviceContext, cbbd);
 
 	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &cBufferStruct, 0, 0);
 	m_cBuffer.apply(0);
+
+
 
 	// Add subscriber to the HID component. 
 	m_HID.getObservable()->addSubscriber(m_game.getObserver());
@@ -121,6 +173,7 @@ void Direct3D::drawScene()
 {
 	D3DApp::drawScene();
 	cbPerObj cBufferStruct;
+	cbPerObj cBlockBuffer;
 
 	XMMATRIX translatePadMatrix;
 	
@@ -136,12 +189,25 @@ void Direct3D::drawScene()
 
 	cBufferStruct.WVP = XMMatrixTranspose(m_WVP);
 	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &cBufferStruct, 0, 0); 
+	m_cBuffer.apply(0);
 	m_shader.setShaders();
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 	m_buffer.apply(0);
 
 	m_pDeviceContext->Draw(4, 0);
+
+	//TEST BLOCK DRAW!
+	
+	m_WVP = m_world *m_camView * m_camProjection;
+	cBlockBuffer.WVP = XMMatrixTranspose(m_WVP);
+	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBuffer, 0, 0);
+	m_cBlockBuffer.apply(0);
+	m_blockShader.setShaders();
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	m_blockBuffer.apply(0);
+	
+	m_pDeviceContext->Draw(2, 0);
 
 	m_pSwapChain->Present(0, 0);
 }

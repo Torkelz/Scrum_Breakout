@@ -1,8 +1,6 @@
 #ifndef PAD_H
 #define PAD_H
 
-#include "Vector2.h"
-#include <string.h>
 #include "Object.h"
 
 class Pad : public Object

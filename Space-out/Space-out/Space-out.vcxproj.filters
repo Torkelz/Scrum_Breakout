@@ -41,6 +41,12 @@
     <ClCompile Include="Player.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="ABlock.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Block.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -87,6 +93,12 @@
     <ClInclude Include="Pad.h">
       <Filter>Object\Header</Filter>
     </ClInclude>
+    <ClInclude Include="ABlock.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Block.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="WinHID">
@@ -131,6 +143,9 @@
       <Filter>D3D\HLSL</Filter>
     </FxCompile>
     <FxCompile Include="VertexShader.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="BlockShader.fx">
       <Filter>D3D\HLSL</Filter>
     </FxCompile>
   </ItemGroup>

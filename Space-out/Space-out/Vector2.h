@@ -31,4 +31,28 @@ struct Vector3
 	}
 };
 
+struct Vector4
+{
+	float x;
+	float y;
+	float z;
+	float w;
+
+	Vector4(){}
+
+	Vector4(float p_x, float p_y, float p_z, float p_w)
+	{
+		x = p_x;
+		y = p_y;
+		z = p_z;
+		w = p_w;
+	}
+};
+
+struct BlockVertex
+{
+	Vector3 pos;
+	Vector4 color;
+};
+
 #endif VECTOR2_H

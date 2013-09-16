@@ -12,7 +12,7 @@ protected:
 	Vector3			m_pos;
 	Vector3			m_color;
 	float			m_size;
-
+	int				m_textureID;
 	std::vector<Vector3> m_vertices;
 
 public:
