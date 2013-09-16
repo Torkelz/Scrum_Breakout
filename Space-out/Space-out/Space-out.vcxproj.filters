@@ -44,6 +44,9 @@
     <ClCompile Include="Ball.cpp">
       <Filter>Object</Filter>
     </ClCompile>
+    <ClCompile Include="AABB.cpp" />
+    <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="BoundingVolume.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -94,6 +97,9 @@
       <Filter>Object\Header</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="AABB.h" />
+    <ClInclude Include="Sphere.h" />
+    <ClInclude Include="BoundingVolume.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="WinHID">
