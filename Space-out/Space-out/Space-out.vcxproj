@@ -115,7 +115,6 @@
     <ClInclude Include="Pad.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Sphere.h" />
-    <ClInclude Include="Vector2.h" />
     <ClInclude Include="WinHID.h" />
     <ClInclude Include="WinKeyboard.h" />
     <ClInclude Include="WinMouse.h" />

@@ -54,8 +54,8 @@ void Direct3D::initApp()
 	
 	// PAD ###
 	UINT32 const nrVertices = 4;
-	Vector3 data[nrVertices];
-	std::vector<Vector3>* t_data = m_game.getPad()->getVertices();
+	vec3 data[nrVertices];
+	std::vector<vec3>* t_data = m_game.getPad()->getVertices();
 
 	for(int i = 0; i < nrVertices; i++)
 	{
@@ -63,7 +63,7 @@ void Direct3D::initApp()
 	}
 
 	BufferInitDesc bufferDesc;
-	bufferDesc.elementSize = sizeof(Vector3);
+	bufferDesc.elementSize = sizeof(vec3);
 	bufferDesc.initData = &data;
 	bufferDesc.numElements = nrVertices;
 	bufferDesc.type = VERTEX_BUFFER;
@@ -146,7 +146,7 @@ void Direct3D::onResize()
 void Direct3D::updateScene(float p_dt)
 {
 	D3DApp::updateScene(p_dt);
-	m_game.update();
+	m_game.update(m_ScreenViewport.Width);
 }
 
 void Direct3D::drawScene()
@@ -155,7 +155,7 @@ void Direct3D::drawScene()
 
 	XMMATRIX translatePadMatrix;
 	
-	Vector3* t_pos = m_game.getPad()->getPos();
+	vec3* t_pos = m_game.getPad()->getPos();
 
 	//Try to get the pad closer to the actual mouse.
 	float tempX = t_pos->x - m_ScreenViewport.Width/2;

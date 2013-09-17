@@ -9,31 +9,39 @@ Game::~Game(){}
 void Game::init()
 {
 	m_pObserver = new Observer(this);
-	m_pPad		= new Pad(&Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.56f, 0.56f, 0.56f), "Pad");
-	m_pBall		= new Ball(&Vector3(0.0f, -20.0f, 0.0f), &Vector3(0.56f, 0.56f, 0.56f), "Ball");
+	m_pPad		= new Pad(&vec3(0.0f, 0.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad");
+	m_pBall		= new Ball(&vec3(0.0f, -20.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Ball");
+
+	
 }
 
-void Game::update()
-{}
+void Game::update(float p_screenWidth)
+{
+	vec3 t_pos = *m_pPad->getPos();
+	t_pos.x -= (p_screenWidth * 0.5f);
+
+	mat4 padTranslation = translate(mat4(1.0f), t_pos);
+	((Pad*)m_pPad)->update(padTranslation);
+}
 
 void Game::keyEvent(unsigned short key)
 {
 	float Rotation = 0;
 	if(key == 0x41) // A
 	{
-		PostQuitMessage(0);
+		((Ball*)m_pBall)->setSpeed(vec3(-1.0f, 0.0f, 0.0f));
 	}
 	if(key == 0x44) // D
 	{
-
+		((Ball*)m_pBall)->setSpeed(vec3(1.0f, 0.0f, 0.0f));
 	}
 	if(key == 0x57) // W
 	{
-		
+		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 1.0f, 0.0f));
 	}
 	if(key == 0x53) // S
 	{
-
+		((Ball*)m_pBall)->setSpeed(vec3(0.0f, -1.0f, 0.0f));
 	}
 	if(key == 0x1B) //ESC
 		PostQuitMessage(0);
@@ -53,11 +61,11 @@ void Game::keyEvent(unsigned short key)
 	}
 }
 
-void Game::leftMouseClick( Vector2 p_mousePosition ){}
+void Game::leftMouseClick( vec2 p_mousePosition ){}
 
-void Game::rightMouseClick( Vector2 p_mousePosition ){}
+void Game::rightMouseClick( vec2 p_mousePosition ){}
 
-void Game::mouseMove( Vector2 p_mousePosition )
+void Game::mouseMove( vec2 p_mousePosition )
 {
 	((Pad*)m_pPad)->setPos( p_mousePosition );
 }

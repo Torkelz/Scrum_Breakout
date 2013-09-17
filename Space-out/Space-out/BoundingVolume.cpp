@@ -2,8 +2,8 @@
 
 BoundingVolume::BoundingVolume()
 {
-	m_index = G_NRofVOLUMES;
-	G_NRofVOLUMES++;
+	//m_index = G_NRofVOLUMES;
+	//G_NRofVOLUMES++;
 }
 
 
@@ -34,14 +34,12 @@ int	BoundingVolume::getType()
 void BoundingVolume::updatePosition( mat4 p_scale, mat4 p_translate )
 {
 	m_prevPosition = m_position;
-	//D3DXVec3TransformCoord( &m_position, &m_position, &p_translate );
+
 	vec4 v = vec4(m_position,0) * p_translate;
 
 	 m_position.x = v.x;
 	 m_position.y = v.y;
 	 m_position.z = v.z;
-
-	 //should work.
 }
 
 void BoundingVolume::updatePosition( vec3 p_position )

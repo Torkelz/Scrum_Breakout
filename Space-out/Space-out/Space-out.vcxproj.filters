@@ -77,7 +77,6 @@
     <ClInclude Include="Shader.h">
       <Filter>D3D\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Vector2.h" />
     <ClInclude Include="Direct3D.h">
       <Filter>D3D\Header</Filter>
     </ClInclude>

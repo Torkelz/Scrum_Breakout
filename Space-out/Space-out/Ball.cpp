@@ -1,11 +1,29 @@
 #include "Ball.h"
 
-Ball::Ball(Vector3* p_pPos, Vector3* p_pColor, std::string p_objectName):Object(p_pPos, p_pColor, p_objectName)
+Ball::Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName):Object(p_pPos, p_pColor, p_objectName)
 {
 	m_texturePath	= "sphere.jpg";
+	m_boundingVolume = Sphere(3.14f, *p_pPos);
 }
 
 Ball::~Ball(){}
+
+void Ball::update()
+{
+	updatePosition();
+	m_boundingVolume.updatePosition(m_pos);
+}
+
+void Ball::updatePosition()
+{
+	m_pos += m_speed;
+	m_speed = vec3(0.0f, 0.0f, 0.0f);
+}
+
+void Ball::setSpeed(vec3 p_speed)
+{
+	m_speed = p_speed;
+}
 
 std::string* Ball::getTexturePath()
 {
