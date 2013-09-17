@@ -1,0 +1,95 @@
+#include "Header/GLApp.h"
+
+#include "Header/OpenGL.h"
+
+GLApp::GLApp()
+{
+	m_hMainWnd   = 0;
+	m_appPaused  = false;
+	m_minimized  = false;
+	m_maximized  = false;
+	m_resizing   = false;
+
+	m_MainWndTitle = "Space-out";
+	m_ClientWidth    = 1024;
+	m_ClientHeight   = 768;
+
+}
+GLApp::~GLApp()
+{
+	glfwTerminate();
+}
+
+void GLApp::initApp()
+{
+	initMainWindow();
+	initOpenGL();
+}
+
+int GLApp::run()
+{
+	glfwMakeContextCurrent(m_hMainWnd);
+
+	glfwSetKeyCallback(m_hMainWnd, OpenGL::messageCallback);
+	glfwSetWindowSizeCallback(m_hMainWnd, resizeCallback);
+	double currTime = glfwGetTime();
+	while (!glfwWindowShouldClose(m_hMainWnd))
+	{
+		/* Render here */
+		double newTime = glfwGetTime();
+		double dt = newTime - currTime;
+		currTime = newTime;
+
+		std::ostringstream os;
+		os << dt;
+		std::string sdt = os.str();
+
+		glfwSetWindowTitle(m_hMainWnd, (m_MainWndTitle + "  " + sdt).c_str());
+		if( !m_appPaused )
+		{
+			updateScene(dt);
+			drawScene();
+		}
+		else
+		{
+			sleep(100);
+		}
+		/* Swap front and back buffers */
+		glfwSwapBuffers(m_hMainWnd);
+
+		/* Poll for and process events */
+		glfwPollEvents();
+	}
+	return 0;
+}
+
+void GLApp::updateScene(float p_dt)
+{
+	p_dt = 0;
+}
+
+void GLApp::drawScene()
+{
+
+}
+
+void GLApp::initMainWindow()
+{
+	if (!glfwInit())
+		glfwTerminate();
+}
+
+void GLApp::initOpenGL()
+{
+	m_hMainWnd = glfwCreateWindow(m_ClientWidth, m_ClientHeight, m_MainWndTitle.c_str(), NULL, NULL);
+	    if (!m_hMainWnd)
+	    {
+	        glfwTerminate();
+	    }
+}
+
+void GLApp::resizeCallback(GLFWwindow* p_pMainWnd, int p_width, int p_height)
+{
+	m_appPaused = true;
+
+}

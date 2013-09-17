@@ -2,6 +2,8 @@
 #define GLAPP_H_
 
 #include "GLUtil.h"
+#include <unistd.h>
+#include <sstream>
 
 using namespace std;
 
@@ -19,9 +21,10 @@ public:
 	// implement specific application requirements.
 
 	virtual void		initApp();
-	virtual void		onResize();// reset projection/etc
 	virtual void		updateScene(float p_dt);
 	virtual void		drawScene();
+//	static 	void		resizeCallback(GLFWwindow* p_pMainWnd, int p_width, int p_height);
+//	static	void		MessageLoop(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods);
 
 protected:
 	void initMainWindow();
@@ -30,10 +33,10 @@ protected:
 protected:
 
 	GLFWwindow*					m_hMainWnd;
-	bool						m_AppPaused;
-	bool						m_Minimized;
-	bool						m_Maximized;
-	bool						m_Resizing;
+	bool						m_appPaused;
+	bool						m_minimized;
+	bool						m_maximized;
+	bool						m_resizing;
 
 	//GameTimer					m_Timer;
 

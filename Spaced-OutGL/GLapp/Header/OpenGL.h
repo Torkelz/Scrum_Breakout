@@ -12,12 +12,14 @@ class OpenGL : public GLApp{
 	OpenGL();
 	~OpenGL();
 
-	void initApp();
-	void onResize();
-	void updateScene(float p_dt);
-	void drawScene();
-private:
+	void 			initApp();
+	void 			updateScene(float p_dt);
+	void 			drawScene();
+	static void 	messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods);
 
+private:
+	mat4x4 			m_camView;
+	float			rotation;
 };
 
 #endif /* OPENGL_H_ */

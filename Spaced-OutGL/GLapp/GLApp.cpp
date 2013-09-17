@@ -1,12 +1,14 @@
 #include "Header/GLApp.h"
 
+#include "Header/OpenGL.h"
+
 GLApp::GLApp()
 {
 	m_hMainWnd   = 0;
-	m_AppPaused  = false;
-	m_Minimized  = false;
-	m_Maximized  = false;
-	m_Resizing   = false;
+	m_appPaused  = false;
+	m_minimized  = false;
+	m_maximized  = false;
+	m_resizing   = false;
 
 	m_MainWndTitle = "Space-out";
 	m_ClientWidth    = 1024;
@@ -26,22 +28,62 @@ void GLApp::initApp()
 
 int GLApp::run()
 {
+	glfwMakeContextCurrent(m_hMainWnd);
+
+	glfwSetKeyCallback(m_hMainWnd, OpenGL::messageCallback);
+
+	//glfwSetWindowSizeCallback(m_hMainWnd, resizeCallback);
+
+	double currTime = glfwGetTime();
+	int tWidth, tHeight;
+
 	while (!glfwWindowShouldClose(m_hMainWnd))
 	{
-		/* Render here */
 
-		/* Swap front and back buffers */
-		glfwSwapBuffers(m_hMainWnd);
+		//Check if window is resized
+		glfwGetWindowSize(m_hMainWnd, &tWidth, &tHeight);
+		if(tWidth != m_ClientWidth || tHeight != m_ClientHeight)
+			m_appPaused = true;
+		/* Render here */
+		if( !m_appPaused )
+		{
+			//Calc dt when application is not paused
+			double newTime = glfwGetTime();
+			double dt = newTime - currTime;
+			currTime = newTime;
+			std::ostringstream os;
+			os << dt;
+			std::string sdt = os.str();
+			//Print debug dt
+			glfwSetWindowTitle(m_hMainWnd, (m_MainWndTitle + "  " + sdt).c_str());
+
+
+			//Update and Draw
+			updateScene(dt);
+			drawScene();
+
+
+
+			glfwPollEvents();
+		}
+		else
+		{
+			glfwSetWindowTitle(m_hMainWnd, "PAUSED MOTHERFUKAAAAAAA");
+			m_appPaused = false;
+			glfwPollEvents();
+			glfwGetWindowSize(m_hMainWnd, &tWidth, &tHeight);
+						m_ClientWidth = tWidth;
+						m_ClientHeight = tHeight;
+			usleep(500000);
+
+			//Keep dt paused
+			currTime = glfwGetTime();
+		}
 
 		/* Poll for and process events */
-		glfwPollEvents();
+
 	}
 	return 0;
-}
-
-void GLApp::onResize()
-{
-
 }
 
 void GLApp::updateScene(float p_dt)
@@ -51,6 +93,10 @@ void GLApp::updateScene(float p_dt)
 
 void GLApp::drawScene()
 {
+	/* Swap front and back buffers */
+	glfwSwapBuffers(m_hMainWnd);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 1.0f, 0.5f);
 
 }
 
