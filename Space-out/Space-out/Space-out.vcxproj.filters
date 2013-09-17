@@ -47,6 +47,9 @@
     <ClCompile Include="Block.cpp">
       <Filter>Object</Filter>
     </ClCompile>
+    <ClCompile Include="LevelGenerator.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -98,6 +101,9 @@
     </ClInclude>
     <ClInclude Include="Block.h">
       <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelGenerator.h">
+      <Filter>Game\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -49,10 +49,6 @@ struct Vector4
 	}
 };
 
-struct BlockVertex
-{
-	Vector3 pos;
-	Vector4 color;
-};
+
 
 #endif VECTOR2_H

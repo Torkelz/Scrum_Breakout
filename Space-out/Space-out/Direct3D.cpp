@@ -89,7 +89,7 @@ void Direct3D::initApp()
 
 	
 	BufferInitDesc blockBufferDesc;
-	blockBufferDesc.elementSize		= sizeof(Vector3);
+	blockBufferDesc.elementSize		= sizeof(BlockVertex);
 	blockBufferDesc.initData		= &blockData;
 	blockBufferDesc.numElements		= 2;
 	blockBufferDesc.type			= VERTEX_BUFFER;

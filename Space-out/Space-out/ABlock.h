@@ -3,6 +3,12 @@
 
 #include "Object.h"
 
+struct BlockVertex
+{
+	Vector3 pos;
+	Vector4 color;
+};
+
 class ABlock : public Object
 {
 public:

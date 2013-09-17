@@ -41,6 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\BTH\Documents\GitHub\Scrum_Breakout\Space-out\glm;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -82,6 +83,7 @@
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="Direct3D.cpp" />
+    <ClCompile Include="LevelGenerator.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -102,6 +104,7 @@
     <ClInclude Include="d3dUtil.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="LevelGenerator.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="GameTimer.h" />

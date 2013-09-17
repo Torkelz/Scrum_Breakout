@@ -23,14 +23,15 @@ struct GSOutput
 
 VSOutput VS(VSInput p_vIn)
 {
-	VSOutput vOut;
+	VSOutput vOut, lol;
 	
 	// Transform to homogeneous clip space.
 	vOut.m_posH = mul(float4(p_vIn.m_posL, 1.0f), m_WVP);
 	
 	// Just pass vertex color into the pixel shader.
     vOut.m_col = p_vIn.m_col;
-    
+    //vOut.m_col = float4(1.0f, 0.0f, 0.0f, 1.0f);
+
     return vOut;
 }
 
@@ -48,6 +49,7 @@ void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStrea
 	float4 vert6 = p_input[0].m_posH + mul( float4(dimensions * float4(-1.0,  1.0,  1.0, 0.0)), m_WVP); // 6 -++
 	float4 vert7 = p_input[0].m_posH + mul( float4(dimensions * float4( 1.0,  1.0,  1.0, 0.0)), m_WVP); // 7 +++
 	GSOutput outVertex = (GSOutput)0;
+	outVertex.m_col = p_input[0].m_col;
 
 	// left
 	outVertex.m_posH = vert5;
@@ -115,7 +117,6 @@ void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStrea
 	p_outputStream.Append(outVertex);
 	p_outputStream.RestartStrip();
 
-	outVertex.m_col = p_input[0].m_col;
 }
 
 
