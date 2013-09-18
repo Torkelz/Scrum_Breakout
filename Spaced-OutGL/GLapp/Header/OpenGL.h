@@ -16,10 +16,13 @@ class OpenGL : public GLApp{
 	void 			updateScene(float p_dt);
 	void 			drawScene();
 	static void 	messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods);
+private:
+	void			updateFPSCounter();
 
 private:
 	mat4x4 			m_camView;
-	float			rotation;
+	float			m_rotation;
+	float			m_ratio;
 };
 
 #endif /* OPENGL_H_ */

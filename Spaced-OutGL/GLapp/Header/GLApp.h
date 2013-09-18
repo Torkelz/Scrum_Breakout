@@ -23,12 +23,14 @@ public:
 	virtual void		initApp();
 	virtual void		updateScene(float p_dt);
 	virtual void		drawScene();
+	static  void		errorCallback(int p_error, const char* p_pDescription);
 //	static 	void		resizeCallback(GLFWwindow* p_pMainWnd, int p_width, int p_height);
 //	static	void		MessageLoop(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods);
-
+private:
+	static 	bool 		gl_log(const char* p_pMessage, const char* p_pFilename, int p_line);
 protected:
-	void initMainWindow();
-	void initOpenGL();
+	void 				initMainWindow();
+	void 				initOpenGL();
 
 protected:
 

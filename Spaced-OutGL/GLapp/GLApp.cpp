@@ -1,5 +1,4 @@
 #include "Header/GLApp.h"
-
 #include "Header/OpenGL.h"
 
 GLApp::GLApp()
@@ -13,7 +12,6 @@ GLApp::GLApp()
 	m_MainWndTitle = "Space-out";
 	m_ClientWidth    = 1024;
 	m_ClientHeight   = 768;
-
 }
 GLApp::~GLApp()
 {
@@ -29,79 +27,63 @@ void GLApp::initApp()
 int GLApp::run()
 {
 	glfwMakeContextCurrent(m_hMainWnd);
-
 	glfwSetKeyCallback(m_hMainWnd, OpenGL::messageCallback);
-
-	//glfwSetWindowSizeCallback(m_hMainWnd, resizeCallback);
 
 	double currTime = glfwGetTime();
 	int tWidth, tHeight;
 
 	while (!glfwWindowShouldClose(m_hMainWnd))
 	{
-
 		//Check if window is resized
 		glfwGetWindowSize(m_hMainWnd, &tWidth, &tHeight);
 		if(tWidth != m_ClientWidth || tHeight != m_ClientHeight)
 			m_appPaused = true;
-		/* Render here */
 		if( !m_appPaused )
 		{
 			//Calc dt when application is not paused
 			double newTime = glfwGetTime();
 			double dt = newTime - currTime;
 			currTime = newTime;
-			std::ostringstream os;
-			os << dt;
-			std::string sdt = os.str();
-			//Print debug dt
-			glfwSetWindowTitle(m_hMainWnd, (m_MainWndTitle + "  " + sdt).c_str());
-
 
 			//Update and Draw
 			updateScene(dt);
 			drawScene();
 
-
-
 			glfwPollEvents();
 		}
 		else
 		{
-			glfwSetWindowTitle(m_hMainWnd, "PAUSED MOTHERFUKAAAAAAA");
 			m_appPaused = false;
 			glfwPollEvents();
 			glfwGetWindowSize(m_hMainWnd, &tWidth, &tHeight);
-						m_ClientWidth = tWidth;
-						m_ClientHeight = tHeight;
+			m_ClientWidth = tWidth;
+			m_ClientHeight = tHeight;
 			usleep(500000);
 
 			//Keep dt paused
 			currTime = glfwGetTime();
 		}
-
-		/* Poll for and process events */
-
 	}
 	return 0;
 }
 
 void GLApp::updateScene(float p_dt)
 {
-	p_dt = 0;
+
 }
 
 void GLApp::drawScene()
 {
 	/* Swap front and back buffers */
 	glfwSwapBuffers(m_hMainWnd);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.0f, 1.0f, 0.5f);
 
 }
 
 void GLApp::initMainWindow()
 {
+	glfwSetErrorCallback(errorCallback);
 	if (!glfwInit())
 		glfwTerminate();
 }
@@ -113,4 +95,22 @@ void GLApp::initOpenGL()
 	    {
 	        glfwTerminate();
 	    }
+}
+
+void GLApp::errorCallback(int p_error, const char* p_pDescription)
+{
+	fputs(p_pDescription, stderr);
+	gl_log(p_pDescription, __FILE__, __LINE__);
+}
+
+bool GLApp::gl_log(const char* p_pMessage, const char* p_pFilename, int p_line)
+{
+	FILE* file = fopen ("gl.log", "a+");
+	  if (!file) {
+	    fprintf (stderr, "ERROR: could not open %s for writing\n", "gl.log");
+	    return false;
+	  }
+	  fprintf (file, "%s:%i %s\n", p_pFilename, p_line, p_pMessage);
+	  fclose (file);
+	  return true;
 }
