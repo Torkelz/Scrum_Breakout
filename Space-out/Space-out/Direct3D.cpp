@@ -82,16 +82,37 @@ void Direct3D::initApp()
 	// PAD END
 
 
-	//TEST BLOCK START!
-	BlockVertex blockData[2];
-	for (int i = 0; i < 2; i++)
-		blockData[i] = m_game.getBlocks().at(i)->getBlockVertex();
+	//TEST BLOCK START
+	m_pBlockList = m_game.getBlocks();
+	int listSize = m_pBlockList->m_blocksFront.size();
+	m_blockBufferSize = 0;
+	m_blockBufferSize += listSize;
+	std::vector<BlockVertex> blockData;
 
+	for (int i = 0; i < listSize; i++)
+		blockData.push_back(m_pBlockList->m_blocksFront.at(i)->getBlockVertex());
+
+	listSize = m_pBlockList->m_blocksBack.size();
+	m_blockBufferSize += listSize;
+	for (int i = 0; i < listSize; i++)
+		blockData.push_back(m_pBlockList->m_blocksBack.at(i)->getBlockVertex());
 	
+	listSize = m_pBlockList->m_blocksLeft.size();
+	m_blockBufferSize += listSize;
+	for (int i = 0; i < listSize; i++)
+		blockData.push_back(m_pBlockList->m_blocksLeft.at(i)->getBlockVertex());
+
+	listSize = m_pBlockList->m_blocksRight.size();
+	m_blockBufferSize += listSize;
+	for (int i = 0; i < listSize; i++)
+		blockData.push_back(m_pBlockList->m_blocksRight.at(i)->getBlockVertex());
+
+	blockData.shrink_to_fit();
+
 	BufferInitDesc blockBufferDesc;
 	blockBufferDesc.elementSize		= sizeof(BlockVertex);
-	blockBufferDesc.initData		= &blockData;
-	blockBufferDesc.numElements		= 2;
+	blockBufferDesc.initData		= blockData.data();
+	blockBufferDesc.numElements		= m_blockBufferSize;
 	blockBufferDesc.type			= VERTEX_BUFFER;
 	blockBufferDesc.usage			= BUFFER_USAGE_IMMUTABLE;
 
@@ -111,9 +132,9 @@ void Direct3D::initApp()
 
 	BufferInitDesc cBlockBufferDesc;	
 
-	cBlockBufferDesc.elementSize = sizeof(cbPerObj);
+	cBlockBufferDesc.elementSize = sizeof(cBlockBuffer);
 	cBlockBufferDesc.initData = NULL;
-	cBlockBufferDesc.numElements = 1;
+	cBlockBufferDesc.numElements = 4;
 	cBlockBufferDesc.type = CONSTANT_BUFFER_ALL;
 	cBlockBufferDesc.usage = BUFFER_DEFAULT;
 	
@@ -127,8 +148,8 @@ void Direct3D::initApp()
 	m_HID = HID( getMainWnd() );
 	
 	//Set up world view projdf
-	m_camPosition = XMVectorSet( 0.0f, 0.0f, -100.f, 0.0f );
-	m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
+	m_camPosition = XMVectorSet( 60.0f, 0.0f, -100.0f, 0.0f );
+	m_camTarget = XMVectorSet( 60.0f, 0.0f, 0.0f, 0.0f );
 	m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
 	m_camView = XMMatrixLookAtLH( m_camPosition, m_camTarget, m_camUp );
@@ -173,7 +194,7 @@ void Direct3D::drawScene()
 {
 	D3DApp::drawScene();
 	cbPerObj cBufferStruct;
-	cbPerObj cBlockBuffer;
+	cBlockBuffer cBlockBufferStruct;
 
 	XMMATRIX translatePadMatrix;
 	
@@ -200,16 +221,18 @@ void Direct3D::drawScene()
 	//TEST BLOCK DRAW!
 	
 	m_WVP = m_world *m_camView * m_camProjection;
-	cBlockBuffer.WVP = XMMatrixTranspose(m_WVP);
-	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBuffer, 0, 0);
+	cBlockBufferStruct.WVP = XMMatrixTranspose(m_WVP);
+	cBlockBufferStruct.sizeX = g_bSizeX;
+	cBlockBufferStruct.sizeY = g_bSizeY;
+	cBlockBufferStruct.sizeZ = g_bSizeZ;
+	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 	m_cBlockBuffer.apply(0);
 	m_blockShader.setShaders();
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 	m_blockBuffer.apply(0);
-	
-	m_pDeviceContext->Draw(2, 0);
+	m_pDeviceContext->Draw(m_blockBufferSize, 0);
 
-	m_pSwapChain->Present(0, 0);
+	m_pSwapChain->Present(1, 0);
 }
 
 LRESULT Direct3D::msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)

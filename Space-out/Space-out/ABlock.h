@@ -2,12 +2,27 @@
 #define ABLOCK_H
 
 #include "Object.h"
+#include <DirectXMath.h>
+
+using namespace DirectX;
 
 struct BlockVertex
 {
 	Vector3 pos;
 	Vector4 color;
 };
+
+struct cBlockBuffer
+{
+	XMMATRIX WVP;
+	float sizeX;
+	float sizeY;
+	float sizeZ;
+};
+
+const static float	g_bSizeX = 3.0f;
+const static float 	g_bSizeY = 1.0f;
+const static float	g_bSizeZ = 1.0f;
 
 class ABlock : public Object
 {
@@ -21,10 +36,6 @@ public:
 	int					getHp();
 	int					getBlockID();
 	BlockVertex			getBlockVertex();
-
-	const static int	m_sizeX = 3;
-	const static int	m_sizeY = 1;
-	const static int	m_sizeZ = 1;
 
 protected:
 	int m_hp;

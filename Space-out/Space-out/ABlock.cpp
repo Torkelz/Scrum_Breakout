@@ -6,6 +6,7 @@ ABlock::ABlock(Vector3* p_pPos, Vector3* p_pColor, std::string p_objectName, int
 	m_blockID = p_blockID;
 	m_vertex.pos = *p_pPos;
 	m_vertex.color = Vector4(p_pColor->x, p_pColor->y, p_pColor->z, 1.0f);
+
 }
 
 ABlock::~ABlock(){}

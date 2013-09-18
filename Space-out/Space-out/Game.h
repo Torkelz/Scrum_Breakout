@@ -3,6 +3,7 @@
 
 #include "Vector2.h"
 #include <vector>
+#include "LevelGenerator.h"
 
 class Observer;
 class Object;
@@ -25,12 +26,13 @@ public:
 	void					keyEvent( unsigned short p_key );
 	Observer*				getObserver();
 	Object*					getPad();
-	std::vector<ABlock*>	getBlocks();
+	BlockLists*				getBlocks();
 
 private:
 	Observer*				m_pObserver;
 	Object*					m_pPad;
-	std::vector<ABlock*>	m_pBlocks;
+	BlockLists*				m_pBlocks;
+	LevelGenerator			m_loadLevel;
 };
 
 #endif	GAME_H

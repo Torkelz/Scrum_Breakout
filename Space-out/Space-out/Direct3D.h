@@ -45,6 +45,8 @@ private:
 	Buffer		m_blockBuffer;
 	Shader		m_blockShader;
 	Buffer		m_cBlockBuffer;
+	BlockLists* m_pBlockList;
+	int			m_blockBufferSize;
 
 	Buffer		m_buffer;
 	Buffer		m_cBuffer;

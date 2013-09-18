@@ -2,7 +2,6 @@
 #include "Observer.h"
 #include "Pad.h"
 #include "Block.h"
-#include "LevelGenerator.h"
 
 Game::Game(){}
 Game::~Game(){}
@@ -11,8 +10,9 @@ void Game::init()
 {
 	m_pObserver = new Observer(this);
 	m_pPad		= new Pad(&Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.56f, 0.56f, 0.56f), "Pad");
-	m_pBlocks.push_back(new Block(&Vector3(-10.0f, 0.0f, -80.0f), &Vector3(1.0f, 0.23f, 0.67f), "Block", 0));
-	m_pBlocks.push_back(new Block(&Vector3(10.0f, 0.0f, -80.0f), &Vector3(0.0f, 0.56f, 0.56f), "Block", 0));
+	m_loadLevel = LevelGenerator();
+	m_loadLevel.loadFile("Levels/level2.txt");
+	m_pBlocks = m_loadLevel.getBlocks();
 }
 
 void Game::update()
@@ -74,7 +74,7 @@ Object* Game::getPad()
 	return m_pPad;
 }
 
-std::vector<ABlock*> Game::getBlocks()
+BlockLists* Game::getBlocks()
 {
 	return m_pBlocks;
 }
