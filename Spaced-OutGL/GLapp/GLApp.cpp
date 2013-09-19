@@ -22,6 +22,14 @@ void GLApp::initApp()
 {
 	initMainWindow();
 	initOpenGL();
+
+	glewExperimental = true;
+
+	GLenum err = glewInit();
+	if(err != GLEW_OK)
+	{
+		glfwTerminate();
+	}
 }
 
 int GLApp::run()
@@ -84,7 +92,7 @@ void GLApp::drawScene()
 void GLApp::initMainWindow()
 {
 	glfwSetErrorCallback(errorCallback);
-	if (!glfwInit())
+	if(!glfwInit())
 		glfwTerminate();
 }
 
@@ -95,6 +103,7 @@ void GLApp::initOpenGL()
 	    {
 	        glfwTerminate();
 	    }
+	    glfwMakeContextCurrent(m_hMainWnd);
 }
 
 void GLApp::errorCallback(int p_error, const char* p_pDescription)

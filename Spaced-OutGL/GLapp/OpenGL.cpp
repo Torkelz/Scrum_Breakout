@@ -1,5 +1,10 @@
 #include "Header/OpenGL.h"
 
+struct triangleVertex
+{
+	vec3 pos;
+	vec3 col;
+};
 int main(void)
 {
 	OpenGL theApp;
@@ -9,11 +14,13 @@ int main(void)
 
 OpenGL::OpenGL() : GLApp()
 {
-
+	m_ratio = 0;
+	m_rotation = 0;
 }
 
 OpenGL::~OpenGL()
 {
+	triBuffer.~Buffer();
 
 }
 
@@ -21,6 +28,26 @@ void OpenGL::initApp()
 {
 	GLApp::initApp();
 	m_rotation = 0.0f;
+	triangleVertex tri[3];
+	tri[0].pos = vec3(-0.6f, -0.4f, 0.f);
+	tri[0].col = vec3(0.f, 0.f, 1.f);
+	tri[1].pos = vec3(0.6f, -0.4f, 0.f);
+	tri[1].col = vec3(0.f, 1.f, 0.f);
+	tri[2].pos = vec3(0.f, 0.6f, 0.f);
+	tri[2].col = vec3(1.f, 0.f, 0.f);
+
+	BufferInputDesc desc[2];
+	desc[0].size = 3;
+	desc[0].type = GL_FLOAT;
+	desc[0].normalized = GL_FALSE;
+	desc[0].pointer = NULL;
+	desc[1].size = 3;
+	desc[1].type = GL_FLOAT;
+	desc[1].normalized = GL_FALSE;
+	desc[1].pointer = NULL;
+	bool test =	triBuffer.init(GL_ARRAY_BUFFER, &tri, sizeof(triangleVertex),3, GL_STATIC_DRAW, desc, 2);
+	if(!test)
+		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 }
 
 void OpenGL::updateScene(float p_dt)
@@ -44,14 +71,63 @@ void OpenGL::drawScene()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glRotatef((float) m_rotation * 50.f, 0.f, 0.f, 1.f);
-	glBegin(GL_TRIANGLES);
-	glColor3f(1.f, 0.f, 0.f);
-	glVertex3f(-0.6f, -0.4f, 0.f);
-	glColor3f(0.f, 1.f, 0.f);
-	glVertex3f(0.6f, -0.4f, 0.f);
-	glColor3f(0.f, 0.f, 1.f);
-	glVertex3f(0.f, 0.6f, 0.f);
-	glEnd();
+	triBuffer.apply();
+	GLuint shader = glCreateShader(GL_VERTEX_SHADER);
+	const char* str = "../ShaderGLSL/triVertex.glsl";
+	glShaderSource(shader,1,&str, NULL);
+	GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
+	const char* fragStr = "../ShaderGLSL/triFragment.glsl";
+	glShaderSource(fragment,1,&fragStr, NULL);
+	glCompileShader(shader);
+	GLint status;
+	    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+	    if (status == GL_FALSE)
+	    {
+	        GLint infoLogLength;
+	        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+	        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+	        glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
+
+	        const char *strShaderType = NULL;
+	        strShaderType = "vertex";
+
+
+	        fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType, strInfoLog);
+	        delete[] strInfoLog;
+	    }
+
+	glCompileShader(fragment);
+	glGetShaderiv(fragment, GL_COMPILE_STATUS, &status);
+		    if (status == GL_FALSE)
+		    {
+		        GLint infoLogLength;
+		        glGetShaderiv(fragment, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+		        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+		        glGetShaderInfoLog(fragment, infoLogLength, NULL, strInfoLog);
+
+		        const char *strShaderType = NULL;
+		        strShaderType = "fragment";
+
+
+		        fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType, strInfoLog);
+		        delete[] strInfoLog;
+		    }
+	GLuint program = glCreateProgram();
+	glAttachShader(program, shader);
+	glAttachShader(program, fragment);
+	glLinkProgram(program);
+	glUseProgram(program);
+	glDrawArrays(GL_TRIANGLES,0,triBuffer.getNumElem());
+//	glBegin(GL_TRIANGLES);
+//	glColor3f(1.f, 0.f, 0.f);
+//	glVertex3f(-0.6f, -0.4f, 0.f);
+//	glColor3f(0.f, 1.f, 0.f);
+//	glVertex3f(0.6f, -0.4f, 0.f);
+//	glColor3f(0.f, 0.f, 1.f);
+//	glVertex3f(0.f, 0.6f, 0.f);
+//	glEnd();
 }
 
 void OpenGL::messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods)

@@ -2,6 +2,7 @@
 #define OPENGL_H_
 
 #include "GLApp.h"
+#include "../../GLUtility/Header/Buffer.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,6 +24,7 @@ private:
 	mat4x4 			m_camView;
 	float			m_rotation;
 	float			m_ratio;
+	Buffer			triBuffer;
 };
 
 #endif /* OPENGL_H_ */
