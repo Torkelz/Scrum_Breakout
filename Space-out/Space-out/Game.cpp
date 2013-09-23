@@ -13,6 +13,7 @@ void Game::init()
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
 	m_pBlocks = m_loadLevel.getBlocks();
+
 }
 
 void Game::update()
@@ -74,7 +75,7 @@ Object* Game::getPad()
 	return m_pPad;
 }
 
-BlockLists* Game::getBlocks()
+vector<ABlock*>* Game::getBlocks(int p_list)
 {
-	return m_pBlocks;
+	return &m_pBlocks->at(p_list);
 }

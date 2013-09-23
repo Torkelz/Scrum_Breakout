@@ -26,12 +26,12 @@ public:
 	void					keyEvent( unsigned short p_key );
 	Observer*				getObserver();
 	Object*					getPad();
-	BlockLists*				getBlocks();
+	vector<ABlock*>*		getBlocks(int p_list);
 
 private:
 	Observer*				m_pObserver;
 	Object*					m_pPad;
-	BlockLists*				m_pBlocks;
+	vector<vector<ABlock*>>*m_pBlocks;
 	LevelGenerator			m_loadLevel;
 };
 

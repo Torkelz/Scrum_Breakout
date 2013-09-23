@@ -2,36 +2,54 @@
 
 LevelGenerator::LevelGenerator()
 {
-
+	m_posXOffsetFB	= 0;
+	m_posXOffsetL	= 0;
+	m_posXOffsetR	= 0;
+	m_posZOffsetLR	= 0;
+	m_posZOffsetF	= 0;
+	m_posZOffsetB	= 0;
+	m_posYOffset	= 0;
 }
 
 LevelGenerator::~LevelGenerator(){}
 
 void LevelGenerator::loadFile(string p_fileName)
 {
-	string temp;
-	char* temp1;
-	char currentseg = NULL;
+	string line;
+	char* lineChar;
 	int offset = 0;
-	fstream m_file;
-	m_file.open(p_fileName);
-	int linecount = 1;
+	fstream file;
+	file.open(p_fileName);
 	
-	if(m_file.is_open())
+	if(file.is_open())
 	{
-		getline(m_file, temp);
-		getline(m_file, temp);
+		//X-Axis
+		getline(file, line);
+		m_blockCountX = stringToNumber(line);
+		//Y-Axis
+		getline(file, line);
+		m_blockCountY = stringToNumber(line);
+		m_offsetLimit = (m_blockCountX * m_blockCountY) - m_blockCountX;
+		//Calculate offset based of X, Y
+		calcOffsets();
+
+		//Rest of file
+		m_loadedData.resize(m_blockCountX*m_blockCountY);
+		getline(file,line);
+
 		for(int i = 0; i < 4; i++)
 		{
-			while(temp.length()>1)
+			getline(file, line);
+			offset = 0;
+			while(line.length()>1)
 			{
-				unsigned int size = temp.length() + 1;
-				temp1 = new char[size];
-				strcpy_s(temp1, size, temp.c_str());
+				unsigned int size = line.length() + 1;
+				lineChar = new char[size];
+				strcpy_s(lineChar, size, line.c_str());
 				char* token;
 				char* token_next;
-				token = strtok_s(temp1, ";", &token_next);
-				int looplength = (offset + size * 0.5f);
+				token = strtok_s(lineChar, ";", &token_next);
+				int looplength = (int)(offset + size * 0.5f);
 
 				for (int j = offset; j < looplength ; j++)
 				{
@@ -39,93 +57,34 @@ void LevelGenerator::loadFile(string p_fileName)
 					{
 						int a = 0;
 						a += atoi(token);
-						m_loadedData[j] = a;
-						if(a == 0)
-						{
-							int lol = 0;
-						}
+						m_loadedData.at(j) = a;
 						token = strtok_s( NULL, ";", &token_next);
 					}
 				}
-				if(offset < 180)
+				if(offset < m_offsetLimit)
 					offset += size/2;
-				getline(m_file, temp);
+				if(!file.eof())
+					getline(file, line);
+				else 
+					line = ' ';
 			}
+			m_blockLists.push_back(vector<ABlock*>());
 			createBlocks((FACE)i);
 		}
-	//	while (!m_file.eof())
-	//	{
-	//		getline(m_file, temp);
-	//		int size = temp.length()+1;
-	//		if(size == 2)
-	//		{
-	//			currentseg = temp[0];
-	//			getline(m_file, temp);
-	//			size = temp.length()+1;
-	//		}
-	//		temp1 = new char[temp.length() + 1];
-	//		strcpy_s(temp1, size, temp.c_str());
-	//		char* token;
-	//		char* token_next;
-	//		token = strtok_s(temp1, ";", &token_next);
-
-	//		for (int i = offset; i < (offset + size/2) ; i++)
-	//		{
-	//			if (token != NULL)
-	//			{
-	//				int a = 0;
-	//				a += atoi(token);
-	//				m_loadedData[i] = a;
-	//				token = strtok_s( NULL, ";", &token_next);
-	//			}
-	//		}
-	//		if( offset < 180)
-	//			offset += size/2;
-
-
-	//		if (currentseg == 'f' && linecount == 10)
-	//		{
-	//			createBlocks(FRONT);
-	//			linecount = 1;
-	//		}
-	//		else if(currentseg == 'b' && linecount == 10)
-	//		{
-	//			createBlocks(BACK);
-	//			linecount = 1;
-	//		}
-	//		else if(currentseg == 'l' && linecount == 10)
-	//		{
-	//			createBlocks(LEFT);
-	//			linecount = 1;
-	//		}
-	//		else if(currentseg == 'r' && linecount == 10)
-	//		{
-	//			createBlocks(RIGHT);
-	//			linecount = 1;
-	//		}
-	//		else
-	//		{
-	//			linecount++;
-	//		}
-	//			
-	//	}
 	}
-	m_blockLists.m_blocksFront.shrink_to_fit();
-	m_blockLists.m_blocksBack.shrink_to_fit();
-	m_blockLists.m_blocksLeft.shrink_to_fit();
-	m_blockLists.m_blocksRight.shrink_to_fit();
+	for(int i = 0; i < 4; i++)
+		m_blockLists.at(i).shrink_to_fit();
+	
 }
 
 void LevelGenerator::createBlocks(FACE p_face)
 {
 	int size = sizeof(m_loadedData)/sizeof(int);
-	int x = (int)(size * 0.1f);
-	int y = (int)(size * 0.05f);
 	int offset = 0;
 	int row = 0;
-	for (int i = 0; i < y; i++)
+	for (int i = 0; i < m_blockCountY; i++)
 	{
-		for (int j = offset; j < (x + offset); j++)
+		for (int j = offset; j < (m_blockCountX + offset); j++)
 		{
 			
 			switch (m_loadedData[j])
@@ -141,12 +100,12 @@ void LevelGenerator::createBlocks(FACE p_face)
 			}
 			row++;
 		}
-		offset += x;
+		offset += m_blockCountX;
 		row = 0;
 	}
 }
 
-BlockLists* LevelGenerator::getBlocks()
+vector<vector<ABlock*>>* LevelGenerator::getBlocks()
 {
 	return &m_blockLists;
 }
@@ -156,24 +115,60 @@ void LevelGenerator::addBlockToList(int i, int row, FACE p_face)
 	switch(p_face)
 	{
 		case FRONT:
-			m_blockLists.m_blocksFront.push_back(new Block(&Vector3((0+row*(g_bSizeX*2.1f)), 30+(-5.0f+i*(g_bSizeY*2.2f)), -15.0f), &Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+			m_blockLists.at(0).push_back(new Block(&Vector3(	m_posXOffsetFB+row*(g_bSizeX*2.1f),	
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
+																		m_posZOffsetF),
+																		&Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;		
 		case BACK:		
-			m_blockLists.m_blocksBack.push_back(new Block(&Vector3((0+row*(g_bSizeX*2.1f)), 30+(-5.0f+i*(g_bSizeY*2.2f)), 35.0f), &Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+			m_blockLists.at(1).push_back(new Block(&Vector3(		m_posXOffsetFB+row*(g_bSizeX*2.1f),
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
+																		m_posZOffsetB),
+																		&Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;		
 		case LEFT:		
-			m_blockLists.m_blocksLeft.push_back(new Block(&Vector3(-15.0f, 30+(-5.0f+i*(g_bSizeY*2.2f)), (0+row*(g_bSizeZ*2.1f))), &Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+			m_blockLists.at(2).push_back(new Block(&Vector3(		m_posXOffsetL,
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
+																		m_posZOffsetLR+row*(g_bSizeX*2.1f)),
+																		&Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;		
 		case RIGHT:		
-			m_blockLists.m_blocksRight.push_back(new Block(&Vector3(135.0f, 30+(-5.0f+i*(g_bSizeY*2.2f)), (0+row*(g_bSizeZ*2.1f))), &Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+			m_blockLists.at(3).push_back(new Block(&Vector3(	m_posXOffsetR,
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
+																		m_posZOffsetLR+row*(g_bSizeX*2.1f)),
+																		&Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;
 	}
 };
 
+int LevelGenerator::stringToNumber(string p_number)
+{
+	stringstream ss(p_number);
+	int result;
+	ss >> result;
+	return result;
+}
 
-
-
-
-
-
+void LevelGenerator::calcOffsets()
+{
+	//Front, back X
+	m_posXOffsetFB = 0.0f;
+	//Left X
+	m_posXOffsetL = -g_bSizeX;
+	//Right X
+	m_posXOffsetR = g_bSizeX * 2.0f * m_blockCountX + g_bSizeZ;
+	//Left, Right Z
+	m_posZOffsetLR = g_bSizeX;
+	//Front Z
+	m_posZOffsetF = 0.0f;
+	//Back Z
+	m_posZOffsetB = g_bSizeX * 2.0f * m_blockCountX + g_bSizeZ;
+	//All Y
+	m_posYOffset = 30.0f;
+}	  
+	  
+	  
+	  
+	  
+	  
 

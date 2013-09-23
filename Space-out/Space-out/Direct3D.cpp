@@ -39,12 +39,15 @@ void Direct3D::initApp()
 	HRESULT hr = S_OK;
 	cbPerObj cBufferStruct;
 
-	m_buffer		= Buffer();
-	m_cBuffer		= Buffer();
-	m_shader		= Shader();
-	m_blockBuffer	= Buffer();
-	m_blockShader	= Shader();
-	m_cBlockBuffer	= Buffer();
+	m_buffer			= Buffer();
+	m_cBuffer			= Buffer();
+	m_shader			= Shader();
+
+	for(int i = 0; i < 4; i++)
+		m_blockBuffers[i]	= Buffer();
+
+	m_blockShader		= Shader();
+	m_cBlockBuffer		= Buffer();
 
 	m_game = Game();
 	m_game.init();
@@ -83,40 +86,33 @@ void Direct3D::initApp()
 
 
 	//TEST BLOCK START
-	m_pBlockList = m_game.getBlocks();
-	int listSize = m_pBlockList->m_blocksFront.size();
-	m_blockBufferSize = 0;
-	m_blockBufferSize += listSize;
-	std::vector<BlockVertex> blockData;
+	for(int i = 0; i < 4; i++)
+	{
+		std::vector<BlockVertex> blockData;
+		m_pBlockList = m_game.getBlocks(i);
+		int listSize = m_pBlockList->size();
 
-	for (int i = 0; i < listSize; i++)
-		blockData.push_back(m_pBlockList->m_blocksFront.at(i)->getBlockVertex());
+		for (int j = 0; j < listSize; j++)
+			blockData.push_back(m_pBlockList->at(j)->getBlockVertex());
 
-	listSize = m_pBlockList->m_blocksBack.size();
-	m_blockBufferSize += listSize;
-	for (int i = 0; i < listSize; i++)
-		blockData.push_back(m_pBlockList->m_blocksBack.at(i)->getBlockVertex());
-	
-	listSize = m_pBlockList->m_blocksLeft.size();
-	m_blockBufferSize += listSize;
-	for (int i = 0; i < listSize; i++)
-		blockData.push_back(m_pBlockList->m_blocksLeft.at(i)->getBlockVertex());
+		BufferInitDesc blockBufferDesc;
+		blockBufferDesc.elementSize		= sizeof(BlockVertex);
+		blockBufferDesc.initData		= blockData.data();
+		blockBufferDesc.numElements		= listSize;
+		blockBufferDesc.type			= VERTEX_BUFFER;
+		blockBufferDesc.usage			= BUFFER_USAGE_IMMUTABLE;
 
-	listSize = m_pBlockList->m_blocksRight.size();
-	m_blockBufferSize += listSize;
-	for (int i = 0; i < listSize; i++)
-		blockData.push_back(m_pBlockList->m_blocksRight.at(i)->getBlockVertex());
+		m_blockBuffers[i].init(m_pDevice, m_pDeviceContext, blockBufferDesc);
+		if(i == 0)
+			m_blockBufferSizeF = listSize;
+		else if(i == 1)
+			m_blockBufferSizeB = listSize;
+		else if(i == 2)
+			m_blockBufferSizeL = listSize;
+		else
+			m_blockBufferSizeR = listSize;
+	}
 
-	blockData.shrink_to_fit();
-
-	BufferInitDesc blockBufferDesc;
-	blockBufferDesc.elementSize		= sizeof(BlockVertex);
-	blockBufferDesc.initData		= blockData.data();
-	blockBufferDesc.numElements		= m_blockBufferSize;
-	blockBufferDesc.type			= VERTEX_BUFFER;
-	blockBufferDesc.usage			= BUFFER_USAGE_IMMUTABLE;
-
-	m_blockBuffer.init(m_pDevice, m_pDeviceContext, blockBufferDesc);
 
 	D3D11_INPUT_ELEMENT_DESC blockInputdesc[] = 
 	{
@@ -148,8 +144,8 @@ void Direct3D::initApp()
 	m_HID = HID( getMainWnd() );
 	
 	//Set up world view projdf
-	m_camPosition = XMVectorSet( 60.0f, 0.0f, -100.0f, 0.0f );
-	m_camTarget = XMVectorSet( 60.0f, 0.0f, 0.0f, 0.0f );
+	m_camPosition = XMVectorSet( 45.0f, 0.0f, -60.0f, 0.0f );
+	m_camTarget = XMVectorSet( 45.0f, 0.0f, 0.0f, 0.0f );
 	m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
 	m_camView = XMMatrixLookAtLH( m_camPosition, m_camTarget, m_camUp );
@@ -222,15 +218,29 @@ void Direct3D::drawScene()
 	
 	m_WVP = m_world *m_camView * m_camProjection;
 	cBlockBufferStruct.WVP = XMMatrixTranspose(m_WVP);
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	m_blockShader.setShaders();
+
 	cBlockBufferStruct.sizeX = g_bSizeX;
 	cBlockBufferStruct.sizeY = g_bSizeY;
 	cBlockBufferStruct.sizeZ = g_bSizeZ;
 	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 	m_cBlockBuffer.apply(0);
-	m_blockShader.setShaders();
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	m_blockBuffer.apply(0);
-	m_pDeviceContext->Draw(m_blockBufferSize, 0);
+	m_blockBuffers[0].apply(0);
+	m_pDeviceContext->Draw(m_blockBufferSizeF, 0);
+	m_blockBuffers[1].apply(0);
+	m_pDeviceContext->Draw(m_blockBufferSizeB, 0);
+
+	cBlockBufferStruct.sizeX = g_bSizeZ;
+	cBlockBufferStruct.sizeY = g_bSizeY;
+	cBlockBufferStruct.sizeZ = g_bSizeX;
+	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
+	m_cBlockBuffer.apply(0);
+	m_blockBuffers[2].apply(0);
+	m_pDeviceContext->Draw(m_blockBufferSizeL, 0);
+	m_blockBuffers[3].apply(0);
+	m_pDeviceContext->Draw(m_blockBufferSizeR, 0);
+
 
 	m_pSwapChain->Present(1, 0);
 }

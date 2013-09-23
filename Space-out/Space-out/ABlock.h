@@ -18,6 +18,7 @@ struct cBlockBuffer
 	float sizeX;
 	float sizeY;
 	float sizeZ;
+	int	  state;
 };
 
 const static float	g_bSizeX = 3.0f;

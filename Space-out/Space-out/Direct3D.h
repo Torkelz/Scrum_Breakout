@@ -30,28 +30,31 @@ public:
 	LRESULT msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
 private:
 	//Camera Variables
-	XMMATRIX	m_camView;
-	XMMATRIX	m_camProjection;
-	XMMATRIX	m_world;
-	XMMATRIX	m_WVP;
-	XMVECTOR	m_camPosition;
-	XMVECTOR	m_camTarget;
-	XMVECTOR	m_camUp;
-
-	HID			m_HID;
-	Game		m_game;
+	XMMATRIX		 m_camView;
+	XMMATRIX		 m_camProjection;
+	XMMATRIX		 m_world;
+	XMMATRIX		 m_WVP;
+	XMVECTOR		 m_camPosition;
+	XMVECTOR		 m_camTarget;
+	XMVECTOR		 m_camUp;
+					 
+	HID				 m_HID;
+	Game			 m_game;
 
 	//Block Test
-	Buffer		m_blockBuffer;
-	Shader		m_blockShader;
-	Buffer		m_cBlockBuffer;
-	BlockLists* m_pBlockList;
-	int			m_blockBufferSize;
+	Buffer			 m_blockBuffers[4];
+	Shader			 m_blockShader;
+	Buffer			 m_cBlockBuffer;
+	vector<ABlock*>* m_pBlockList;
+	int				 m_blockBufferSizeF;
+	int				 m_blockBufferSizeB;
+	int				 m_blockBufferSizeL;
+	int				 m_blockBufferSizeR;
 
-	Buffer		m_buffer;
-	Buffer		m_cBuffer;
-	Shader		m_shader;
+	Buffer			 m_buffer;
+	Buffer			 m_cBuffer;
+	Shader			 m_shader;
 	//TEST
-	ID3D11Buffer* mVB;
+	ID3D11Buffer*    mVB;
 };
 #endif
