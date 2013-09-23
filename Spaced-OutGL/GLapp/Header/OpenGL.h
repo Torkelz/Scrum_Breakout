@@ -25,6 +25,7 @@ private:
 	float			m_rotation;
 	float			m_ratio;
 	Buffer			triBuffer;
+	GLint 			m_program;
 };
 
 #endif /* OPENGL_H_ */

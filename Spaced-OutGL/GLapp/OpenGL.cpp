@@ -1,4 +1,6 @@
 #include "Header/OpenGL.h"
+#include <fstream>
+
 
 struct triangleVertex
 {
@@ -16,6 +18,7 @@ OpenGL::OpenGL() : GLApp()
 {
 	m_ratio = 0;
 	m_rotation = 0;
+	m_program = 0;
 }
 
 OpenGL::~OpenGL()
@@ -48,6 +51,75 @@ void OpenGL::initApp()
 	bool test =	triBuffer.init(GL_ARRAY_BUFFER, &tri, sizeof(triangleVertex),3, GL_STATIC_DRAW, desc, 2);
 	if(!test)
 		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+	GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint shader = glCreateShader(GL_VERTEX_SHADER);
+		std::string VertexShaderCode;
+		const char* vertexChar = "/home/bth/Desktop/GitHub/Git/Spaced-OutGL/GLapp/triVertex.vertexshader";
+		std::ifstream VertexShaderStream(vertexChar);
+		if(VertexShaderStream.is_open())
+		{
+			std::string Line = "";
+			while(getline(VertexShaderStream, Line))
+				VertexShaderCode += "\n" + Line;
+			VertexShaderStream.close();
+		}
+
+		// Read the Fragment Shader code from the file
+		std::string FragmentShaderCode;
+		std::ifstream FragmentShaderStream("/home/bth/Desktop/GitHub/Git/Spaced-OutGL/GLapp/triFragment.fragmentshader", std::ios::in);
+		if(FragmentShaderStream.is_open()){
+			std::string Line = "";
+			while(getline(FragmentShaderStream, Line))
+				FragmentShaderCode += "\n" + Line;
+			FragmentShaderStream.close();
+		}
+		const char* sourceVer = VertexShaderCode.c_str();
+		GLint lengthVer= VertexShaderCode.length();
+
+		glShaderSource(shader,1, &sourceVer, &lengthVer);
+		const char* sourceFra = FragmentShaderCode.c_str();
+		GLint lengthFra = FragmentShaderCode.length();
+		glShaderSource(fragment,1,&sourceFra, &lengthFra);
+		glCompileShader(shader);
+		GLint status;
+		    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+		    if (status == GL_FALSE)
+		    {
+		        GLint infoLogLength;
+		        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+		        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+		        glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
+
+		        const char *strShaderType = NULL;
+		        strShaderType = "vertex";
+
+
+		        fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType, strInfoLog);
+		        delete[] strInfoLog;
+		    }
+
+		glCompileShader(fragment);
+		glGetShaderiv(fragment, GL_COMPILE_STATUS, &status);
+			    if (status == GL_FALSE)
+			    {
+			        GLint infoLogLength;
+			        glGetShaderiv(fragment, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+			        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+			        glGetShaderInfoLog(fragment, infoLogLength, NULL, strInfoLog);
+
+			        const char *strShaderType = NULL;
+			        strShaderType = "fragment";
+
+
+			        fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType, strInfoLog);
+			        delete[] strInfoLog;
+			    }
+		m_program = glCreateProgram();
+		glAttachShader(m_program, shader);
+		glAttachShader(m_program, fragment);
+		glLinkProgram(m_program);
 }
 
 void OpenGL::updateScene(float p_dt)
@@ -72,53 +144,8 @@ void OpenGL::drawScene()
 	glLoadIdentity();
 	glRotatef((float) m_rotation * 50.f, 0.f, 0.f, 1.f);
 	triBuffer.apply();
-	GLuint shader = glCreateShader(GL_VERTEX_SHADER);
-	const char* str = "../ShaderGLSL/triVertex.glsl";
-	glShaderSource(shader,1,&str, NULL);
-	GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	const char* fragStr = "../ShaderGLSL/triFragment.glsl";
-	glShaderSource(fragment,1,&fragStr, NULL);
-	glCompileShader(shader);
-	GLint status;
-	    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-	    if (status == GL_FALSE)
-	    {
-	        GLint infoLogLength;
-	        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
 
-	        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-	        glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
-
-	        const char *strShaderType = NULL;
-	        strShaderType = "vertex";
-
-
-	        fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType, strInfoLog);
-	        delete[] strInfoLog;
-	    }
-
-	glCompileShader(fragment);
-	glGetShaderiv(fragment, GL_COMPILE_STATUS, &status);
-		    if (status == GL_FALSE)
-		    {
-		        GLint infoLogLength;
-		        glGetShaderiv(fragment, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-		        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-		        glGetShaderInfoLog(fragment, infoLogLength, NULL, strInfoLog);
-
-		        const char *strShaderType = NULL;
-		        strShaderType = "fragment";
-
-
-		        fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType, strInfoLog);
-		        delete[] strInfoLog;
-		    }
-	GLuint program = glCreateProgram();
-	glAttachShader(program, shader);
-	glAttachShader(program, fragment);
-	glLinkProgram(program);
-	glUseProgram(program);
+	glUseProgram(m_program);
 	glDrawArrays(GL_TRIANGLES,0,triBuffer.getNumElem());
 //	glBegin(GL_TRIANGLES);
 //	glColor3f(1.f, 0.f, 0.f);
