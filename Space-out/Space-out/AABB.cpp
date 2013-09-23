@@ -24,63 +24,6 @@ void AABB::initialize()
 	calculateBounds();
 }
 
-void AABB::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext)
-{
-	m_pDevice = p_pDevice;
-	m_pDeviceContext = p_pDeviceContext;
-
-	m_sphere.initDraw(m_pDevice, m_pDeviceContext);
-
-	buildCubeIndices(0);
-
-	BufferInitDesc desc;
-	desc.type				= VERTEX_BUFFER;
-	desc.numElements		= 8;
-	desc.elementSize		= sizeof( XMFLOAT3 );
-	desc.usage				= BUFFER_DEFAULT;
-	desc.initData			= m_bounds;
-	m_pBuffer = new Buffer();
-	m_pBuffer->init(p_pDevice, p_pDeviceContext, desc);
-
-	BufferInitDesc cbDesc;	
-
-	cbDesc.elementSize = sizeof(CB);
-	cbDesc.initData = NULL;
-	cbDesc.numElements = 1;
-	cbDesc.type = CONSTANT_BUFFER_VS;
-	cbDesc.usage = BUFFER_DEFAULT;
-	
-	m_pCB = new Buffer();
-	m_pCB->init(p_pDevice, p_pDeviceContext, cbDesc);
-
-	int						temp[24];
-	for (UINT i = 0; i < 24; i++)
-	{
-		temp[i]				= m_indices.at(i);
-	}
-
-	desc.type				= INDEX_BUFFER;
-	desc.numElements		= 24;
-	desc.elementSize		= sizeof(UINT);
-	desc.usage				= BUFFER_DEFAULT;
-	desc.initData			= &temp;
-
-	m_pIndexBuffer = new Buffer();
-	m_pIndexBuffer->init(p_pDevice, p_pDeviceContext, desc);
-
-
-
-	D3D11_INPUT_ELEMENT_DESC inputDesc[] = 
-	{
-		{"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
-	};
-
-	m_pShader = new Shader();
-	m_pShader->init(p_pDevice, p_pDeviceContext, 1);
-	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "VSInstmain","vs_5_0", VERTEX_SHADER , inputDesc);
-	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "PSScene", "ps_5_0", PIXEL_SHADER, NULL);
-}
-
 void AABB::calculateBounds()
 {
 	m_position = vec3(	m_bounds[0].x + ((m_bounds[7].x - m_bounds[0].x) / 2) , 
@@ -98,19 +41,18 @@ void AABB::calculateBounds()
 	m_distances[1] = m_top.x - m_bottom.x;
 	m_distances[2] = m_top.z - m_bottom.z;
 
-	m_center = m_bounds[7] + m_bounds[0];
-	m_center *= 0.5f;
 	m_halfDiagonal = m_bounds[7] - m_bounds[0];
-	m_halfDiagonal *= 0.25f;
+	m_halfDiagonal *= 0.5f;
 
 	m_sphere.setRadius(length(m_halfDiagonal));
-	m_sphere.updatePosition(m_center);
+	m_sphere.updatePosition(m_position);
 }
 
 void AABB::updatePosition(mat4 p_scale, mat4 p_translate)
 {
 	mat4 scalate;
 	scalate = p_scale * p_translate;
+	//scalate = p_scale;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -255,6 +197,64 @@ bool AABB::collide(BoundingVolume* p_pVolume)
 	}
 
 	return 0;
+}
+
+void AABB::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext)
+{
+	m_pDevice = p_pDevice;
+	m_pDeviceContext = p_pDeviceContext;
+
+	m_sphere.initDraw(m_pDevice, m_pDeviceContext);
+
+	buildCubeIndices(0);
+
+	BufferInitDesc desc;
+	desc.type				= VERTEX_BUFFER;
+	desc.numElements		= 8;
+	desc.elementSize		= sizeof( XMFLOAT3 );
+	desc.usage				= BUFFER_DEFAULT;
+	desc.initData			= m_bounds;
+
+	m_pBuffer = new Buffer();
+	m_pBuffer->init(p_pDevice, p_pDeviceContext, desc);
+
+	BufferInitDesc cbDesc;	
+
+	cbDesc.elementSize = sizeof(CB);
+	cbDesc.initData = NULL;
+	cbDesc.numElements = 1;
+	cbDesc.type = CONSTANT_BUFFER_VS;
+	cbDesc.usage = BUFFER_DEFAULT;
+	
+	m_pCB = new Buffer();
+	m_pCB->init(p_pDevice, p_pDeviceContext, cbDesc);
+
+	int						temp[24];
+	for (UINT i = 0; i < 24; i++)
+	{
+		temp[i]				= m_indices.at(i);
+	}
+
+	desc.type				= INDEX_BUFFER;
+	desc.numElements		= 24;
+	desc.elementSize		= sizeof(UINT);
+	desc.usage				= BUFFER_DEFAULT;
+	desc.initData			= &temp;
+
+	m_pIndexBuffer = new Buffer();
+	m_pIndexBuffer->init(p_pDevice, p_pDeviceContext, desc);
+
+
+
+	D3D11_INPUT_ELEMENT_DESC inputDesc[] = 
+	{
+		{"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+	};
+
+	m_pShader = new Shader();
+	m_pShader->init(p_pDevice, p_pDeviceContext, 1);
+	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "VSInstmain","vs_5_0", VERTEX_SHADER , inputDesc);
+	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "PSScene", "ps_5_0", PIXEL_SHADER, NULL);
 }
 
 void AABB::draw(XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj)
