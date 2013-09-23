@@ -131,12 +131,12 @@ void Direct3D::initApp()
 	// BALLZZZ FROM THE WALL
 
 	// Bounding Volume DEBUGGING DRAW
-	BoundingVolume* t_v;
+	/*BoundingVolume* t_v;
 	t_v = m_game.getPad()->getBoundingVolume();
 	((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
 
 	t_v = m_game.getBall()->getBoundingVolume();
-	((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);*/
 	// END DEBUGGING DRAW
 
 	// HID-STUFF
@@ -182,14 +182,14 @@ void Direct3D::drawScene()
 
 
 	// Bounding Volume DEBUGGING DRAW
-	BoundingVolume* t_v;
+	/*BoundingVolume* t_v;
 	t_v = m_game.getBall()->getBoundingVolume();
 	Sphere t_sphere = *((Sphere*)t_v);
 	t_sphere.draw(m_world, m_camView, m_camProjection);
 
 	t_v = m_game.getPad()->getBoundingVolume();
 	AABB t_bb = *((AABB*)t_v);
-	t_bb.draw(m_world, m_camView, m_camProjection);
+	t_bb.draw(m_world, m_camView, m_camProjection);*/
 	// END DEBUGGING DRAW
 
 
