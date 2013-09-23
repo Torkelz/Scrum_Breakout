@@ -23,5 +23,5 @@ std::vector<vec3>* Object::getVertices()
 
 BoundingVolume* Object::getBoundingVolume()
 {
-	return &m_boundingVolume;
+	return m_boundingVolume;
 }

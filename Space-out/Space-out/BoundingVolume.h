@@ -2,6 +2,7 @@
 #define BOUNDINGVOLUME_H
 
 #include <glm.hpp>
+#include <gtx\norm.hpp>
 
 using namespace glm;
 
@@ -27,7 +28,7 @@ protected:
 
 	enum TYPE {
 		AABBOX,
-		FRUSTUM
+		SPHERE
 	};
 };
 
