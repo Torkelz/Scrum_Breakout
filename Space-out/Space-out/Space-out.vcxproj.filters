@@ -148,9 +148,6 @@
     <FxCompile Include="Ball.fx">
       <Filter>D3D\HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="BoundingBox.fx">
-      <Filter>D3D\HLSL</Filter>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Space-out.rc" />

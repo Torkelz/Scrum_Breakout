@@ -2,23 +2,26 @@
 
 Pad::Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName) : Object(p_pPos, p_pColor, p_objectName)
 {
+<<<<<<< HEAD
 	m_vertices.push_back(vec3(-5.0f, -5.0f, 0.0f));
 	m_vertices.push_back(vec3(-5.0f, 5.0f, 0.0f));
 	m_vertices.push_back(vec3(5.0f, -5.0f, 0.0f));
 	m_vertices.push_back(vec3(5.0f, 5.0f, 0.0f));
 	m_boundingVolume = new AABB(m_vertices.at(3), m_vertices.at(0), vec4(1.0f, 1.0f, 1.0f, 1.0f));
+=======
+	m_vertices.push_back(vec3(0.0f, 0.0f, 0.0f));
+	m_vertices.push_back(vec3(0.0f, 10.0f, 0.0f));
+	m_vertices.push_back(vec3(10.0f, 0.0f, 0.0f));
+	m_vertices.push_back(vec3(10.0f, 10.0f, 0.0f));
+	m_boundingVolume = AABB(m_vertices.at(0), m_vertices.at(3), vec4(1.0f, 1.0f, 1.0f, 1.0f));
+>>>>>>> parent of 4fd34e2... Collision debugging
 }
 
 Pad::~Pad(){}
 
 void Pad::update(mat4 p_translate)
 {
-	m_boundingVolume->updatePosition(mat4(1.0f),p_translate);
-}
-
-bool Pad::collide(BoundingVolume* p_pVolume)
-{
-	return ((AABB*)m_boundingVolume)->collide(p_pVolume);
+	m_boundingVolume.updatePosition(mat4(1.0f),p_translate);
 }
 
 void Pad::setPos(vec2 p_pos)

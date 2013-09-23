@@ -3,7 +3,7 @@
 Ball::Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName):Object(p_pPos, p_pColor, p_objectName)
 {
 	m_texturePath	= "sphere.jpg";
-	m_boundingVolume = new Sphere(2.5f * 0.5f, *p_pPos);
+	m_boundingVolume = Sphere(3.14f, *p_pPos);
 }
 
 Ball::~Ball(){}
@@ -11,7 +11,7 @@ Ball::~Ball(){}
 void Ball::update()
 {
 	updatePosition();
-	m_boundingVolume->updatePosition(m_pos);
+	m_boundingVolume.updatePosition(m_pos);
 }
 
 void Ball::updatePosition()

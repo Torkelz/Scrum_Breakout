@@ -2,8 +2,8 @@
 
 AABB::AABB(vec3 p_top, vec3 p_bot, vec4 p_color) : BoundingVolume()
 {
-	m_top		= p_top + vec3(1.0f, 1.0f, 0.0f);
-	m_bottom	= p_bot + vec3(-1.0f, -1.0f, 0.0f);
+	m_top		= p_top;
+	m_bottom	= p_bot;
 	
 	m_bounds[0] = m_bottom;
 	m_bounds[7] = m_top;
@@ -22,13 +22,48 @@ AABB::~AABB(){}
 void AABB::initialize()
 {
 	calculateBounds();
+<<<<<<< HEAD
+=======
+
+	/*if (G_DEBUG)
+	{
+		buildCubeIndices(0);
+
+		BUFFER_INIT_DESC desc;
+		desc.Type				= VERTEX_BUFFER;
+		desc.NumElements		= 8;
+		desc.ElementSize		= sizeof( D3DXVECTOR3 );
+		desc.Usage				= BUFFER_DEFAULT;
+		desc.InitData			= m_bounds;
+		m_vertexBuffer = new Buffer();
+		m_vertexBuffer->init(m_device, desc);
+
+		int						temp[24];
+		for (UINT i = 0; i < 24; i++)
+		{
+			temp[i]				= m_indices.at(i);
+		}
+
+		desc.Type				= INDEX_BUFFER;
+		desc.NumElements		= 24;
+		desc.ElementSize		= sizeof(UINT);
+		desc.Usage				= BUFFER_DEFAULT;
+		desc.InitData			= temp;
+
+		m_indexBuffer = new Buffer();
+		m_indexBuffer->init(m_device, desc);
+
+		m_shader = new Shader();
+		m_shader->init(m_device, "BoundingBox.fx", 12);
+	}*/
+>>>>>>> parent of 4fd34e2... Collision debugging
 }
 
 void AABB::calculateBounds()
 {
 	m_position = vec3(	m_bounds[0].x + ((m_bounds[7].x - m_bounds[0].x) / 2) , 
-						m_bounds[0].y + ((m_bounds[7].y - m_bounds[0].y) / 2) , 
-						m_bounds[0].z + ((m_bounds[7].z - m_bounds[0].z) / 2) );
+								m_bounds[0].y + ((m_bounds[7].y - m_bounds[0].y) / 2) , 
+								m_bounds[0].z + ((m_bounds[7].z - m_bounds[0].z) / 2) );
 
 	m_bounds[1] = vec3( m_bounds[7].x,		m_bounds[0].y,		m_bounds[0].z ); // Xyz
 	m_bounds[2] = vec3( m_bounds[0].x,		m_bounds[7].y,		m_bounds[0].z ); // xYz
@@ -41,7 +76,13 @@ void AABB::calculateBounds()
 	m_distances[1] = m_top.x - m_bottom.x;
 	m_distances[2] = m_top.z - m_bottom.z;
 
+<<<<<<< HEAD
 	m_halfDiagonal = m_bounds[7] - m_bounds[0];
+=======
+	m_center = m_top + m_bottom;
+	m_center *= 0.5f;
+	m_halfDiagonal = m_top - m_bottom;
+>>>>>>> parent of 4fd34e2... Collision debugging
 	m_halfDiagonal *= 0.5f;
 
 	m_sphere.setRadius(length(m_halfDiagonal));
@@ -54,22 +95,12 @@ void AABB::updatePosition(mat4 p_scale, mat4 p_translate)
 	scalate = p_scale * p_translate;
 	//scalate = p_scale;
 
-	for (int i = 0; i < 4; i++)
-	{
-		m_translate.r[i].m128_f32[0] = scalate[i].x;
-		m_translate.r[i].m128_f32[1] = scalate[i].y;
-		m_translate.r[i].m128_f32[2] = scalate[i].z;
-		m_translate.r[i].m128_f32[3] = scalate[i].w;
-	}
-
-	scalate = transpose(scalate);
-	
-	vec4 v = vec4(m_bottom, 1.0f) * scalate;
+	vec4 v = vec4(m_bottom, 0.0f) * scalate;
 	m_bounds[0].x = v.x;
 	m_bounds[0].y = v.y;
 	m_bounds[0].z = v.z;
 
-	v = vec4(m_top, 1.0f) * scalate;
+	v = vec4(m_top, 0.0f) * scalate;
 	m_bounds[7].x = v.x;
 	m_bounds[7].y = v.y;
 	m_bounds[7].z = v.z;
@@ -185,6 +216,7 @@ bool AABB::boxVsSphere(Sphere* p_pSphere)
 	return false;
 }
 
+<<<<<<< HEAD
 bool AABB::collide(BoundingVolume* p_pVolume)
 {
 	if(p_pVolume->getType() == AABBOX)
@@ -258,24 +290,24 @@ void AABB::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceConte
 }
 
 void AABB::draw(XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj)
+=======
+void AABB::draw(mat4& p_world, mat4& p_view, mat4& p_proj)
+>>>>>>> parent of 4fd34e2... Collision debugging
 {
-	XMMATRIX WorldViewProj;
-	WorldViewProj = XMMatrixMultiply(p_world, m_translate);
-	WorldViewProj = XMMatrixMultiply(WorldViewProj, p_view );
-	WorldViewProj = XMMatrixMultiply(WorldViewProj, p_proj );
+	/*D3DXMATRIX WorldViewProj;
+	D3DXMatrixMultiply( &WorldViewProj, &p_world, &p_view );
+	D3DXMatrixMultiply( &WorldViewProj, &WorldViewProj, &p_proj );
 
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	m_device->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_LINELIST);
+	m_indexBuffer->apply(0);
+	m_vertexBuffer->apply(0);
 
-	m_cb.color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_cb.WVP = XMMatrixTranspose(WorldViewProj);
-	m_pCB->apply(0);
-	m_pDeviceContext->UpdateSubresource(m_pCB->getBufferPointer(), 0, NULL, &m_cb, 0, 0);
-	
-	m_pIndexBuffer->apply(0);
-	m_pBuffer->apply(0);
-	m_pShader->setShaders();
+	D3D10_TECHNIQUE_DESC techDesc;
+	m_shader->getTechnique()->GetDesc( &techDesc );
+			
+	m_shader->setFloat4("gColor", m_color);
+	m_shader->setMatrix("g_mWorldViewProjection", WorldViewProj);
 
-	m_pDeviceContext->DrawIndexed(24, 0, 0);
-	
-	m_sphere.draw(p_world, p_view, p_proj);
+	m_shader->apply(0);
+	m_device->DrawIndexed(24, 0, 0);*/
 }

@@ -12,9 +12,6 @@
 #include "Game.h"
 #include "Observer.h"
 
-#include "BoundingVolume.h"
-#include "AABB.h"
-
 class Object;
 
 using namespace DirectX;
@@ -28,7 +25,6 @@ struct CBBall
 {
 	XMVECTOR eyePosW;
 	XMMATRIX viewProj;
-	XMMATRIX translation;
 	XMFLOAT2 size;
 };
 
@@ -70,8 +66,5 @@ private:
 
 	//TEST
 	ID3D11Buffer* mVB;
-
-	// DEBUGGING DRAW
-	
 };
 #endif

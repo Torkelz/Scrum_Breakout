@@ -14,7 +14,6 @@ HRESULT Shader::compileAndCreateShaderFromFile( LPCWSTR p_pFileName, char* p_pEn
 {
 	HRESULT hr = S_OK;
 	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
-	dwShaderFlags |= D3DCOMPILE_DEBUG;
 
 	ID3DBlob* pErrBlob;
 	ID3DBlob* pBlob;
