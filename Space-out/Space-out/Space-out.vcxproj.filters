@@ -1,62 +1,187 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <FxCompile Include="Ball.fx" />
-    <FxCompile Include="BoundingBox.fx" />
-    <FxCompile Include="GeometryShader.fx" />
-    <FxCompile Include="BlockShader.fx" />
-    <FxCompile Include="PixelShader.fx" />
-    <FxCompile Include="VertexShader.fx" />
+    <FxCompile Include="Ball.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="BoundingBox.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="BlockShader.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="GeometryShader.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShader.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShader.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ABlock.cpp" />
-    <ClCompile Include="Block.cpp" />
-    <ClCompile Include="AABB.cpp" />
-    <ClCompile Include="Ball.cpp" />
-    <ClCompile Include="BoundingVolume.cpp" />
-    <ClCompile Include="Buffer.cpp" />
-    <ClCompile Include="d3dApp.cpp" />
-    <ClCompile Include="Direct3D.cpp" />
-    <ClCompile Include="LevelGenerator.cpp" />
-    <ClCompile Include="Object.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameTimer.cpp" />
-    <ClCompile Include="HIDObservable.cpp" />
-    <ClCompile Include="Observer.cpp" />
-    <ClCompile Include="Pad.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Sphere.cpp" />
-    <ClCompile Include="WinHID.cpp" />
-    <ClCompile Include="WinKeyboard.cpp" />
-    <ClCompile Include="WinMouse.cpp" />
+    <ClCompile Include="Buffer.cpp">
+      <Filter>D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dApp.cpp">
+      <Filter>D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Direct3D.cpp">
+      <Filter>D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="WinHID.cpp">
+      <Filter>WinHID</Filter>
+    </ClCompile>
+    <ClCompile Include="WinMouse.cpp">
+      <Filter>WinHID</Filter>
+    </ClCompile>
+    <ClCompile Include="WinKeyboard.cpp">
+      <Filter>WinHID</Filter>
+    </ClCompile>
+    <ClCompile Include="Observer.cpp">
+      <Filter>Observer</Filter>
+    </ClCompile>
+    <ClCompile Include="HIDObservable.cpp">
+      <Filter>Observer</Filter>
+    </ClCompile>
+    <ClCompile Include="AABB.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ABlock.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Ball.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Block.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="BoundingVolume.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Pad.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelGenerator.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Sphere.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ABlock.h" />
-    <ClInclude Include="Block.h" />
-    <ClInclude Include="AABB.h" />
-    <ClInclude Include="Ball.h" />
-    <ClInclude Include="BoundingVolume.h" />
-    <ClInclude Include="Buffer.h" />
-    <ClInclude Include="d3dApp.h" />
-    <ClInclude Include="d3dUtil.h" />
-    <ClInclude Include="Direct3D.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="LevelGenerator.h" />
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="Shader.h" />
     <ClInclude Include="GameTimer.h" />
-    <ClInclude Include="HIDObservable.h" />
-    <ClInclude Include="Observer.h" />
-    <ClInclude Include="Pad.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="Sphere.h" />
-    <ClInclude Include="WinHID.h" />
-    <ClInclude Include="WinKeyboard.h" />
-    <ClInclude Include="WinMouse.h" />
+    <ClInclude Include="Buffer.h">
+      <Filter>D3D\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dApp.h">
+      <Filter>D3D\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dUtil.h">
+      <Filter>D3D\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Direct3D.h">
+      <Filter>D3D\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>D3D\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="WinHID.h">
+      <Filter>WinHID\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="WinKeyboard.h">
+      <Filter>WinHID\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="WinMouse.h">
+      <Filter>WinHID\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="HIDObservable.h">
+      <Filter>Observer\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Observer\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AABB.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ABlock.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Ball.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Block.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingVolume.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Pad.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelGenerator.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Space-out.rc" />
+    <Filter Include="D3D">
+      <UniqueIdentifier>{2ef572bd-cc80-4547-afca-14e5711abf44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{1273bd4a-2c40-4072-a327-3652bbe8e1b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object">
+      <UniqueIdentifier>{4db39609-7d16-4678-8b63-4e5d8576f062}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Observer">
+      <UniqueIdentifier>{6e3c851d-038a-4288-88aa-0eab29e697c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WinHID">
+      <UniqueIdentifier>{e3ac17a9-57ce-4a80-9c68-c5fc770c87bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D\Header">
+      <UniqueIdentifier>{7b5cea91-ba34-45c0-8672-67f1adbf9a10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D\HLSL">
+      <UniqueIdentifier>{56583c27-8b89-4141-9834-3840b5daa692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Header">
+      <UniqueIdentifier>{b3de783b-adde-4851-97c9-bb6849de7cdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WinHID\Header">
+      <UniqueIdentifier>{580efcc4-a2c3-4d95-b9c0-9ad7c51b9bc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Observer\Header">
+      <UniqueIdentifier>{db9386cc-da38-45b9-9112-3d0250a57e4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Header">
+      <UniqueIdentifier>{8d8e02c2-0d70-46b6-9731-b35f3bc9cb06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

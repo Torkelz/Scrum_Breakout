@@ -269,7 +269,8 @@ void Direct3D::drawScene()
 	t_sphere.draw(m_world, m_camView, m_camProjection);
 
 	t_v = m_game.getPad()->getBoundingVolume();
-	((AABB*)t_v)->draw(m_world, m_camView, m_camProjection);
+	AABB t_bb = *((AABB*)t_v);
+	t_bb.draw(m_world, m_camView, m_camProjection);
 	// END DEBUGGING DRAW
 
 	//TEST BLOCK DRAW!

@@ -11,7 +11,7 @@ void Game::init()
 {
 	m_pObserver = new Observer(this);
 	m_pPad		= new Pad(&vec3(0.0f, 0.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad");
-	m_pBall		= new Ball(&vec3(0.0f, -20.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Ball");
+	m_pBall		= new Ball(&vec3(0.0f, 0.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Ball");
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
 	m_pBlocks = m_loadLevel.getBlocks();
