@@ -8,8 +8,8 @@ using namespace DirectX;
 
 struct BlockVertex
 {
-	Vector3 pos;
-	Vector4 color;
+	vec3 pos;
+	vec4 color;
 };
 
 struct cBlockBuffer
@@ -28,12 +28,12 @@ const static float	g_bSizeZ = 1.0f;
 class ABlock : public Object
 {
 public:
-	ABlock(Vector3* p_pPos, Vector3* p_pColor, std::string p_objectName, int p_blockID);
+	ABlock(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, int p_blockID);
 	~ABlock();
 	
 	virtual void		init();
 	virtual void		update();
-	void				setPos(Vector2 p_pos);
+	void				setPos(vec2 p_pos);
 	int					getHp();
 	int					getBlockID();
 	BlockVertex			getBlockVertex();

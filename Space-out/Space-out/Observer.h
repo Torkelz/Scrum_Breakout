@@ -2,7 +2,9 @@
 #define OBSERVER_H
 
 #include <Windows.h>
-#include "Vector2.h"
+#include <glm.hpp>
+
+using namespace glm;
 
 class Game;
 
@@ -11,9 +13,9 @@ class Observer
 public:
 	Observer(Game* p_pGame);
 	
-	void		broadcastLeftClick( Vector2 p_mousePosition );
-	void		broadcastRightClick( Vector2 p_mousePosition );
-	void		broadcastMousePos( Vector2 p_mousePosition );
+	void		broadcastLeftClick( vec2 p_mousePosition );
+	void		broadcastRightClick( vec2 p_mousePosition );
+	void		broadcastMousePos( vec2 p_mousePosition );
 	void		broadcastKeyPress( USHORT p_key );
 
 	int			getIndex();

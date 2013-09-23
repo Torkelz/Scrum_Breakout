@@ -115,28 +115,28 @@ void LevelGenerator::addBlockToList(int i, int row, FACE p_face)
 	switch(p_face)
 	{
 		case FRONT:
-			m_blockLists.at(0).push_back(new Block(&Vector3(	m_posXOffsetFB+row*(g_bSizeX*2.1f),	
+			m_blockLists.at(0).push_back(new Block(&vec3(	m_posXOffsetFB+row*(g_bSizeX*2.1f),	
 																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
 																		m_posZOffsetF),
-																		&Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;		
 		case BACK:		
-			m_blockLists.at(1).push_back(new Block(&Vector3(		m_posXOffsetFB+row*(g_bSizeX*2.1f),
+			m_blockLists.at(1).push_back(new Block(&vec3(		m_posXOffsetFB+row*(g_bSizeX*2.1f),
 																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
 																		m_posZOffsetB),
-																		&Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;		
 		case LEFT:		
-			m_blockLists.at(2).push_back(new Block(&Vector3(		m_posXOffsetL,
+			m_blockLists.at(2).push_back(new Block(&vec3(		m_posXOffsetL,
 																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
 																		m_posZOffsetLR+row*(g_bSizeX*2.1f)),
-																		&Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;		
 		case RIGHT:		
-			m_blockLists.at(3).push_back(new Block(&Vector3(	m_posXOffsetR,
+			m_blockLists.at(3).push_back(new Block(&vec3(	m_posXOffsetR,
 																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
 																		m_posZOffsetLR+row*(g_bSizeX*2.1f)),
-																		&Vector3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;
 	}
 };
