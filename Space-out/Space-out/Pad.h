@@ -13,6 +13,8 @@ public:
 	~Pad();
 
 	void update(mat4 p_translate);
+	bool collide(BoundingVolume* p_pVolume);
+
 	void setPos(vec2 p_pos);
 };
 

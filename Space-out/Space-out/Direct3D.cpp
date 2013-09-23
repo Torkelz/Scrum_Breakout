@@ -130,6 +130,15 @@ void Direct3D::initApp()
 
 	// BALLZZZ FROM THE WALL
 
+	// Bounding Volume DEBUGGING DRAW
+	BoundingVolume* t_v;
+	t_v = m_game.getPad()->getBoundingVolume();
+	((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+
+	t_v = m_game.getBall()->getBoundingVolume();
+	((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	// END DEBUGGING DRAW
+
 	// HID-STUFF
 
 	m_HID = HID( getMainWnd() );
@@ -212,28 +221,23 @@ void Direct3D::drawScene()
 
 
 	// Ball draw shit
+	vec3* t_ballPos = m_game.getBall()->getPos();
+
 	m_cbBall.eyePosW = m_camPosition;
-<<<<<<< HEAD
 	m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
 	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos->x, t_ballPos->y, t_ballPos->z));
 	//m_cbBall.translation = XMMatrixIdentity();
-=======
-	m_cbBall.viewProj = m_camView * m_camProjection;
->>>>>>> parent of 4fd34e2... Collision debugging
 	m_cbBall.size = XMFLOAT2(5.0f, 5.0f);
 	m_constantBallBuffer.apply(0);
 
 	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
 	m_ballShader.setShaders();
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	
+
 	m_ballBuffer.apply(0);
 	m_pDeviceContext->Draw(1, 0);
 
-<<<<<<< HEAD
 
-=======
->>>>>>> parent of 4fd34e2... Collision debugging
 	m_pSwapChain->Present(0, 0);
 }
 

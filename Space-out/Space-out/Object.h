@@ -12,7 +12,7 @@ protected:
 	vec3			m_pos;
 	vec3			m_color;
 	float			m_size;
-	BoundingVolume	m_boundingVolume;
+	BoundingVolume*	m_boundingVolume;
 
 	std::vector<vec3> m_vertices;
 
