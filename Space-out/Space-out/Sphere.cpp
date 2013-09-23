@@ -39,7 +39,7 @@ bool Sphere::sphereVsSphere (Sphere* p_sphere)
     vec3 CDiff;
 	CDiff = *p_sphere->getPosition() - m_position;
 	
-	float c = length2(CDiff);
+	float c = length(CDiff);
 	float rSum = p_sphere->getRadius() + m_radius;
     float rSumSqr = rSum*rSum;
 
@@ -54,7 +54,7 @@ void Sphere::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceCon
 
 	BufferInitDesc desc;
 	desc.type				= VERTEX_BUFFER;
-	desc.numElements		= 1;
+	desc.numElements		= 8;
 	desc.elementSize		= sizeof( XMFLOAT3 );
 	desc.usage				= BUFFER_DEFAULT;
 	desc.initData			= &XMFLOAT3(m_position.x, m_position.y, m_position.z);
@@ -86,7 +86,7 @@ void Sphere::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceCon
 void Sphere::draw(XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj)
 {
 	XMMATRIX WorldViewProj;
-	m_translate = XMMatrixTranslation(m_position.x, m_position.y, m_position.z);
+	m_translate = XMMatrixTranslation(m_position.x + 5.0f, m_position.y, m_position.z);
 	//m_translate = XMMatrixIdentity();
 	WorldViewProj = XMMatrixMultiply(p_world, m_translate);
 	WorldViewProj = XMMatrixMultiply(WorldViewProj, p_view );
@@ -96,7 +96,6 @@ void Sphere::draw(XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj)
 
 	m_cb.color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_cb.WVP = XMMatrixTranspose(WorldViewProj);
-	//m_cb.WVP = WorldViewProj;
 	m_pCB->apply(0);
 	m_pDeviceContext->UpdateSubresource(m_pCB->getBufferPointer(), 0, NULL, &m_cb, 0, 0);
 	

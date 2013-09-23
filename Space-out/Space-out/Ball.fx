@@ -34,7 +34,7 @@ struct PSSceneIn
 
 float4 VShader( float3 pos : POSITION ) : SV_POSITION
 {
-	return float4(pos, 1.0f);
+	return float4(pos, 0.0f);
 }
 
 // The draw GS just expands points into camera facing quads.
@@ -54,8 +54,7 @@ void GShader(point temp gIn[1] : SV_POSITION, inout TriangleStream<PSSceneIn> tr
 	world[1] = float4(up, 0.0f);
 	world[2] = float4(look, 0.0f);
 	world[3] = float4(gIn[0].pos.xyz, 1.0f);
-
-	float4x4 WVP = mul(world, translation);
+	float4x4 WVP = mul(translation, world);
 	WVP = mul(WVP, viewProj);
 
 	// Compute 4 triangle strip vertices (quad) in local space.
@@ -71,7 +70,7 @@ void GShader(point temp gIn[1] : SV_POSITION, inout TriangleStream<PSSceneIn> tr
 	// Transform quad vertices to world space and output
 	// them as a triangle strip.
 	PSSceneIn gOut;
-	//[unroll]
+	[unroll]
 
 	for(int i = 0; i < 4; ++i)
 	{

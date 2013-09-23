@@ -25,7 +25,6 @@ void Game::update(float p_screenWidth)
 	if(((Pad*)m_pPad)->collide(m_pBall->getBoundingVolume()))
 	{
 		int i = 0;
-		((Pad*)m_pPad)->collide(m_pBall->getBoundingVolume());
 	}
 }
 
@@ -34,11 +33,11 @@ void Game::keyEvent(unsigned short key)
 	float Rotation = 0;
 	if(key == 0x41) // A
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(-1.0f, 0.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(1.0f, 0.0f, 0.0f));
 	}
 	if(key == 0x44) // D
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(1.0f, 0.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(-1.0f, 0.0f, 0.0f));
 	}
 	if(key == 0x57) // W
 	{

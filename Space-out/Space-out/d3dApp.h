@@ -3,7 +3,6 @@
 
 #include "d3dUtil.h"
 #include "GameTimer.h"
-#include <sstream>
 #include <string>
 
 class D3DApp
@@ -61,8 +60,5 @@ protected:
 	int							m_ClientWidth;
 	int							m_ClientHeight;
 	bool						m_Enable4xMsaa;
-
-	//DEBUG REMOVE
-	std::wstring					m_winTitle;
 };
 #endif // D3DAPP_H
