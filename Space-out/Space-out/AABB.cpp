@@ -198,6 +198,75 @@ bool AABB::collide(BoundingVolume* p_pVolume)
 	return 0;
 }
 
+vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
+{
+	vec3 returnVector;
+
+	int plane = findPlane(p_sphereCenter);
+
+	switch(plane)
+	{
+		case TOP:
+		case BOTTOM:
+			returnVector = vec3(p_speed.x, -p_speed.y, p_speed.z);
+			break;
+
+		case LEFT:
+		case RIGHT:
+			returnVector = vec3(-p_speed.x, p_speed.y, -p_speed.z);
+			break;
+
+		case CORNER:
+			vec3 t_centerVec = m_position - p_sphereCenter;
+			t_centerVec = normalize(t_centerVec);
+			float speed = length(p_speed);
+			p_speed = normalize(p_speed);
+			returnVector = speed * (t_centerVec + p_speed);
+			break;
+
+		default:
+			break;
+	};
+
+	return returnVector;
+}
+
+int AABB::findPlane(vec3 p_sphereCenter)
+{
+	vec3 t_centerVec = p_sphereCenter - m_position;
+	vec3 t_up = vec3(0.0f, 1.0f, 0.0f);
+
+	float angle = acos(dot(t_centerVec, t_up) / (length(p_sphereCenter) * length(t_up)) );
+	
+	if(angle >= 320 || angle <= 40)
+		return TOP;
+	if(angle >= 50 && angle <= 120)
+		return RIGHT;
+	if(angle >= 140 && angle <= 220)
+		return BOTTOM;
+	if(angle >= 230 && angle <= 310)
+		return LEFT;
+	if(	angle > 40 && angle < 50 ||
+		angle > 130 && angle < 140 ||
+		angle > 220 && angle < 230 ||
+		angle > 310 && angle < 320 )
+		return CORNER;
+
+	return -1;
+}
+
+//void AABB::calculateCornerVectors()
+//{
+//	m_cornerVectors[0] = ( m_bounds[0] + ((m_bounds[1] - m_bounds[0]) * 0.5f) ) - m_position;
+//	m_cornerVectors[1] = ( m_bounds[0] + ((m_bounds[4] - m_bounds[0]) * 0.5f) ) - m_position;
+//	m_cornerVectors[2] = ( m_bounds[4] + ((m_bounds[5] - m_bounds[4]) * 0.5f) ) - m_position;
+//	m_cornerVectors[3] = ( m_bounds[1] + ((m_bounds[5] - m_bounds[1]) * 0.5f) ) - m_position;
+//	m_cornerVectors[4] = ( m_bounds[2] + ((m_bounds[3] - m_bounds[2]) * 0.5f) ) - m_position;
+//	m_cornerVectors[5] = ( m_bounds[2] + ((m_bounds[6] - m_bounds[2]) * 0.5f) ) - m_position;
+//	m_cornerVectors[6] = ( m_bounds[6] + ((m_bounds[7] - m_bounds[6]) * 0.5f) ) - m_position;
+//	m_cornerVectors[7] = ( m_bounds[3] + ((m_bounds[7] - m_bounds[3]) * 0.5f) ) - m_position;
+//}
+
 //void AABB::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext)
 //{
 //	m_pDevice = p_pDevice;
