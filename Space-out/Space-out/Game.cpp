@@ -15,6 +15,21 @@ void Game::init()
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
 	m_pBlocks = m_loadLevel.getBlocks();
+
+	m_activePlayField = 0;
+	m_originWorld = vec3(0.f,0.f,0.f);
+
+
+	vec2 size = m_loadLevel.getFieldSize();
+	size *= 0.5f;
+	vec3 startPosition(m_originWorld.x-size.x, m_originWorld.y + size.y, m_originWorld.z + size.x);
+	size *= 2;
+	float angle = 0;
+	//Create Fields
+	for(UINT i = 0; i < m_nrPlayFields; i++, angle += 90)
+	{
+		m_playFields[i] = new PlayField(startPosition, angle, size);
+	}
 }
 
 void Game::update(float p_screenWidth)

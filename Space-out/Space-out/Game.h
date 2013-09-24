@@ -5,13 +5,14 @@
 #include <gtc\matrix_transform.hpp>
 #include <vector>
 #include "LevelGenerator.h"
+#include "PlayField.h"
+
+#define UINT unsigned int
 
 using namespace glm;
 
 class Observer;
 class Object;
-class ABlock;
-class Block;
 
 class Game
 {
@@ -36,6 +37,14 @@ private:
 	Object*					m_pBall;
 	vector<vector<ABlock*>>*m_pBlocks;
 	LevelGenerator			m_loadLevel;
+
+	static const UINT		m_nrPlayFields = 4;
+	vec3					m_originWorld;
+
+	UINT					m_activePlayField;		
+
+	PlayField*				m_playFields[m_nrPlayFields];
+	
 };
 
 #endif	GAME_H

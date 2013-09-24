@@ -2,8 +2,8 @@
 
 AABB::AABB(vec3 p_top, vec3 p_bot, vec4 p_color) : BoundingVolume()
 {
-	m_top		= p_top + vec3(1.0f, 1.0f, 0.0f);
-	m_bottom	= p_bot + vec3(-1.0f, -1.0f, 0.0f);
+	m_top		= p_top;// + vec3(1.0f, 1.0f, 0.0f);
+	m_bottom	= p_bot;// + vec3(-1.0f, -1.0f, 0.0f);
 	
 	m_bounds[0] = m_bottom;
 	m_bounds[7] = m_top;

@@ -2,6 +2,7 @@
 #define ABLOCK_H
 
 #include "Object.h"
+#include "AABB.h"
 #include <DirectXMath.h>
 
 using namespace DirectX;
@@ -18,12 +19,9 @@ struct cBlockBuffer
 	float sizeX;
 	float sizeY;
 	float sizeZ;
-	int	  state;
 };
 
-const static float	g_bSizeX = 3.0f;
-const static float 	g_bSizeY = 1.0f;
-const static float	g_bSizeZ = 1.0f;
+const vec3 g_bvSize(3.0f, 1.0f, 1.0f);
 
 class ABlock : public Object
 {
@@ -31,7 +29,7 @@ public:
 	ABlock(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, int p_blockID);
 	~ABlock();
 	
-	virtual void		init();
+	virtual void		init(mat4* p_pRotMat);
 	virtual void		update();
 	void				setPos(vec2 p_pos);
 	int					getHp();
@@ -42,6 +40,7 @@ protected:
 	int m_hp;
 	int m_blockID;
 	BlockVertex m_vertex;
+
 };
 
 

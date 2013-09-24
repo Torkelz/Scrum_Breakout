@@ -280,9 +280,9 @@ void Direct3D::drawScene()
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 	m_blockShader.setShaders();
 
-	cBlockBufferStruct.sizeX = g_bSizeX;
-	cBlockBufferStruct.sizeY = g_bSizeY;
-	cBlockBufferStruct.sizeZ = g_bSizeZ;
+	cBlockBufferStruct.sizeX = g_bvSize.x;
+	cBlockBufferStruct.sizeY = g_bvSize.y;
+	cBlockBufferStruct.sizeZ = g_bvSize.z;
 	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 	m_cBlockBuffer.apply(0);
 	m_blockBuffers[0].apply(0);
@@ -290,9 +290,9 @@ void Direct3D::drawScene()
 	m_blockBuffers[1].apply(0);
 	m_pDeviceContext->Draw(m_blockBufferSizeB, 0);
 
-	cBlockBufferStruct.sizeX = g_bSizeZ;
-	cBlockBufferStruct.sizeY = g_bSizeY;
-	cBlockBufferStruct.sizeZ = g_bSizeX;
+	cBlockBufferStruct.sizeX = g_bvSize.z;
+	cBlockBufferStruct.sizeY = g_bvSize.y;
+	cBlockBufferStruct.sizeZ = g_bvSize.x;
 	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 	m_cBlockBuffer.apply(0);
 	m_blockBuffers[2].apply(0);

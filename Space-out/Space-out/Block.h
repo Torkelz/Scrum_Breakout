@@ -9,7 +9,7 @@ public:
 	Block(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, int p_blockID);
 	~Block();
 
-	void init();
+	void init(mat4* p_pRotMat);
 	void update();
 
 private:

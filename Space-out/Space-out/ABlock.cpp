@@ -31,6 +31,11 @@ BlockVertex ABlock::getBlockVertex()
 	return m_vertex;
 }
 
-void ABlock::init(){}
+void ABlock::init(mat4* p_pRotMat)
+{
+	vec4 temp = *p_pRotMat * vec4(g_bvSize, 0.0f);
+	vec3 temp1 = vec3(temp.x, temp.y, temp.z);
+	m_boundingVolume = new AABB((m_pos + temp1), (m_pos - temp1), vec4(m_color, 1));
+}
 
 void ABlock::update(){}

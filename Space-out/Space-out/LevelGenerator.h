@@ -35,6 +35,8 @@ public:
 	void loadFile(string p_fileName);
 	void createBlocks(FACE p_face);
 	vector<vector<ABlock*>>* getBlocks();
+
+	vec2			getFieldSize();
 	
 
 private:
@@ -43,6 +45,8 @@ private:
 	int				m_blockCountY;
 	int				m_offsetLimit;
 	vector<vector<ABlock*>> m_blockLists;
+
+	vec2			m_fieldSize;
 
 	float			m_posXOffsetFB; //X-Front, X-Back
 	float			m_posXOffsetL;	//X-Left

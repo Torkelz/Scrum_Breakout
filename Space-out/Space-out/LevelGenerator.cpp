@@ -33,6 +33,11 @@ void LevelGenerator::loadFile(string p_fileName)
 		//Calculate offset based of X, Y
 		calcOffsets();
 
+		getline(file,line);
+		m_fieldSize.x = stringToNumber(line);
+		getline(file,line);
+		m_fieldSize.y = stringToNumber(line);
+
 		//Rest of file
 		m_loadedData.resize(m_blockCountX*m_blockCountY);
 		getline(file,line);
@@ -115,27 +120,27 @@ void LevelGenerator::addBlockToList(int i, int row, FACE p_face)
 	switch(p_face)
 	{
 		case FRONT:
-			m_blockLists.at(0).push_back(new Block(&vec3(	m_posXOffsetFB+row*(g_bSizeX*2.1f),	
-																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
+			m_blockLists.at(0).push_back(new Block(&vec3(	m_posXOffsetFB+row*(g_bvSize.x*2.1f),	
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
 																		m_posZOffsetF),
 																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;		
 		case BACK:		
-			m_blockLists.at(1).push_back(new Block(&vec3(		m_posXOffsetFB+row*(g_bSizeX*2.1f),
-																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
+			m_blockLists.at(1).push_back(new Block(&vec3(		m_posXOffsetFB+row*(g_bvSize.x*2.1f),
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
 																		m_posZOffsetB),
 																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;		
 		case LEFT:		
 			m_blockLists.at(2).push_back(new Block(&vec3(		m_posXOffsetL,
-																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
-																		m_posZOffsetLR+row*(g_bSizeX*2.1f)),
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
+																		m_posZOffsetLR+row*(g_bvSize.x*2.1f)),
 																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;		
 		case RIGHT:		
 			m_blockLists.at(3).push_back(new Block(&vec3(	m_posXOffsetR,
-																		m_posYOffset+((-1)*(-5.0f+i*(g_bSizeY*2.2f))),
-																		m_posZOffsetLR+row*(g_bSizeX*2.1f)),
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
+																		m_posZOffsetLR+row*(g_bvSize.x*2.1f)),
 																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
 			break;
 	}
@@ -154,15 +159,15 @@ void LevelGenerator::calcOffsets()
 	//Front, back X
 	m_posXOffsetFB = 0.0f;
 	//Left X
-	m_posXOffsetL = -g_bSizeX;
+	m_posXOffsetL = -g_bvSize.x;
 	//Right X
-	m_posXOffsetR = g_bSizeX * 2.0f * m_blockCountX + g_bSizeZ;
+	m_posXOffsetR = g_bvSize.x * 2.0f * m_blockCountX + g_bvSize.z;
 	//Left, Right Z
-	m_posZOffsetLR = g_bSizeX;
+	m_posZOffsetLR = g_bvSize.x;
 	//Front Z
 	m_posZOffsetF = 0.0f;
 	//Back Z
-	m_posZOffsetB = g_bSizeX * 2.0f * m_blockCountX + g_bSizeZ;
+	m_posZOffsetB = g_bvSize.x * 2.0f * m_blockCountX + g_bvSize.z;
 	//All Y
 	m_posYOffset = 30.0f;
 }	  
@@ -172,3 +177,7 @@ void LevelGenerator::calcOffsets()
 	  
 	  
 
+vec2 LevelGenerator::getFieldSize()
+{
+	return m_fieldSize;
+}

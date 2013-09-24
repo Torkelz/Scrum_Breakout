@@ -76,11 +76,14 @@
     <ClCompile Include="Pad.cpp">
       <Filter>Object</Filter>
     </ClCompile>
-    <ClCompile Include="LevelGenerator.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Sphere.cpp">
       <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelGenerator.cpp">
+      <Filter>Level</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayField.cpp">
+      <Filter>Level</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -99,9 +102,6 @@
     </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>D3D\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>Game\Header</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>Game\Header</Filter>
@@ -145,8 +145,14 @@
     <ClInclude Include="Sphere.h">
       <Filter>Object\Header</Filter>
     </ClInclude>
-    <ClInclude Include="LevelGenerator.h">
+    <ClInclude Include="Game.h">
       <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelGenerator.h">
+      <Filter>Level\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayField.h">
+      <Filter>Level\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +188,12 @@
     </Filter>
     <Filter Include="Object\Header">
       <UniqueIdentifier>{8d8e02c2-0d70-46b6-9731-b35f3bc9cb06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Level">
+      <UniqueIdentifier>{70dbb232-7fd7-4847-806e-e141ff47c9b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Level\Header">
+      <UniqueIdentifier>{4483bfe0-6c58-4580-86d0-10116030b12f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -88,6 +88,7 @@
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="LevelGenerator.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="PlayField.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameTimer.cpp" />
@@ -113,6 +114,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="LevelGenerator.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="PlayField.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="HIDObservable.h" />

@@ -7,8 +7,9 @@ Block::Block(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, int p_block
 
 Block::~Block(){}
 
-void Block::init()
+void Block::init(mat4* p_pRotMat)
 {
+	ABlock::init(p_pRotMat);
 
 }
 
@@ -19,5 +20,6 @@ void Block::update()
 		//Dead, destroy object using BlockID.
 	}
 	//Collision check?
+	
 }
 
