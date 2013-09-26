@@ -11,7 +11,21 @@ LevelGenerator::LevelGenerator()
 	m_posYOffset	= 0;
 }
 
-LevelGenerator::~LevelGenerator(){}
+LevelGenerator::~LevelGenerator()
+{
+	m_posXOffsetFB	= 0;
+	m_posXOffsetL	= 0;
+	m_posXOffsetR	= 0;
+	m_posZOffsetLR	= 0;
+	m_posZOffsetF	= 0;
+	m_posZOffsetB	= 0;
+	m_posYOffset	= 0;
+	m_blockCountX	= 0;
+	m_blockCountY	= 0;
+	m_offsetLimit	= 0;
+	m_fieldSize.x	= 0;
+	m_fieldSize.y	= 0;
+}
 
 void LevelGenerator::loadFile(string p_fileName)
 {
@@ -34,9 +48,9 @@ void LevelGenerator::loadFile(string p_fileName)
 		calcOffsets();
 
 		getline(file,line);
-		m_fieldSize.x = stringToNumber(line);
+		m_fieldSize.x = (float)stringToNumber(line);
 		getline(file,line);
-		m_fieldSize.y = stringToNumber(line);
+		m_fieldSize.y = (float)stringToNumber(line);
 
 		//Rest of file
 		m_loadedData.resize(m_blockCountX*m_blockCountY);
@@ -110,9 +124,9 @@ void LevelGenerator::createBlocks(FACE p_face)
 	}
 }
 
-vector<vector<ABlock*>>* LevelGenerator::getBlocks()
+vector<ABlock*> LevelGenerator::getBlockList(int p_list)
 {
-	return &m_blockLists;
+	return m_blockLists.at(p_list);
 }
 
 void LevelGenerator::addBlockToList(int i, int row, FACE p_face)
@@ -123,25 +137,25 @@ void LevelGenerator::addBlockToList(int i, int row, FACE p_face)
 			m_blockLists.at(0).push_back(new Block(&vec3(	m_posXOffsetFB+row*(g_bvSize.x*2.1f),	
 																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
 																		m_posZOffsetF),
-																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", vec2(row, i)));
 			break;		
 		case BACK:		
 			m_blockLists.at(1).push_back(new Block(&vec3(		m_posXOffsetFB+row*(g_bvSize.x*2.1f),
 																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
 																		m_posZOffsetB),
-																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", vec2(row, i)));
 			break;		
 		case LEFT:		
 			m_blockLists.at(2).push_back(new Block(&vec3(		m_posXOffsetL,
 																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
 																		m_posZOffsetLR+row*(g_bvSize.x*2.1f)),
-																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", vec2(row, i)));
 			break;		
 		case RIGHT:		
 			m_blockLists.at(3).push_back(new Block(&vec3(	m_posXOffsetR,
 																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
 																		m_posZOffsetLR+row*(g_bvSize.x*2.1f)),
-																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", 0));
+																		&vec3(0.115f*i, 0.0f, 0.37f), "Block", vec2(row, i)));
 			break;
 	}
 };
@@ -180,4 +194,9 @@ void LevelGenerator::calcOffsets()
 vec2 LevelGenerator::getFieldSize()
 {
 	return m_fieldSize;
+}
+
+vec2 LevelGenerator::getNrBlocks()
+{
+	return vec2(m_blockCountX, m_blockCountY);
 }

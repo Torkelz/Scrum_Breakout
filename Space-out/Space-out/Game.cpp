@@ -14,7 +14,6 @@ void Game::init()
 	m_pBall		= new Ball(&vec3(0.0f, 0.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Ball");
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
-	m_pBlocks = m_loadLevel.getBlocks();
 
 	m_activePlayField = 0;
 	m_originWorld = vec3(0.f,0.f,0.f);
@@ -30,6 +29,13 @@ void Game::init()
 	{
 		m_playFields[i] = new PlayField(startPosition, angle, size);
 	}
+
+	for(UINT i = 0; i < m_nrPlayFields; i++)
+	{
+		m_playFields[i]->init(m_loadLevel.getBlockList(i), m_loadLevel.getNrBlocks());
+	}
+	m_loadLevel.~LevelGenerator();
+
 }
 
 void Game::update(float p_screenWidth)
@@ -107,7 +113,8 @@ Object* Game::getBall()
 	return m_pBall;
 }
 
-vector<ABlock*>* Game::getBlocks(int p_list)
+PlayField* Game::getField(int p_id)
 {
-	return &m_pBlocks->at(p_list);
+	return m_playFields[p_id];
 }
+

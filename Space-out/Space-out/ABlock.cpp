@@ -1,6 +1,6 @@
 #include "ABlock.h"
 
-ABlock::ABlock(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, int p_blockID) : Object(p_pPos, p_pColor, p_objectName)
+ABlock::ABlock(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, vec2 p_blockID) : Object(p_pPos, p_pColor, p_objectName)
 {
 	m_hp = 0;
 	m_blockID = p_blockID;
@@ -11,9 +11,10 @@ ABlock::ABlock(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, int p_blo
 
 ABlock::~ABlock(){}
 
-void ABlock::setPos(vec2 p_pos)
+void ABlock::setPos(vec3 p_pos)
 {
-	m_pos.x = p_pos.x;
+	m_pos = p_pos;
+	m_vertex.pos = p_pos;
 }
 
 int ABlock::getHp()
@@ -21,7 +22,7 @@ int ABlock::getHp()
 	return m_hp;
 }
 
-int ABlock::getBlockID()
+vec2 ABlock::getBlockID()
 {
 	return m_blockID;
 }

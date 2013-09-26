@@ -16,29 +16,31 @@ struct BlockVertex
 struct cBlockBuffer
 {
 	XMMATRIX WVP;
+	XMMATRIX rotation;
 	float sizeX;
 	float sizeY;
 	float sizeZ;
 };
 
-const vec3 g_bvSize(3.0f, 1.0f, 1.0f);
+const vec3 g_bvSize(3.0f, 3.0f, 1.0f);
 
 class ABlock : public Object
 {
 public:
-	ABlock(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, int p_blockID);
+	ABlock(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, vec2 p_blockID);
 	~ABlock();
 	
 	virtual void		init(mat4* p_pRotMat);
 	virtual void		update();
-	void				setPos(vec2 p_pos);
+	void				setPos(vec3 p_pos);
 	int					getHp();
-	int					getBlockID();
+	vec2				getBlockID();
 	BlockVertex			getBlockVertex();
+	
 
 protected:
 	int m_hp;
-	int m_blockID;
+	vec2 m_blockID;
 	BlockVertex m_vertex;
 
 };

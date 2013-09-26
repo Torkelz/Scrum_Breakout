@@ -14,18 +14,21 @@ class PlayField
 public:
 	PlayField(vec3 p_positionOriginal, float p_angle, vec2 p_size);
 	~PlayField();
-	void init(vector<ABlock*> p_blockList);
+	void init(vector<ABlock*> p_blockList, vec2 p_nrBlocks);
 	void update();
 
 	BlockVertex* getBufferData(); //Transfer to a array of blockvertex structs from blocklist
+	int			 getListSize();
+	mat4		getRotationMatrix();
 private:
 	vector<ABlock*> m_blockList;
 	mat4			m_rotMatrixOriginal;
 	vec2			m_size;
 	vec3			m_positionOriginal;
-	vector<AABB*>	m_borders;
+	vector<BoundingVolume*>	m_borders;
 	float			m_angle;
-	vec3			m_planeVector;
+	vec3			m_planeVectorX;
+	vec3			m_planeVectorY;
 };
 
 #endif

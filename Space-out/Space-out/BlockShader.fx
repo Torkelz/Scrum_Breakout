@@ -1,6 +1,7 @@
 cbuffer BlockConstBuffer
 {
 	float4x4 m_WVP;
+	float4x4 m_rotation;
 	float	 m_sizeX;
 	float	 m_sizeY;
 	float	 m_sizeZ;
@@ -44,15 +45,16 @@ VSOutput VS(VSInput p_vIn)
 void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStream)
 {
 	float dimensions = 2.0f;
+	float4x4 rWVP = mul(m_rotation, m_WVP);
 
-	float4 vert0 = p_input[0].m_posH + mul( float4(float4(-1.0*m_sizeX, -1.0*m_sizeY, -1.0*m_sizeZ, 0.0)), m_WVP); // 0 --- UpperLeftFront
-	float4 vert1 = p_input[0].m_posH + mul( float4(float4( 1.0*m_sizeX, -1.0*m_sizeY, -1.0*m_sizeZ, 0.0)), m_WVP); // 1 +-- LowerLeftFront
-	float4 vert2 = p_input[0].m_posH + mul( float4(float4(-1.0*m_sizeX,  1.0*m_sizeY, -1.0*m_sizeZ, 0.0)), m_WVP); // 2 -+- UpperRightFront
-	float4 vert3 = p_input[0].m_posH + mul( float4(float4( 1.0*m_sizeX,  1.0*m_sizeY, -1.0*m_sizeZ, 0.0)), m_WVP); // 3 ++- LowerRightFront
-	float4 vert4 = p_input[0].m_posH + mul( float4(float4(-1.0*m_sizeX, -1.0*m_sizeY,  1.0*m_sizeZ, 0.0)), m_WVP); // 4 --+ LowerLeftBack
-	float4 vert5 = p_input[0].m_posH + mul( float4(float4( 1.0*m_sizeX, -1.0*m_sizeY,  1.0*m_sizeZ, 0.0)), m_WVP); // 5 +-+ UpperLeftBack
-	float4 vert6 = p_input[0].m_posH + mul( float4(float4(-1.0*m_sizeX,  1.0*m_sizeY,  1.0*m_sizeZ, 0.0)), m_WVP); // 6 -++ LowerRightBack
-	float4 vert7 = p_input[0].m_posH + mul( float4(float4( 1.0*m_sizeX,  1.0*m_sizeY,  1.0*m_sizeZ, 0.0)), m_WVP); // 7 +++ UpperRightBack
+	float4 vert0 = p_input[0].m_posH + mul( float4(float4(-1.0*m_sizeX, -1.0*m_sizeY, -1.0*m_sizeZ, 0.0)), rWVP); // 0 --- UpperLeftFront
+	float4 vert1 = p_input[0].m_posH + mul( float4(float4( 1.0*m_sizeX, -1.0*m_sizeY, -1.0*m_sizeZ, 0.0)), rWVP); // 1 +-- LowerLeftFront
+	float4 vert2 = p_input[0].m_posH + mul( float4(float4(-1.0*m_sizeX,  1.0*m_sizeY, -1.0*m_sizeZ, 0.0)), rWVP); // 2 -+- UpperRightFront
+	float4 vert3 = p_input[0].m_posH + mul( float4(float4( 1.0*m_sizeX,  1.0*m_sizeY, -1.0*m_sizeZ, 0.0)), rWVP); // 3 ++- LowerRightFront
+	float4 vert4 = p_input[0].m_posH + mul( float4(float4(-1.0*m_sizeX, -1.0*m_sizeY,  1.0*m_sizeZ, 0.0)), rWVP); // 4 --+ LowerLeftBack
+	float4 vert5 = p_input[0].m_posH + mul( float4(float4( 1.0*m_sizeX, -1.0*m_sizeY,  1.0*m_sizeZ, 0.0)), rWVP); // 5 +-+ UpperLeftBack
+	float4 vert6 = p_input[0].m_posH + mul( float4(float4(-1.0*m_sizeX,  1.0*m_sizeY,  1.0*m_sizeZ, 0.0)), rWVP); // 6 -++ LowerRightBack
+	float4 vert7 = p_input[0].m_posH + mul( float4(float4( 1.0*m_sizeX,  1.0*m_sizeY,  1.0*m_sizeZ, 0.0)), rWVP); // 7 +++ UpperRightBack
 
 
 	GSOutput outVertex = (GSOutput)0;

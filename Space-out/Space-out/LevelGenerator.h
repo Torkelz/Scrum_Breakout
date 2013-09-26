@@ -18,14 +18,6 @@ enum FACE
 	RIGHT
 };
 
-//struct BlockLists
-//{
-//	vector<ABlock*>	m_blocksFront;
-//	vector<ABlock*>	m_blocksBack;
-//	vector<ABlock*>	m_blocksLeft;
-//	vector<ABlock*>	m_blocksRight;
-//};
-
 class LevelGenerator
 {
 public:
@@ -34,9 +26,10 @@ public:
 
 	void loadFile(string p_fileName);
 	void createBlocks(FACE p_face);
-	vector<vector<ABlock*>>* getBlocks();
+	vector<ABlock*> getBlockList(int p_list);
 
 	vec2			getFieldSize();
+	vec2			getNrBlocks();
 	
 
 private:

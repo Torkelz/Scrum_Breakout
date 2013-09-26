@@ -31,6 +31,21 @@ struct CBBall
 	XMFLOAT2 size;
 };
 
+inline XMMATRIX mat4ToXMMatrix(mat4 p)
+{
+	XMMATRIX r;
+
+	for (int i = 0; i < 4; i++)
+	{
+		r.r[i].m128_f32[0] = p[i].x;
+		r.r[i].m128_f32[1] = p[i].y;
+		r.r[i].m128_f32[2] = p[i].z;
+		r.r[i].m128_f32[3] = p[i].w;
+	}
+
+	return r;
+};
+
 class Direct3D : public D3DApp
 {
 public:
@@ -57,6 +72,7 @@ private:
 	Game			 m_game;
 
 	//Block Test
+	
 	Buffer			 m_blockBuffers[4];
 	Shader			 m_blockShader;
 	Buffer			 m_cBlockBuffer;

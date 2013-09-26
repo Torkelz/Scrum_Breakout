@@ -30,7 +30,8 @@ public:
 	Observer*				getObserver();
 	Object*					getPad();
 	vector<ABlock*>*		getBlocks(int p_list);
-	Object*		getBall();
+	Object*					getBall();
+	PlayField*				getField(int p_id);
 private:
 	Observer*				m_pObserver;
 	Object*					m_pPad;
