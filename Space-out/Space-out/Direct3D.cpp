@@ -48,13 +48,14 @@ void Direct3D::initApp()
 	m_game.init();
 
 
-	//Set up world view projdf
+	//Set up world view proj
 	m_camPosition = XMVectorSet( 0.0f, 0.0f, 175.f, 0.0f );
 	m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
 	m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
 	m_camView = XMMatrixLookAtLH( m_camPosition, m_camTarget, m_camUp );
-	m_camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
+	//m_camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
+	m_camProjection = XMMatrixPerspectiveFovLH( PI*0.25f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 300.0f);
 	
 	m_world = XMMatrixIdentity();
 	
@@ -88,32 +89,7 @@ void Direct3D::initApp()
 
 
 	//TEST BLOCK START
-	//for(int i = 0; i < 4; i++)
-	//{
-	//	std::vector<BlockVertex> blockData;
-	//	m_pBlockList = m_game.getBlocks(i);
-	//	int listSize = m_pBlockList->size();
 
-	//	for (int j = 0; j < listSize; j++)
-	//		blockData.push_back(m_pBlockList->at(j)->getBlockVertex());
-
-	//	BufferInitDesc blockBufferDesc;
-	//	blockBufferDesc.elementSize		= sizeof(BlockVertex);
-	//	blockBufferDesc.initData		= blockData.data();
-	//	blockBufferDesc.numElements		= listSize;
-	//	blockBufferDesc.type			= VERTEX_BUFFER;
-	//	blockBufferDesc.usage			= BUFFER_USAGE_IMMUTABLE;
-
-	//	m_blockBuffers[i].init(m_pDevice, m_pDeviceContext, blockBufferDesc);
-	//	if(i == 0)
-	//		m_blockBufferSizeF = listSize;
-	//	else if(i == 1)
-	//		m_blockBufferSizeB = listSize;
-	//	else if(i == 2)
-	//		m_blockBufferSizeL = listSize;
-	//	else
-	//		m_blockBufferSizeR = listSize;
-	//}
 
 	//TEST BLOCK START
 	for(int i = 0; i < 4; i++)
@@ -155,7 +131,7 @@ void Direct3D::initApp()
 	
 	m_WVP	= m_world * m_camView * m_camProjection;
 	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
-
+	//m_cbPad.WVP = m_WVP;
 	BufferInitDesc cbbd;	
 
 	cbbd.elementSize = sizeof(CBPad);
@@ -205,12 +181,12 @@ void Direct3D::initApp()
 	// BALLZZZ FROM THE WALL
 
 	// Bounding Volume DEBUGGING DRAW
-	BoundingVolume* t_v;
+	/*BoundingVolume* t_v;
 	t_v = m_game.getPad()->getBoundingVolume();
 	((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
 
 	t_v = m_game.getBall()->getBoundingVolume();
-	((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);*/
 	// END DEBUGGING DRAW
 
 	// HID-STUFF
@@ -231,12 +207,43 @@ void Direct3D::updateScene(float p_dt)
 {
 	D3DApp::updateScene(p_dt);
 	m_game.update(m_ScreenViewport.Width);
+
+	std::wostringstream outs;   
+	outs.precision(6);
+	outs << L"    PAD:"
+		<< L" " << m_game.getPad()->getBoundingVolume()->getPosition()->x << L"," 
+		<< m_game.getPad()->getBoundingVolume()->getPosition()->y << L","
+		<< m_game.getPad()->getBoundingVolume()->getPosition()->z << L","
+		
+		<< L"    BALL:"
+		<< L" " << m_game.getBall()->getBoundingVolume()->getPosition()->x << L"," 
+		<< m_game.getBall()->getBoundingVolume()->getPosition()->y << L","
+		<< m_game.getBall()->getBoundingVolume()->getPosition()->z << L",";
+
+
+	SetWindowTextW(m_hMainWnd,outs.str().c_str());
+
+	m_winTitle = outs.str();
 }
 
 void Direct3D::drawScene()
 {
 	D3DApp::drawScene();
 	cBlockBuffer cBlockBufferStruct;
+
+
+	// Bounding Volume DEBUGGING DRAW
+	/*BoundingVolume* t_v;
+	t_v = m_game.getBall()->getBoundingVolume();
+	Sphere t_sphere = *((Sphere*)t_v);
+	t_sphere.draw(m_world, m_camView, m_camProjection);
+
+	t_v = m_game.getPad()->getBoundingVolume();
+	AABB t_bb = *((AABB*)t_v);
+	t_bb.draw(m_world, m_camView, m_camProjection);*/
+	// END DEBUGGING DRAW
+
+
 
 	XMMATRIX translatePadMatrix;
 	
@@ -245,8 +252,8 @@ void Direct3D::drawScene()
 	//Try to get the pad closer to the actual mouse.
 	float tempX = t_pos->x - m_ScreenViewport.Width/2;
 
-	translatePadMatrix = XMMatrixTranslation(tempX, t_pos->y, t_pos->z);
-
+	translatePadMatrix = XMMatrixTranslation(tempX * 0.125f, t_pos->y, t_pos->z);
+	//translatePadMatrix = XMMatrixIdentity();
 	m_world = XMMatrixIdentity();
 	m_WVP = translatePadMatrix * m_world * m_camView * m_camProjection;
 
@@ -258,12 +265,16 @@ void Direct3D::drawScene()
 	m_buffer.apply(0);
 	m_pDeviceContext->Draw(4, 0);
 
+	
+	// end shit
+
 	// Ball draw shit
 	vec3* t_ballPos = m_game.getBall()->getPos();
 
 	m_cbBall.eyePosW = m_camPosition;
 	m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
 	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos->x, t_ballPos->y, t_ballPos->z));
+	//m_cbBall.translation = XMMatrixIdentity();
 	m_cbBall.size = XMFLOAT2(5.0f, 5.0f);
 	m_constantBallBuffer.apply(0);
 
@@ -273,19 +284,9 @@ void Direct3D::drawScene()
 
 	m_ballBuffer.apply(0);
 	m_pDeviceContext->Draw(1, 0);
-	// end shit
 
-	// Bounding Volume DEBUGGING DRAW
-	BoundingVolume* t_v;
-	t_v = m_game.getBall()->getBoundingVolume();
-	Sphere t_sphere = *((Sphere*)t_v);
-	t_sphere.draw(m_world, m_camView, m_camProjection);
 
-	t_v = m_game.getPad()->getBoundingVolume();
-	AABB t_bb = *((AABB*)t_v);
-	t_bb.draw(m_world, m_camView, m_camProjection);
-	// END DEBUGGING DRAW
-
+	
 	//TEST BLOCK DRAW!
 	
 	m_WVP = m_world *m_camView * m_camProjection;
