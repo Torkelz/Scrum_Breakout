@@ -201,7 +201,7 @@ void Direct3D::drawScene()
 	//Try to get the pad closer to the actual mouse.
 	float tempX = t_pos->x - m_ScreenViewport.Width/2;
 
-	translatePadMatrix = XMMatrixTranslation(tempX, t_pos->y, t_pos->z);
+	translatePadMatrix = XMMatrixTranslation(tempX * 0.125f, t_pos->y, t_pos->z);
 	//translatePadMatrix = XMMatrixIdentity();
 	m_world = XMMatrixIdentity();
 	m_WVP = translatePadMatrix * m_world * m_camView * m_camProjection;
@@ -216,9 +216,6 @@ void Direct3D::drawScene()
 
 	
 	// end shit
-
-	
-
 
 	// Ball draw shit
 	vec3* t_ballPos = m_game.getBall()->getPos();
@@ -238,7 +235,7 @@ void Direct3D::drawScene()
 	m_pDeviceContext->Draw(1, 0);
 
 
-	m_pSwapChain->Present(0, 0);
+	m_pSwapChain->Present(1, 0);
 }
 
 LRESULT Direct3D::msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)

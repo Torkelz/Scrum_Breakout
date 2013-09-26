@@ -195,12 +195,14 @@ bool AABB::collide(BoundingVolume* p_pVolume)
 		return boxVsSphere((Sphere*)p_pVolume);
 	}
 
-	return 0;
+	return false;
 }
 
 vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 {
 	vec3 returnVector;
+	float speed;
+	vec3 t_centerVector;
 
 	int plane = findPlane(p_sphereCenter);
 
@@ -217,11 +219,10 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 			break;
 
 		case CORNER:
-			vec3 t_centerVec = m_position - p_sphereCenter;
-			t_centerVec = normalize(t_centerVec);
-			float speed = length(p_speed);
-			p_speed = normalize(p_speed);
-			returnVector = speed * (t_centerVec + p_speed);
+			t_centerVector = p_sphereCenter - m_position;
+			t_centerVector = normalize(t_centerVector);
+			speed = length(p_speed);
+			returnVector = speed * (t_centerVector + p_speed);
 			break;
 
 		default:
@@ -233,23 +234,23 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 
 int AABB::findPlane(vec3 p_sphereCenter)
 {
-	vec3 t_centerVec = p_sphereCenter - m_position;
+	vec3 t_centerVec = normalize(p_sphereCenter - m_position);
 	vec3 t_up = vec3(0.0f, 1.0f, 0.0f);
 
-	float angle = acos(dot(t_centerVec, t_up) / (length(p_sphereCenter) * length(t_up)) );
+	float angle = acos(dot(t_centerVec, t_up) / (length(t_centerVec) * length(t_up)) );
 	
-	if(angle >= 320 || angle <= 40)
+	if(angle >= 5.5850536f || angle <= 0.6981317f) // More than 320 or less than 40 degrees. 0,0174532925
 		return TOP;
-	if(angle >= 50 && angle <= 120)
+	if(angle >= 0.872664625f && angle <= 2.0943951f) // More than 50 and less than 130 degrees.
 		return RIGHT;
-	if(angle >= 140 && angle <= 220)
+	if(angle >= 2.44346095f && angle <= 3.83972435f) // More than 140 and less than 220 degrees.
 		return BOTTOM;
-	if(angle >= 230 && angle <= 310)
+	if(angle >= 4.014257275f && angle <= 5.410520675f) // More than 230 and less than 310
 		return LEFT;
-	if(	angle > 40 && angle < 50 ||
-		angle > 130 && angle < 140 ||
-		angle > 220 && angle < 230 ||
-		angle > 310 && angle < 320 )
+	if(	angle > 0.6981317f && angle < 0.872664625f ||
+		angle > 2.0943951f && angle < 2.44346095f ||
+		angle > 3.83972435f && angle < 4.014257275f ||
+		angle > 5.410520675f && angle < 5.5850536f )
 		return CORNER;
 
 	return -1;

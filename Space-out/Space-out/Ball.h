@@ -17,6 +17,7 @@ public:
 	void			update();
 	void			updatePosition();
 	void			setSpeed(vec3 p_speed);
+	vec3			getSpeed();
 
 	std::string*	getTexturePath();
 };

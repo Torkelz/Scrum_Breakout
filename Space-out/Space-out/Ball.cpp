@@ -17,12 +17,16 @@ void Ball::update()
 void Ball::updatePosition()
 {
 	m_pos += m_speed;
-	m_speed = vec3(0.0f, 0.0f, 0.0f);
 }
 
 void Ball::setSpeed(vec3 p_speed)
 {
 	m_speed = p_speed;
+}
+
+vec3 Ball::getSpeed()
+{
+	return m_speed;
 }
 
 std::string* Ball::getTexturePath()
