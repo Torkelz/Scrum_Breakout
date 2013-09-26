@@ -1,7 +1,0 @@
-#ifndef OPENGL_H_
-#define OPENGL_H_
-#include "GLapp.h"
-using namespace glm;
-
-
-#endif /* OPENGL_H_ */
