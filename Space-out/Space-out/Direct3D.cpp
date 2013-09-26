@@ -156,7 +156,7 @@ void Direct3D::onResize()
 void Direct3D::updateScene(float p_dt)
 {
 	D3DApp::updateScene(p_dt);
-	m_game.update(m_ScreenViewport.Width);
+	m_game.update(m_ScreenViewport.Width, p_dt);
 
 	std::wostringstream outs;   
 	outs.precision(6);
@@ -200,8 +200,9 @@ void Direct3D::drawScene()
 
 	//Try to get the pad closer to the actual mouse.
 	float tempX = t_pos->x - m_ScreenViewport.Width/2;
+	float tempY = -35.0f;
 
-	translatePadMatrix = XMMatrixTranslation(tempX * 0.125f, t_pos->y, t_pos->z);
+	translatePadMatrix = XMMatrixTranslation(tempX * 0.125f, tempY, t_pos->z);
 	//translatePadMatrix = XMMatrixIdentity();
 	m_world = XMMatrixIdentity();
 	m_WVP = translatePadMatrix * m_world * m_camView * m_camProjection;

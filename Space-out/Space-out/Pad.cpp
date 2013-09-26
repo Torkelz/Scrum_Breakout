@@ -2,10 +2,10 @@
 
 Pad::Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName) : Object(p_pPos, p_pColor, p_objectName)
 {
-	m_vertices.push_back(vec3(-5.0f, -5.0f, 0.0f));
-	m_vertices.push_back(vec3(-5.0f, 5.0f, 0.0f));
-	m_vertices.push_back(vec3(5.0f, -5.0f, 0.0f));
-	m_vertices.push_back(vec3(5.0f, 5.0f, 0.0f));
+	m_vertices.push_back(vec3(-5.0f, -1.0f, 0.0f));
+	m_vertices.push_back(vec3(-5.0f, 1.0f, 0.0f));
+	m_vertices.push_back(vec3(5.0f, -1.0f, 0.0f));
+	m_vertices.push_back(vec3(5.0f, 1.0f, 0.0f));
 	m_boundingVolume = new AABB(m_vertices.at(3), m_vertices.at(0), vec4(1.0f, 1.0f, 1.0f, 1.0f));
 }
 
