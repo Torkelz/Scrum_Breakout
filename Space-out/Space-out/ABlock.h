@@ -32,7 +32,7 @@ public:
 	
 	virtual void		init(mat4* p_pRotMat);
 	virtual void		update();
-	void				setPos(vec3 p_pos);
+	void				setPos(vec3 p_pos, mat4* p_pRotMat);
 	int					getHp();
 	vec2				getBlockID();
 	BlockVertex			getBlockVertex();
