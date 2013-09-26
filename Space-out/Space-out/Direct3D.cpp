@@ -49,7 +49,7 @@ void Direct3D::initApp()
 
 
 	//Set up world view proj
-	m_camPosition = XMVectorSet( 0.0f, 0.0f, 175.f, 0.0f );
+	m_camPosition = XMVectorSet( 0.0f, 0.0f, -250.f, 0.0f );
 	m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
 	m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 

@@ -7,7 +7,6 @@
 #include "LevelGenerator.h"
 #include "PlayField.h"
 
-#define UINT unsigned int
 
 using namespace glm;
 
@@ -39,10 +38,10 @@ private:
 	vector<vector<ABlock*>>*m_pBlocks;
 	LevelGenerator			m_loadLevel;
 
-	static const UINT		m_nrPlayFields = 4;
+	static const unsigned int		m_nrPlayFields = 4;
 	vec3					m_originWorld;
 
-	UINT					m_activePlayField;		
+	unsigned int					m_activePlayField;		
 
 	PlayField*				m_playFields[m_nrPlayFields];
 	
