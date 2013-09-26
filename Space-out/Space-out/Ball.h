@@ -14,8 +14,8 @@ public:
 	Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName);
 	~Ball();
 
-	void			update();
-	void			updatePosition();
+	void			update(float p_dt);
+	void			updatePosition(float p_dt);
 	void			setSpeed(vec3 p_speed);
 	vec3			getSpeed();
 

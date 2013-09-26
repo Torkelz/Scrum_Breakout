@@ -34,6 +34,7 @@ public:
 	bool				collide( BoundingVolume* p_pVolume );
 	vec3				findNewDirection(vec3 p_sphereCenter, vec3 p_speed);
 	int					findPlane(vec3 p_sphereCenter);
+	void				calculateAngle();
 	//void				calculateCornerVectors();
 
 	//DEBUGGING
@@ -53,6 +54,8 @@ private:
 	vec3				m_halfDiagonal;
 
 	vec3				m_cornerVectors[8];
+
+	float				m_v, m_w, m_v2, m_w2, cornerAngles[8];
 
 	//DEBUGGING
 	/*Buffer*				m_pBuffer;

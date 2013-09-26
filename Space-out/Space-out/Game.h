@@ -21,7 +21,7 @@ public:
 
 	void					init();
 
-	void		update(float p_screenWidth);
+	void		update(float p_screenWidth, float p_dt);
 	void		leftMouseClick( vec2 p_mousePosition );
 	void		rightMouseClick( vec2 p_mousePosition );
 	void		mouseMove( vec2 p_mousePosition );
