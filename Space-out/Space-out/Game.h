@@ -31,6 +31,8 @@ public:
 	vector<ABlock*>*		getBlocks(int p_list);
 	Object*					getBall();
 	PlayField*				getField(int p_id);
+	PlayField*				getActiveField();
+	unsigned int			getActiveFieldNr();
 private:
 	Observer*				m_pObserver;
 	Object*					m_pPad;

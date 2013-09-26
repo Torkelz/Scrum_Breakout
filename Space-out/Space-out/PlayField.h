@@ -20,6 +20,10 @@ public:
 	BlockVertex* getBufferData(); //Transfer to a array of blockvertex structs from blocklist
 	int			 getListSize();
 	mat4		getRotationMatrix();
+	ABlock*		getBlock(unsigned int p_id);
+	void		deleteBlock(unsigned int p_id);
+	bool		getUpdateBuffer();
+	void		setUpdateBuffer(bool p_bool);
 private:
 	vector<ABlock*> m_blockList;
 	mat4			m_rotMatrixOriginal;
@@ -29,6 +33,7 @@ private:
 	float			m_angle;
 	vec3			m_planeVectorX;
 	vec3			m_planeVectorY;
+	bool			m_updateBuffer;
 };
 
 #endif

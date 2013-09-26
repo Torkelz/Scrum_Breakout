@@ -35,15 +35,15 @@ void Game::init()
 		m_playFields[i]->init(m_loadLevel.getBlockList(i), m_loadLevel.getNrBlocks());
 	}
 	m_loadLevel.~LevelGenerator();
-
 }
 
 void Game::update(float p_screenWidth, float p_dt)
 {
 	vec3 t_pos = *m_pPad->getPos();
-	t_pos.x -= (p_screenWidth * 0.5f);
+	t_pos.x += (p_screenWidth * 0.5f);
 	t_pos.x *= 0.125f;
 	t_pos.y = -35.0f;
+	t_pos.z = 50.0f;
 
 	mat4 padTranslation = translate(mat4(1.0f), t_pos);
 	((Pad*)m_pPad)->update(padTranslation);
@@ -54,6 +54,18 @@ void Game::update(float p_screenWidth, float p_dt)
 		vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 		tempSpeed.y = abs(tempSpeed.y);
 		((Ball*)m_pBall)->setSpeed( tempSpeed );
+	}
+	for(int i = 0; i < m_playFields[m_activePlayField]->getListSize();i++)
+	{
+		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
+
+		if(  bv->collide(m_pBall->getBoundingVolume()))
+		{
+			m_playFields[m_activePlayField]->deleteBlock(i);
+
+			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+			((Ball*)m_pBall)->setSpeed( tempSpeed );
+		}
 	}
 }
 
@@ -99,7 +111,7 @@ void Game::rightMouseClick( vec2 p_mousePosition ){}
 
 void Game::mouseMove( vec2 p_mousePosition )
 {
-	((Pad*)m_pPad)->setPos( p_mousePosition );
+	((Pad*)m_pPad)->setPos( vec2(-p_mousePosition.x, p_mousePosition.y) );
 }
 
 Observer* Game::getObserver()
@@ -122,3 +134,12 @@ PlayField* Game::getField(int p_id)
 	return m_playFields[p_id];
 }
 
+PlayField* Game::getActiveField()
+{
+	return m_playFields[m_activePlayField];
+}
+
+unsigned int Game::getActiveFieldNr()
+{
+	return m_activePlayField;
+}

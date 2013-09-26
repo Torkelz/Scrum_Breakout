@@ -25,22 +25,22 @@ public:
 	bool	sphereVsSphere(Sphere* p_sphere);
 
 	//DEBUGGING
-	/*void				initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext);
-	void				draw( XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj );*/
+	//void				initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext);
+	//void				draw( XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj );
 
 private:
 	float	m_radius;
 	float	m_sqrRadius;
 
 	//DEBUGGING
-	/*Buffer*				m_pBuffer;
-	Buffer*				m_pCB;
-	Shader*				m_pShader;
+	//Buffer*				m_pBuffer;
+	//Buffer*				m_pCB;
+	//Shader*				m_pShader;
 
-	ID3D11Device*		m_pDevice;
-	ID3D11DeviceContext* m_pDeviceContext;
-	CBS					m_cb;
-	XMMATRIX			m_translate;*/
+	//ID3D11Device*		m_pDevice;
+	//ID3D11DeviceContext* m_pDeviceContext;
+	//CBS					m_cb;
+	//XMMATRIX			m_translate;
 };
 
 #endif SPHERE_H

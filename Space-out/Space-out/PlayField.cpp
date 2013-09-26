@@ -31,6 +31,7 @@ PlayField::PlayField(vec3 p_positionOriginal, float p_angle, vec2 p_size)
 	m_planeVectorY = vec3(RoundDoneRight(tempY.x),RoundDoneRight(tempY.y),RoundDoneRight(tempY.z));
 
 	m_size = p_size;
+	m_updateBuffer = false;
 }
 
 PlayField::~PlayField()
@@ -113,3 +114,25 @@ mat4 PlayField::getRotationMatrix()
 	return m_rotMatrixOriginal;
 }
 
+
+ABlock* PlayField::getBlock(unsigned int p_id)
+{
+	return m_blockList.at(p_id);
+}
+
+void PlayField::deleteBlock(unsigned int p_id)
+{
+	m_blockList.erase(m_blockList.begin() + p_id);
+	setUpdateBuffer(true);
+}
+
+
+bool PlayField::getUpdateBuffer()
+{
+	return m_updateBuffer;
+}
+
+void PlayField::setUpdateBuffer(bool p_bool)
+{
+	m_updateBuffer = p_bool;
+}

@@ -16,6 +16,7 @@ public:
 
 	void			update(float p_dt);
 	void			updatePosition(float p_dt);
+	void			setPosition(vec3 p_pos);
 	void			setSpeed(vec3 p_speed);
 	vec3			getSpeed();
 

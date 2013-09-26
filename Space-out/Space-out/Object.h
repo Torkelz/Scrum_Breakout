@@ -22,6 +22,7 @@ public:
 
 	void					update();
 
+	void					setPos(vec3 p_pos);
 	vec3*					getPos();
 	std::vector<vec3>*		getVertices();
 	BoundingVolume*			getBoundingVolume();

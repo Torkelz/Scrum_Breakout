@@ -11,6 +11,12 @@ Object::~Object(){}
 
 void Object::update(){}
 
+void Object::setPos(vec3 p_pos)
+{
+	m_pos = p_pos;
+	//m_boundingVolume->updatePosition(p_pos);
+}
+
 vec3* Object::getPos()
 {
 	return &m_pos;

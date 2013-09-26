@@ -54,13 +54,13 @@ void AABB::updatePosition(mat4 p_scale, mat4 p_translate)
 	mat4 scalate;
 	scalate = p_scale * p_translate;
 
-	/*for (int i = 0; i < 4; i++)
-	{
-		m_translate.r[i].m128_f32[0] = scalate[i].x;
-		m_translate.r[i].m128_f32[1] = scalate[i].y;
-		m_translate.r[i].m128_f32[2] = scalate[i].z;
-		m_translate.r[i].m128_f32[3] = scalate[i].w;
-	}*/
+	//for (int i = 0; i < 4; i++)
+	//{
+	//	m_translate.r[i].m128_f32[0] = scalate[i].x;
+	//	m_translate.r[i].m128_f32[1] = scalate[i].y;
+	//	m_translate.r[i].m128_f32[2] = scalate[i].z;
+	//	m_translate.r[i].m128_f32[3] = scalate[i].w;
+	//}
 
 	scalate = transpose(scalate);
 	
@@ -240,7 +240,11 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 
 int AABB::findPlane(vec3 p_sphereCenter)
 {
-	vec3 t_centerVec = normalize(p_sphereCenter - m_position);
+	vec3 t_centerVec = p_sphereCenter - m_position;
+	if ( length(t_centerVec) <= 0)
+		return -1;
+
+	t_centerVec = normalize(t_centerVec);
 	vec3 t_up = vec3(0.0f, 1.0f, 0.0f);
 
 	float angle = acos(dot(t_centerVec, t_up) / (length(t_centerVec) * length(t_up)) );
@@ -279,24 +283,12 @@ void AABB::calculateAngle()
 	cornerAngles[7] = m_v + m_v2 + (m_w2 * 2) + 0.08727f;
 }
 
-//void AABB::calculateCornerVectors()
-//{
-//	m_cornerVectors[0] = ( m_bounds[0] + ((m_bounds[1] - m_bounds[0]) * 0.5f) ) - m_position;
-//	m_cornerVectors[1] = ( m_bounds[0] + ((m_bounds[4] - m_bounds[0]) * 0.5f) ) - m_position;
-//	m_cornerVectors[2] = ( m_bounds[4] + ((m_bounds[5] - m_bounds[4]) * 0.5f) ) - m_position;
-//	m_cornerVectors[3] = ( m_bounds[1] + ((m_bounds[5] - m_bounds[1]) * 0.5f) ) - m_position;
-//	m_cornerVectors[4] = ( m_bounds[2] + ((m_bounds[3] - m_bounds[2]) * 0.5f) ) - m_position;
-//	m_cornerVectors[5] = ( m_bounds[2] + ((m_bounds[6] - m_bounds[2]) * 0.5f) ) - m_position;
-//	m_cornerVectors[6] = ( m_bounds[6] + ((m_bounds[7] - m_bounds[6]) * 0.5f) ) - m_position;
-//	m_cornerVectors[7] = ( m_bounds[3] + ((m_bounds[7] - m_bounds[3]) * 0.5f) ) - m_position;
-//}
-
 //void AABB::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext)
 //{
 //	m_pDevice = p_pDevice;
 //	m_pDeviceContext = p_pDeviceContext;
 //
-//	m_sphere.initDraw(m_pDevice, m_pDeviceContext);
+//	//m_sphere.initDraw(m_pDevice, m_pDeviceContext);
 //
 //	buildCubeIndices(0);
 //
@@ -369,5 +361,5 @@ void AABB::calculateAngle()
 //
 //	m_pDeviceContext->DrawIndexed(24, 0, 0);
 //	
-//	m_sphere.draw(p_world, p_view, p_proj);
+//	//m_sphere.draw(p_world, p_view, p_proj);
 //}
