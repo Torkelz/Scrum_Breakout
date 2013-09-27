@@ -41,7 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\git\Scrum_Breakout\Space-out\cppUnit;C:\Users\BTH\Documents\GitHub\Scrum_Breakout\Space-out\glm;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\glm;C:\git\Scrum_Breakout\Space-out\cppUnit;C:\Users\BTH\Documents\GitHub\Scrum_Breakout\Space-out\glm;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
