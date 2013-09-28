@@ -214,12 +214,18 @@ void Direct3D::updateScene(float p_dt)
 	unsigned int active = m_game.getActiveFieldNr();
 	if(m_game.getField(active)->getUpdateBuffer())
 	{
-		/*m_blockBuffers[active].map();
-		m_blockBuffers[active].getMappedResource().pData = &m_game.getField(active)->getBufferData();
-		m_blockBuffers[active].unmap();*/
+		m_blockBuffers[active].map();
+		D3D11_MAPPED_SUBRESOURCE* ms = m_blockBuffers[active].getMappedResource();
+		//m_blockBuffers[active].getMappedResource()->pData = m_game.getField(active)->getBufferData();
+		int u = sizeof(BlockVertex);
 
-		D3D11_BOX bla; ZeroMemory( &bla, sizeof(D3D11_BOX));
-		m_pDeviceContext->UpdateSubresource( m_blockBuffers[active].getBufferPointer(), 0, &bla, m_game.getField(active)->getBufferData(), 0, 0 );
+		memcpy(ms->pData, m_game.getField(active)->getBufferData(), u *m_game.getField(active)->getListSize() );
+
+		m_blockBuffers[active].unmap();
+
+		//D3D11_BOX bla; ZeroMemory( &bla, sizeof(D3D11_BOX));
+		//m_pDeviceContext->UpdateSubresource( m_blockBuffers[active].getBufferPointer(), 0,NULL, m_game.getField(active)->getBufferData(), 0, 0 );
+		
 		m_game.getField(active)->setUpdateBuffer(false);
 	}
 
@@ -316,14 +322,21 @@ void Direct3D::drawScene()
 	cBlockBufferStruct.sizeZ = g_bvSize.z;
 	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 	m_cBlockBuffer.apply(0);
-	for(int i = 0; i < 4; i++)
-	{
-		cBlockBufferStruct.rotation = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()));
+	unsigned int active = m_game.getActiveFieldNr();
+	cBlockBufferStruct.rotation = mat4ToXMMatrix(m_game.getField(active)->getRotationMatrix());
 		//cBlockBufferStruct.WVP = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()) * m_WVP);
 		m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
-		m_blockBuffers[i].apply(0);
-		m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
-	}
+		m_blockBuffers[active].apply(0);
+		m_pDeviceContext->Draw(m_game.getField(active)->getListSize(), 0);
+
+	//for(int i = 0; i < 4; i++)
+	//{
+	//	cBlockBufferStruct.rotation = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()));
+	//	//cBlockBufferStruct.WVP = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()) * m_WVP);
+	//	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
+	//	m_blockBuffers[i].apply(0);
+	//	m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
+	//}
 
 	
 	//m_blockBuffers[1].apply(0);

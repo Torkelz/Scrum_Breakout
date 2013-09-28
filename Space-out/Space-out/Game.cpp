@@ -21,7 +21,7 @@ void Game::init()
 
 	vec2 size = m_loadLevel.getFieldSize();
 	size *= 0.5f;
-	vec3 startPosition(m_originWorld.x-size.x, m_originWorld.y + size.y, m_originWorld.z + size.x);
+	vec3 startPosition(m_originWorld.x+size.x, m_originWorld.y + size.y, m_originWorld.z + size.x);
 	size *= 2;
 	float angle = 0;
 	//Create Fields

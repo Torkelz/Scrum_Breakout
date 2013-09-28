@@ -4,7 +4,7 @@
 PlayField::PlayField(vec3 p_positionOriginal, float p_angle, vec2 p_size)
 {
 	m_angle = p_angle;
-	m_planeVectorX = vec3(1.0f, 0.0f, 0.0f);
+	m_planeVectorX = vec3(-1.0f, 0.0f, 0.0f);
 	m_planeVectorY = vec3(0.0f, -1.0f, 0.0f);
 
 	m_rotMatrixOriginal = mat4(1.0f);
@@ -80,7 +80,7 @@ void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 		/*pos += m_planeVectorX *  g_bvSize.x +  temp.x * (m_planeVectorX *  g_bvSize.x * 2.0f);
 		pos += m_planeVectorY *  g_bvSize.y +  temp.y * (m_planeVectorY *  g_bvSize.y * 2.0f);*/
 		m_blockList.at(i)->setPos(pos, &m_rotMatrixOriginal);
-		m_blockList.at(i)->setPos(pos, &m_rotMatrixOriginal);
+		//m_blockList.at(i)->setPos(pos, &m_rotMatrixOriginal);
 	}
 }
 

@@ -66,7 +66,7 @@ public:
 	void* map();
 	void unmap();
 
-	D3D11_MAPPED_SUBRESOURCE getMappedResource();
+	D3D11_MAPPED_SUBRESOURCE* getMappedResource();
 
 	ID3D11Buffer* getBufferPointer();
 	void setBuffer(ID3D11Buffer* p_pBuffer);

@@ -182,9 +182,9 @@ void Buffer::unmap()
 	m_pDeviceContext->Unmap( m_pBuffer, 0 );
 }
 
-D3D11_MAPPED_SUBRESOURCE Buffer::getMappedResource()
+D3D11_MAPPED_SUBRESOURCE* Buffer::getMappedResource()
 {
-	return m_mappedResource;
+	return &m_mappedResource;
 }
 
 ID3D11Buffer* Buffer::getBufferPointer()
