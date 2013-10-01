@@ -69,7 +69,7 @@ void Game::update(float p_screenWidth, float p_dt)
 			break;
 		}
 	}
-	for(int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
+	for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
 	{
 		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
 

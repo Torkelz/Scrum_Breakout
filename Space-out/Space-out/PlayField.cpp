@@ -3,35 +3,35 @@
 
 PlayField::PlayField(vec3 p_positionOriginal, float p_angle, vec2 p_size)
 {
-	m_angle = p_angle;
-	m_planeVectorX = vec3(-1.0f, 0.0f, 0.0f);
-	m_planeVectorY = vec3(0.0f, -1.0f, 0.0f);
+	m_angle			= p_angle;
+	m_planeVectorX	= vec3(-1.0f, 0.0f, 0.0f);
+	m_planeVectorY	= vec3(0.0f, -1.0f, 0.0f);
 
 	m_rotMatrixOriginal = mat4(1.0f);
 	m_rotMatrixOriginal = rotate(m_rotMatrixOriginal, m_angle, vec3(0,1,0));
-	mat4 m_trans = mat4();
-	m_trans = translate(m_trans, -p_positionOriginal);
+	mat4 m_trans		= mat4();
+	m_trans				= translate(m_trans, -p_positionOriginal);
 
 	//Move originposition to right coordinates
 	vec4 tempOrigin = vec4(p_positionOriginal,0.f);
-	tempOrigin = m_trans * tempOrigin;
-	tempOrigin = m_rotMatrixOriginal * tempOrigin;
-	m_trans = translate(m_trans, p_positionOriginal);
-	tempOrigin = m_trans * tempOrigin;
+	tempOrigin		= m_trans * tempOrigin;
+	tempOrigin		= m_rotMatrixOriginal * tempOrigin;
+	m_trans			= translate(m_trans, p_positionOriginal);
+	tempOrigin		= m_trans * tempOrigin;
 
 	m_positionOriginal = vec3(RoundDoneRight(tempOrigin.x) , RoundDoneRight(tempOrigin.y), RoundDoneRight(tempOrigin.z));
 
 	//Rotate the direction of the plane
-	vec4 tempX = vec4(m_planeVectorX,0.f);
-	vec4 tempY = vec4(m_planeVectorY,0.f);
-	tempX = m_rotMatrixOriginal * tempX;
-	tempY = m_rotMatrixOriginal * tempY;
+	vec4 tempX	= vec4(m_planeVectorX,0.f);
+	vec4 tempY	= vec4(m_planeVectorY,0.f);
+	tempX		= m_rotMatrixOriginal * tempX;
+	tempY		= m_rotMatrixOriginal * tempY;
 	
 	m_planeVectorX = vec3(RoundDoneRight(tempX.x),RoundDoneRight(tempX.y),RoundDoneRight(tempX.z));
 	m_planeVectorY = vec3(RoundDoneRight(tempY.x),RoundDoneRight(tempY.y),RoundDoneRight(tempY.z));
 
-	m_size = p_size;
-	m_updateBuffer = false;
+	m_size			= p_size;
+	m_updateBuffer	= false;
 }
 
 PlayField::~PlayField()
@@ -42,10 +42,11 @@ PlayField::~PlayField()
 void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 {
 	m_blockList		= p_blockList;
-	vec3 orto; // planevecX * planeVecY pekar mot mot center
+	vec3 orto;		// planevecX * planeVecY pekar mot mot center
 	orto			= cross( m_planeVectorX, m_planeVectorY );
 	float offsetX	= 0.f, offsetY = 150.f, offsetZ = -1.f, sizeX = 150.f, sizeZ = 150.f;
-	
+	mat4 trans;
+
 	//Left AABB
 	vec3 top	= m_positionOriginal - (m_planeVectorX * (offsetX + sizeX)) -(m_planeVectorY * offsetY) + (orto * ((offsetZ + sizeZ)/2));
 	vec3 bottom	= m_positionOriginal - (m_planeVectorX * offsetX) +(m_planeVectorY * (offsetY + m_size.y)) - (orto * ((offsetZ + sizeZ)/2));
@@ -53,14 +54,6 @@ void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 	m_borders.push_back(new AABB(top,bottom,vec4(1.0f, 1.0f, 1.0f, 1.0f)));
 	
 	//Right AABB
-
-	/*mat4 tr = translate(mat4(1.0f), bottom +(top-bottom)*0.5f);
-	mat4 rot = rotate(mat4(1.0f), 3.14f, vec3(0.0f,1.0f,0.0f));
-	tr = inverse(tr) * rot * tr;
-	temptop = tr * temptop;
-	tempbottom = tr * tempbottom;*/
-
-	mat4 trans;
 	trans			= translate(mat4(1.0f),vec3(-(m_size.x + sizeX),0.f,0.f));
 	vec4 temptop	= vec4(top, 1.0f);
 	vec4 tempbottom = vec4(bottom, 1.0f);
@@ -79,20 +72,14 @@ void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 	
 	//Bottom AABB
 	trans		= translate(mat4(1.0f),vec3(0.f,-(m_size.y+sizeZ),0.f));
-
 	temptop		= vec4(top, 1.0f);
 	tempbottom	= vec4(bottom, 1.0f);
-
 	temptop		= trans * temptop;
 	tempbottom	= trans * tempbottom;
 	top			= vec3(temptop);
 	bottom		= vec3(tempbottom);
 
-	//vec3 tempOriginPos = m_positionOriginal + (m_planeVectorY * m_size.y);
-
-	m_borders.push_back(new AABB ( top/*tempOriginPos - (m_planeVectorX * (offsetX - m_size.x)) +(m_planeVectorY * (offsetY +  sizeX)) + (orto * (offsetZ - sizeZ))*/, 
-								bottom/*tempOriginPos - (m_planeVectorX * offsetX) -(m_planeVectorY * offsetY) + (orto * offsetZ)*/,
-								vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	m_borders.push_back(new AABB ( top, bottom,	vec4(1.0f, 1.0f, 1.0f, 1.0f)));
 	
 	//Block Placement STUFF!
 	unsigned int l = m_blockList.size();
@@ -105,10 +92,7 @@ void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 
 		pos += dirX * 0.5f + dirX * temp.x;
 		pos += dirY * 0.5f + dirY * temp.y;  
-		/*pos += m_planeVectorX *  g_bvSize.x +  temp.x * (m_planeVectorX *  g_bvSize.x * 2.0f);
-		pos += m_planeVectorY *  g_bvSize.y +  temp.y * (m_planeVectorY *  g_bvSize.y * 2.0f);*/
 		m_blockList.at(i)->setPos(pos, &m_rotMatrixOriginal);
-		//m_blockList.at(i)->setPos(pos, &m_rotMatrixOriginal);
 	}
 }
 
@@ -121,7 +105,7 @@ BlockVertex* PlayField::getBufferData()
 {
   BlockVertex* temp = NULL;
   unsigned int size = m_blockList.size();
-  temp = new BlockVertex[size];
+  temp				= new BlockVertex[size];
   for(int i = 0; i < size; i++)
   {
 	  temp[i] = m_blockList.at(i)->getBlockVertex();
