@@ -44,6 +44,7 @@ public:
 	void setShaders();
 
 	void setResource(ShaderType p_pShaderType, UINT p_StartSpot, UINT p_NumViews, ID3D11ShaderResourceView* p_pShaderResource);
+	void setSamplerState(ShaderType p_pShaderType,UINT p_StartSpot,UINT p_NumViews, ID3D11SamplerState* p_pSamplerState);
 };
 
 

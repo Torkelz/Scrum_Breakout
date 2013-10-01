@@ -16,7 +16,7 @@ protected:
 	BoundingVolume*	m_boundingVolume;
 	int				m_textureID;
 	std::vector<vec3> m_vertices;
-	wchar_t			m_texturePath;
+	std::wstring*	m_texturePath;
 public:
 	Object(vec3* p_pPos, vec3* p_pColor, std::string p_objectName);
 	~Object();
@@ -27,7 +27,7 @@ public:
 	vec3*					getPos();
 	std::vector<vec3>*		getVertices();
 	BoundingVolume*			getBoundingVolume();
-	wchar_t*				getTexturePath();
+	std::wstring*			getTexturePath();
 };
 
 #endif OBJECT_H

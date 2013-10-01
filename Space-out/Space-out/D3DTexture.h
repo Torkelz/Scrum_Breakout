@@ -22,6 +22,6 @@ public:
 
 	ID3D11Texture2D*			getResource();
 	ID3D11ShaderResourceView*	getResourceView();
-	void						createTexture(wchar_t* p_pTextureFilename, char* p_pDebugName);
-	
+	void						createTexture(std::wstring* p_pTextureFilename, char* p_pDebugName);
+	ID3D11Texture2D*			createTextureResource(DXGI_FORMAT p_dxFormat, UINT p_uWidth, UINT p_uHeight, UINT p_uRowPitch, VOID* p_pInitData);
 };

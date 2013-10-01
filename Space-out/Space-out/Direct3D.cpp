@@ -166,7 +166,7 @@ void Direct3D::initApp()
 	m_ballBuffer.init(m_pDevice, m_pDeviceContext, bufferDesc);
 	m_ballTexture = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_ballTexture.createTexture(m_game.getBall()->getTexturePath(), 0);
-	m_ballShader.setResource(PIXEL_SHADER, 0, 1, m_ballTexture.getResourceView());
+	
 	CBBall cbBall;
 
 	BufferInitDesc cbBallDesc;
@@ -178,8 +178,19 @@ void Direct3D::initApp()
 	
 	m_constantBallBuffer.init(m_pDevice, m_pDeviceContext, cbBallDesc);
 	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &cbBall, 0, 0);
-
 	m_constantBallBuffer.apply(0);
+
+	D3D11_SAMPLER_DESC sd;
+	sd.Filter				= D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sd.AddressU				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressV				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressW				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.ComparisonFunc		= D3D11_COMPARISON_NEVER;
+	sd.MinLOD				= 0;
+	sd.MaxLOD				= D3D11_FLOAT32_MAX;
+	
+
+	m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
 
 	// BALLZZZ FROM THE WALL
 
@@ -299,10 +310,13 @@ void Direct3D::drawScene()
 	m_constantBallBuffer.apply(0);
 
 	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+
+	m_ballShader.setResource(PIXEL_SHADER, 0, 1, m_ballTexture.getResourceView());
+	m_ballShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 	m_ballShader.setShaders();
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-
 	m_ballBuffer.apply(0);
+
 	m_pDeviceContext->Draw(1, 0);
 
 

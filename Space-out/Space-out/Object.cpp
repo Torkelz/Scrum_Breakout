@@ -32,7 +32,7 @@ BoundingVolume* Object::getBoundingVolume()
 	return m_boundingVolume;
 }
 
-wchar_t* Object::getTexturePath()
+std::wstring* Object::getTexturePath()
 {
-	return &m_texturePath;
+	return m_texturePath;
 }

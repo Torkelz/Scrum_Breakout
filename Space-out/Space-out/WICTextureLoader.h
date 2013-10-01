@@ -28,7 +28,8 @@
 #ifdef _MSC_VER
 #pragma once
 #endif
-#pragma comment( lib, "dxguid.lib")
+
+#include <initguid.h>
 #include <d3d11.h>
 
 #pragma warning(push)

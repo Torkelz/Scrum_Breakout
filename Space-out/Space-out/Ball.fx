@@ -1,5 +1,6 @@
 
-Texture2D m_texture;
+Texture2D m_texture : register ( t0 );
+SamplerState m_textureSampler : register ( s0 );
 
 struct temp
 {
@@ -84,15 +85,9 @@ void GShader(point temp gIn[1] : SV_POSITION, inout TriangleStream<PSSceneIn> tr
 //-----------------------------------------------------------------------------------------
 // SamplerState: LinearSampler  
 //-----------------------------------------------------------------------------------------
-SamplerState linearSampler
-{
-	Filter		= MIN_MAG_MIP_LINEAR;
-	AddressU	= Wrap;
-	AddressV	= Wrap;
-};
 
 float4 PShader(PSSceneIn p_input) : SV_TARGET
 {
-	return float4(0.0f, 0.0f, 0.0f, 1.0f);
-	//return m_texture.Sample(linearSampler, p_input.texturePos);
+	//return float4(0.0f, 0.0f, 0.0f, 1.0f);
+	return m_texture.Sample(m_textureSampler, p_input.texturePos);
 }

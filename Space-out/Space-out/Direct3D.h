@@ -94,6 +94,7 @@ private:
 	Shader		m_ballShader;
 	CBBall		m_cbBall;
 	D3DTexture	m_ballTexture;
+	ID3D11SamplerState* m_pBallSampler;
 
 	//TEST
 	ID3D11Buffer*    mVB;
