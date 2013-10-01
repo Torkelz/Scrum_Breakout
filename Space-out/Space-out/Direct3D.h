@@ -13,6 +13,7 @@
 
 #include "BoundingVolume.h"
 #include "AABB.h"
+#include "D3DTexture.h"
 
 class Object;
 
@@ -92,6 +93,7 @@ private:
 	Buffer		m_constantBallBuffer;
 	Shader		m_ballShader;
 	CBBall		m_cbBall;
+	D3DTexture	m_ballTexture;
 
 	//TEST
 	ID3D11Buffer*    mVB;

@@ -85,6 +85,8 @@
     <ClCompile Include="PlayField.cpp">
       <Filter>Level</Filter>
     </ClCompile>
+    <ClCompile Include="WICTextureLoader.cpp" />
+    <ClCompile Include="D3DTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -154,6 +156,8 @@
     <ClInclude Include="PlayField.h">
       <Filter>Level\Header</Filter>
     </ClInclude>
+    <ClInclude Include="WICTextureLoader.h" />
+    <ClInclude Include="D3DTexture.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

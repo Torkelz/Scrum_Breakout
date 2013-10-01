@@ -31,3 +31,8 @@ BoundingVolume* Object::getBoundingVolume()
 {
 	return m_boundingVolume;
 }
+
+wchar_t* Object::getTexturePath()
+{
+	return &m_texturePath;
+}

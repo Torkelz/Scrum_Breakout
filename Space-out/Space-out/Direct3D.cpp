@@ -161,9 +161,12 @@ void Direct3D::initApp()
 
 	bufferDesc.initData = m_game.getBall()->getPos();
 	bufferDesc.numElements = 1;
-
+	
+	//char* debugName;
 	m_ballBuffer.init(m_pDevice, m_pDeviceContext, bufferDesc);
-
+	m_ballTexture = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_ballTexture.createTexture(m_game.getBall()->getTexturePath(), 0);
+	m_ballShader.setResource(PIXEL_SHADER, 0, 1, m_ballTexture.getResourceView());
 	CBBall cbBall;
 
 	BufferInitDesc cbBallDesc;
