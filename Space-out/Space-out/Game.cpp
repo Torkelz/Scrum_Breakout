@@ -61,10 +61,23 @@ void Game::update(float p_screenWidth, float p_dt)
 
 		if(  bv->collide(m_pBall->getBoundingVolume()))
 		{
-			m_playFields[m_activePlayField]->deleteBlock(i);
-
 			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 			((Ball*)m_pBall)->setSpeed( tempSpeed );
+
+			m_playFields[m_activePlayField]->deleteBlock(i);
+			bv = NULL;
+			break;
+		}
+	}
+	for(int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
+	{
+		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
+
+		if(  bv->collide(m_pBall->getBoundingVolume()))
+		{
+			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+			((Ball*)m_pBall)->setSpeed( tempSpeed );
+			break;
 		}
 	}
 }
@@ -74,19 +87,19 @@ void Game::keyEvent(unsigned short key)
 	float Rotation = 0;
 	if(key == 0x41) // A
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(-10.0f, 0.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(-50.0f, 0.0f, 0.0f));
 	}
 	if(key == 0x44) // D
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(10.0f, 0.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(50.0f, 0.0f, 0.0f));
 	}
 	if(key == 0x57) // W
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 10.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f));
 	}
 	if(key == 0x53) // S
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(0.0f, -10.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f));
 	}
 	if(key == 0x1B) //ESC
 		PostQuitMessage(0);

@@ -24,6 +24,8 @@ public:
 	void		deleteBlock(unsigned int p_id);
 	bool		getUpdateBuffer();
 	void		setUpdateBuffer(bool p_bool);
+	BoundingVolume* getCollisionBorder(unsigned int p_id);
+	unsigned int	getNrBorders();
 private:
 	vector<ABlock*> m_blockList;
 	mat4			m_rotMatrixOriginal;

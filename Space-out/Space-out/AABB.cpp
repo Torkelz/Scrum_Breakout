@@ -268,98 +268,100 @@ int AABB::findPlane(vec3 p_sphereCenter)
 
 void AABB::calculateAngle()
 {
-	m_v = atan(m_bounds[0].x / m_bounds[0].y );
+	// For some reason abs works. Remove if it bugs. :)
+	m_v = abs(atan(m_bounds[0].x / m_bounds[0].y ));
 	m_w = (3.14159265358f * 0.5f) - m_v;
 	m_v2 = m_v * 2;
 	m_w2 = m_w * 2;
+	float temp = 0.08727f*2.f; //10.0f degrees
 
-	cornerAngles[0] = m_v - 0.08727f;
-	cornerAngles[1] = m_v + 0.08727f;
-	cornerAngles[2] = m_v + m_w2 - 0.08727f;
-	cornerAngles[3] = m_v + m_w2 + 0.08727f;
-	cornerAngles[4] = m_v + m_v2 + m_w2 - 0.08727f;
-	cornerAngles[5] = m_v + m_v2 + m_w2 + 0.08727f;
-	cornerAngles[6] = m_v + m_v2 + (m_w2 * 2) - 0.08727f;
-	cornerAngles[7] = m_v + m_v2 + (m_w2 * 2) + 0.08727f;
+	cornerAngles[0] = m_v - temp;
+	cornerAngles[1] = m_v + temp;
+	cornerAngles[2] = m_v + m_w2 - temp;
+	cornerAngles[3] = m_v + m_w2 + temp;
+	cornerAngles[4] = m_v + m_v2 + m_w2 - temp;
+	cornerAngles[5] = m_v + m_v2 + m_w2 + temp;
+	cornerAngles[6] = m_v + m_v2 + (m_w2 * 2) - temp;
+	cornerAngles[7] = m_v + m_v2 + (m_w2 * 2) + temp;
 }
 
-//void AABB::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext)
-//{
-//	m_pDevice = p_pDevice;
-//	m_pDeviceContext = p_pDeviceContext;
-//
-//	//m_sphere.initDraw(m_pDevice, m_pDeviceContext);
-//
-//	buildCubeIndices(0);
-//
-//	BufferInitDesc desc;
-//	desc.type				= VERTEX_BUFFER;
-//	desc.numElements		= 8;
-//	desc.elementSize		= sizeof( XMFLOAT3 );
-//	desc.usage				= BUFFER_DEFAULT;
-//	desc.initData			= m_bounds;
-//
-//	m_pBuffer = new Buffer();
-//	m_pBuffer->init(p_pDevice, p_pDeviceContext, desc);
-//
-//	BufferInitDesc cbDesc;	
-//
-//	cbDesc.elementSize = sizeof(CB);
-//	cbDesc.initData = NULL;
-//	cbDesc.numElements = 1;
-//	cbDesc.type = CONSTANT_BUFFER_VS;
-//	cbDesc.usage = BUFFER_DEFAULT;
-//	
-//	m_pCB = new Buffer();
-//	m_pCB->init(p_pDevice, p_pDeviceContext, cbDesc);
-//
-//	int						temp[24];
-//	for (UINT i = 0; i < 24; i++)
-//	{
-//		temp[i]				= m_indices.at(i);
-//	}
-//
-//	desc.type				= INDEX_BUFFER;
-//	desc.numElements		= 24;
-//	desc.elementSize		= sizeof(UINT);
-//	desc.usage				= BUFFER_DEFAULT;
-//	desc.initData			= &temp;
-//
-//	m_pIndexBuffer = new Buffer();
-//	m_pIndexBuffer->init(p_pDevice, p_pDeviceContext, desc);
-//
-//
-//
-//	D3D11_INPUT_ELEMENT_DESC inputDesc[] = 
-//	{
-//		{"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
-//	};
-//
-//	m_pShader = new Shader();
-//	m_pShader->init(p_pDevice, p_pDeviceContext, 1);
-//	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "VSInstmain","vs_5_0", VERTEX_SHADER , inputDesc);
-//	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "PSScene", "ps_5_0", PIXEL_SHADER, NULL);
-//}
-//
-//void AABB::draw(XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj)
-//{
-//	XMMATRIX WorldViewProj;
-//	WorldViewProj = XMMatrixMultiply(p_world, m_translate);
-//	WorldViewProj = XMMatrixMultiply(WorldViewProj, p_view );
-//	WorldViewProj = XMMatrixMultiply(WorldViewProj, p_proj );
-//
-//	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-//
-//	m_cb.color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-//	m_cb.WVP = XMMatrixTranspose(WorldViewProj);
-//	m_pCB->apply(0);
-//	m_pDeviceContext->UpdateSubresource(m_pCB->getBufferPointer(), 0, NULL, &m_cb, 0, 0);
-//	
-//	m_pIndexBuffer->apply(0);
-//	m_pBuffer->apply(0);
-//	m_pShader->setShaders();
-//
-//	m_pDeviceContext->DrawIndexed(24, 0, 0);
-//	
-//	//m_sphere.draw(p_world, p_view, p_proj);
-//}
+void AABB::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext)
+{
+	m_pDevice = p_pDevice;
+	m_pDeviceContext = p_pDeviceContext;
+
+	//m_sphere.initDraw(m_pDevice, m_pDeviceContext);
+
+	buildCubeIndices(0);
+
+	BufferInitDesc desc;
+	desc.type				= VERTEX_BUFFER;
+	desc.numElements		= 8;
+	desc.elementSize		= sizeof( XMFLOAT3 );
+	desc.usage				= BUFFER_DEFAULT;
+	desc.initData			= m_bounds;
+
+	m_pBuffer = new Buffer();
+	m_pBuffer->init(p_pDevice, p_pDeviceContext, desc);
+
+	BufferInitDesc cbDesc;	
+
+	cbDesc.elementSize = sizeof(CB);
+	cbDesc.initData = NULL;
+	cbDesc.numElements = 1;
+	cbDesc.type = CONSTANT_BUFFER_VS;
+	cbDesc.usage = BUFFER_DEFAULT;
+	
+	m_pCB = new Buffer();
+	m_pCB->init(p_pDevice, p_pDeviceContext, cbDesc);
+
+	int						temp[24];
+	for (UINT i = 0; i < 24; i++)
+	{
+		temp[i]				= m_indices.at(i);
+	}
+
+	desc.type				= INDEX_BUFFER;
+	desc.numElements		= 24;
+	desc.elementSize		= sizeof(UINT);
+	desc.usage				= BUFFER_DEFAULT;
+	desc.initData			= &temp;
+
+	m_pIndexBuffer = new Buffer();
+	m_pIndexBuffer->init(p_pDevice, p_pDeviceContext, desc);
+
+
+
+	D3D11_INPUT_ELEMENT_DESC inputDesc[] = 
+	{
+		{"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+	};
+
+	m_pShader = new Shader();
+	m_pShader->init(p_pDevice, p_pDeviceContext, 1);
+	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "VSInstmain","vs_5_0", VERTEX_SHADER , inputDesc);
+	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "PSScene", "ps_5_0", PIXEL_SHADER, NULL);
+}
+
+void AABB::draw(XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj)
+{
+	XMMATRIX WorldViewProj;
+	WorldViewProj = XMMatrixMultiply(p_world, m_translate);
+	WorldViewProj = XMMatrixMultiply(WorldViewProj, p_view );
+	WorldViewProj = XMMatrixMultiply(WorldViewProj, p_proj );
+
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+	m_cb.color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_cb.WVP = XMMatrixTranspose(WorldViewProj);
+	m_pCB->apply(0);
+	m_pDeviceContext->UpdateSubresource(m_pCB->getBufferPointer(), 0, NULL, &m_cb, 0, 0);
+	
+	m_pIndexBuffer->apply(0);
+	m_pBuffer->apply(0);
+	m_pShader->setShaders();
+
+	m_pDeviceContext->DrawIndexed(24, 0, 0);
+	
+	//m_sphere.draw(p_world, p_view, p_proj);
+}

@@ -41,31 +41,59 @@ PlayField::~PlayField()
 
 void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 {
-	m_blockList = p_blockList;
+	m_blockList		= p_blockList;
 	vec3 orto; // planevecX * planeVecY pekar mot mot center
-	orto = cross( m_planeVectorX, m_planeVectorY );
-	float offsetX = 0.f, offsetY = 0.f, offsetZ = 0.f, sizeX = 1.f, sizeZ = 1.f;
+	orto			= cross( m_planeVectorX, m_planeVectorY );
+	float offsetX	= 0.f, offsetY = 150.f, offsetZ = -1.f, sizeX = 150.f, sizeZ = 150.f;
 	
-	//Awesome linear Algebra
 	//Left AABB
-	m_borders.push_back(new AABB(m_positionOriginal + (m_planeVectorX * offsetX) -(m_planeVectorY * offsetY) + (orto * offsetZ), 
-								m_positionOriginal + (m_planeVectorX * (offsetX - sizeX)) -(m_planeVectorY * (offsetY + m_size.y)) + (orto * (offsetZ - sizeZ)), 
-								vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	vec3 top	= m_positionOriginal - (m_planeVectorX * (offsetX + sizeX)) -(m_planeVectorY * offsetY) + (orto * ((offsetZ + sizeZ)/2));
+	vec3 bottom	= m_positionOriginal - (m_planeVectorX * offsetX) +(m_planeVectorY * (offsetY + m_size.y)) - (orto * ((offsetZ + sizeZ)/2));
+	
+	m_borders.push_back(new AABB(top,bottom,vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	
 	//Right AABB
-	vec3 tempOriginPos = m_positionOriginal + (m_planeVectorX * m_size.x);
 
-	m_borders.push_back(new AABB(tempOriginPos - (m_planeVectorX * offsetX) -(m_planeVectorY * offsetY) + (orto * offsetZ), 
-								tempOriginPos - (m_planeVectorX * (offsetX - sizeX)) -(m_planeVectorY * (offsetY + m_size.y)) + (orto * (offsetZ - sizeZ)), 
-								vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	/*mat4 tr = translate(mat4(1.0f), bottom +(top-bottom)*0.5f);
+	mat4 rot = rotate(mat4(1.0f), 3.14f, vec3(0.0f,1.0f,0.0f));
+	tr = inverse(tr) * rot * tr;
+	temptop = tr * temptop;
+	tempbottom = tr * tempbottom;*/
+
+	mat4 trans;
+	trans			= translate(mat4(1.0f),vec3(-(m_size.x + sizeX),0.f,0.f));
+	vec4 temptop	= vec4(top, 1.0f);
+	vec4 tempbottom = vec4(bottom, 1.0f);
+	temptop			= trans * temptop;
+	tempbottom		= trans * tempbottom;
+	top				= vec3(temptop);
+	bottom			= vec3(tempbottom);
+
+	m_borders.push_back(new AABB(top, bottom, vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+
 	//Top AABB
-	m_borders.push_back(new AABB ( m_positionOriginal - (m_planeVectorX * (offsetX - m_size.x)) -(m_planeVectorY * (offsetY + sizeX)) + (orto * (offsetZ - sizeZ)), 
-								m_positionOriginal + (m_planeVectorX * offsetX) -(m_planeVectorY * offsetY) + (orto * offsetZ),
-								vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	top		= m_positionOriginal - (m_planeVectorX * (offsetY)) -(m_planeVectorY * (offsetX + sizeX)) + (orto * ((offsetZ + sizeZ)/2));
+	bottom	= m_positionOriginal + (m_planeVectorX * (m_size.x + offsetY)) -(m_planeVectorY) - (orto * ((offsetZ + sizeZ)/2));
+
+	m_borders.push_back(new AABB ( top,	bottom,	vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	
 	//Bottom AABB
-	tempOriginPos = m_positionOriginal - (m_planeVectorY * m_size.y);
-	m_borders.push_back(new AABB ( tempOriginPos - (m_planeVectorX * (offsetX - m_size.x)) -(m_planeVectorY * (offsetY + sizeX)) + (orto * (offsetZ - sizeZ)), 
-								tempOriginPos - (m_planeVectorX * offsetX) -(m_planeVectorY * offsetY) + (orto * offsetZ),
+	trans		= translate(mat4(1.0f),vec3(0.f,-(m_size.y+sizeZ),0.f));
+
+	temptop		= vec4(top, 1.0f);
+	tempbottom	= vec4(bottom, 1.0f);
+
+	temptop		= trans * temptop;
+	tempbottom	= trans * tempbottom;
+	top			= vec3(temptop);
+	bottom		= vec3(tempbottom);
+
+	//vec3 tempOriginPos = m_positionOriginal + (m_planeVectorY * m_size.y);
+
+	m_borders.push_back(new AABB ( top/*tempOriginPos - (m_planeVectorX * (offsetX - m_size.x)) +(m_planeVectorY * (offsetY +  sizeX)) + (orto * (offsetZ - sizeZ))*/, 
+								bottom/*tempOriginPos - (m_planeVectorX * offsetX) -(m_planeVectorY * offsetY) + (orto * offsetZ)*/,
 								vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	
 	//Block Placement STUFF!
 	unsigned int l = m_blockList.size();
 	for(int i = 0; i < l; i++)
@@ -135,4 +163,14 @@ bool PlayField::getUpdateBuffer()
 void PlayField::setUpdateBuffer(bool p_bool)
 {
 	m_updateBuffer = p_bool;
+}
+
+BoundingVolume* PlayField::getCollisionBorder(unsigned int p_id)
+{
+	return m_borders.at(p_id);
+}
+
+unsigned int PlayField::getNrBorders()
+{
+	return m_borders.size();
 }

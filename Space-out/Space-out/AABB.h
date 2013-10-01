@@ -3,16 +3,16 @@
 
 #include "BoundingVolume.h"
 #include "Sphere.h"
-//#include "Buffer.h"
-//#include "Shader.h"
+#include "Buffer.h"
+#include "Shader.h"
 #include <vector>
 
 //DEBUGGING
-//struct CB
-//{
-//	XMMATRIX WVP;
-//	XMFLOAT4 color;
-//};
+struct CB
+{
+	XMMATRIX WVP;
+	XMFLOAT4 color;
+};
 
 class AABB : public BoundingVolume
 {
@@ -38,8 +38,8 @@ public:
 	//void				calculateCornerVectors();
 
 	//DEBUGGING
-	//void				initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext);
-	//void				draw( XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj );
+	void				initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext);
+	void				draw( XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj );
 private:
 	vec3				m_bottom;
 	vec3				m_top;
@@ -58,15 +58,15 @@ private:
 	float				m_v, m_w, m_v2, m_w2, cornerAngles[8];
 
 	//DEBUGGING
-	//Buffer*				m_pBuffer;
-	//Buffer*				m_pCB;
-	//Buffer*				m_pIndexBuffer;
-	//Shader*				m_pShader;
+	Buffer*				m_pBuffer;
+	Buffer*				m_pCB;
+	Buffer*				m_pIndexBuffer;
+	Shader*				m_pShader;
 
-	//ID3D11Device*		m_pDevice;
-	//ID3D11DeviceContext* m_pDeviceContext;
-	//CB					m_cb;
-	//XMMATRIX			m_translate;
+	ID3D11Device*		m_pDevice;
+	ID3D11DeviceContext* m_pDeviceContext;
+	CB					m_cb;
+	XMMATRIX			m_translate;
 };
 
 #endif
