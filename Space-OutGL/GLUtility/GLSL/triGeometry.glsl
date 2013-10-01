@@ -2,12 +2,6 @@
 layout (points) in;
 layout (triangle_strip, max_vertices = 3) out;
 
-uniform ColorBlock
-{
-	vec4 diffuse;
-	vec4 ambient;
-};
-
 in vec3 outputColor[];
 out vec3 colorGem;
 

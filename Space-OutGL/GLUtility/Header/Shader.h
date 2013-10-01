@@ -21,6 +21,7 @@ public:
 	void attachAndLink();
 	// ## applying ##
 	void apply();
+	void uniformBlockBinding(GLuint p_bindingPoint, const char* p_pUniformName);
 
 private:
 	bool errorCheckShader(GLuint p_pShader, const char* p_pStrShaderType);

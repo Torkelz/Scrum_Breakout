@@ -4,9 +4,16 @@
 struct triangleVertex
 {
 	vertexVec pos;
-	vertexVec col;
+	//vertexVec col;
 };
 triangleVertex tri[1];
+
+struct vertexColor
+{
+	vertexVec col;
+	//0.78f, 0.651f, 0.8f
+};
+vertexColor col[1];
 
 int main(void)
 {
@@ -24,6 +31,7 @@ OpenGL::OpenGL() : GLApp()
 OpenGL::~OpenGL()
 {
 	triBuffer.~Buffer();
+	m_uniBuffer.~Buffer();
 	m_triShader.~Shader();
 }
 
@@ -35,25 +43,38 @@ void OpenGL::initApp()
 
 
 	tri[0].pos = vertexVec(-1.0f, -1.0f, 0.f);
-	tri[0].col = vertexVec(1.0f,0.0f,0.0f);
+	col[0].col = vertexVec(0.78f, 0.651f, 0.8f);
+//	tri[0].col = vertexVec(1.0f,0.0f,0.0f);
 //	tri[1].pos = vertexVec(1.0f, -1.0f, 0.f);
 //	tri[1].col = vertexVec(0.0f,1.0f,0.0f);
 //	tri[2].pos = vertexVec(0.f, 1.0f, 0.f);
 //	tri[2].col = vertexVec(0.0f,0.0f,1.0f);
 
-	BufferInputDesc* desc = new BufferInputDesc[1];
+	BufferInputDesc* desc = new BufferInputDesc[0];
 	desc[0].size = 3;
 	desc[0].type = GL_FLOAT;
 	desc[0].normalized = GL_FALSE;
-	desc[0].pointer = sizeof(vec3);
-	desc[1].size = 3;
-	desc[1].type = GL_FLOAT;
-	desc[1].normalized = GL_FALSE;
-	desc[1].pointer = sizeof(vec3);
+	desc[0].pointer = sizeof(vertexVec);
+//	desc[1].size = 3;
+//	desc[1].type = GL_FLOAT;
+//	desc[1].normalized = GL_FALSE;
+//	desc[1].pointer = sizeof(vec3);
 
-	bool returnValue =	triBuffer.init(GL_ARRAY_BUFFER, tri, sizeof(triangleVertex),3, GL_STATIC_DRAW, desc, 2);
+	bool returnValue =	triBuffer.init(GL_ARRAY_BUFFER, tri, sizeof(triangleVertex),3, GL_STATIC_DRAW, desc, 1);
 	if(!returnValue)
 		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+
+	BufferInputDesc* colDesc = new BufferInputDesc[0];
+	colDesc[0].size = 3;
+	colDesc[0].type = GL_FLOAT;
+	colDesc[0].normalized = GL_FALSE;
+	colDesc[0].pointer = sizeof(vertexVec);
+
+	returnValue =	m_uniBuffer.init(GL_UNIFORM_BUFFER, col, sizeof(vertexColor),3, GL_DYNAMIC_DRAW, colDesc, 1);
+	if(!returnValue)
+		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+
+	GLuint bindingPoint = 1, blockIndex;
 
 	m_triShader.init();
 
@@ -87,6 +108,7 @@ void OpenGL::drawScene()
 	GLApp::drawScene();
 	//glUseProgram(m_program);
 	m_triShader.apply();
+	m_uniBuffer.apply();
 	triBuffer.apply();
 	// Draw the triangle !
 	glDrawArrays(GL_POINTS, 0, 1); // Starting from vertex 0; 3 vertices total -> 1 triangle

@@ -114,3 +114,9 @@ bool Shader::errorCheckShader(GLuint p_pShader, const char* p_pStrShaderType)
 	}
 	return true;
 }
+
+void Shader::uniformBlockBinding(GLuint p_bindingPoint, const char* p_pUniformName)
+{
+	GLuint blockIndex = glGetUniformBlockIndex(m_program, p_pUniformName);
+	glUniformBlockBinding(m_program, blockIndex, p_bindingPoint);
+}

@@ -27,6 +27,7 @@ private:
 	float			m_rotation;
 	float			m_ratio;
 	Buffer			triBuffer;
+	Buffer			m_uniBuffer;
 	Shader			m_triShader;
 };
 
