@@ -1,0 +1,35 @@
+#ifndef SHADER_H_
+#define SHADER_H_
+
+#include "../../GLapp/Header/GLUtil.h"
+
+enum ShaderType
+{
+	VERTEX_SHADER,
+	FRAGMENT_SHADER,
+	GEOMETRY_SHADER
+};
+
+class Shader
+{
+public:
+	Shader();
+	~Shader();
+
+	bool init(GLint* p_pProgram);
+	bool createAndCompile(ShaderType p_shaderType, const char* p_pFileAddress);
+	bool attachAndLink();
+	void errorCheckShader(GLuint p_shader);
+private:
+	GLint*		m_pProgram;
+	GLuint		m_vertex;
+	GLuint		m_fragment;
+	GLuint		m_geometry;
+};
+
+
+#endif /* SHADER_H_ */
+
+
+
+

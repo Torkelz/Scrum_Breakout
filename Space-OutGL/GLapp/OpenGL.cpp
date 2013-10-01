@@ -1,5 +1,4 @@
 #include "Header/OpenGL.h"
-#include <fstream>
 
 
 struct triangleVertex
@@ -7,7 +6,7 @@ struct triangleVertex
 	vertexVec pos;
 	vertexVec col;
 };
-triangleVertex tri[3];
+triangleVertex tri[1];
 
 int main(void)
 {
@@ -20,13 +19,12 @@ OpenGL::OpenGL() : GLApp()
 {
 	m_ratio = 0;
 	m_rotation = 0;
-	m_program = 0;
 }
 
 OpenGL::~OpenGL()
 {
 	triBuffer.~Buffer();
-
+	m_triShader.~Shader();
 }
 
 void OpenGL::initApp()
@@ -34,12 +32,14 @@ void OpenGL::initApp()
 	GLApp::initApp();
 	m_rotation = 0.0f;
 
+
+
 	tri[0].pos = vertexVec(-1.0f, -1.0f, 0.f);
 	tri[0].col = vertexVec(1.0f,0.0f,0.0f);
-	tri[1].pos = vertexVec(1.0f, -1.0f, 0.f);
-	tri[1].col = vertexVec(0.0f,1.0f,0.0f);
-	tri[2].pos = vertexVec(0.f, 1.0f, 0.f);
-	tri[2].col = vertexVec(0.0f,0.0f,1.0f);
+//	tri[1].pos = vertexVec(1.0f, -1.0f, 0.f);
+//	tri[1].col = vertexVec(0.0f,1.0f,0.0f);
+//	tri[2].pos = vertexVec(0.f, 1.0f, 0.f);
+//	tri[2].col = vertexVec(0.0f,0.0f,1.0f);
 
 	BufferInputDesc* desc = new BufferInputDesc[1];
 	desc[0].size = 3;
@@ -51,91 +51,24 @@ void OpenGL::initApp()
 	desc[1].normalized = GL_FALSE;
 	desc[1].pointer = sizeof(vec3);
 
-	bool test =	triBuffer.init(GL_ARRAY_BUFFER, tri, sizeof(triangleVertex),3, GL_STATIC_DRAW, desc, 2);
-	if(!test)
+	bool returnValue =	triBuffer.init(GL_ARRAY_BUFFER, tri, sizeof(triangleVertex),3, GL_STATIC_DRAW, desc, 2);
+	if(!returnValue)
 		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 
-	//----------------------------------------------------------------------------------------------------
-	// SHADER TEST UGLY FUCK CODE START -------------------------------------------------------------------
-	GLuint shader = glCreateShader(GL_VERTEX_SHADER);
-	GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	std::string VertexShaderCode;
-	const char* vertexChar = "GLapp/triVertex.vertexshader";
-	std::ifstream VertexShaderStream(vertexChar,std::ios::in);
-	if(VertexShaderStream.is_open())
-	{
-		std::string Line = "";
-		while(getline(VertexShaderStream, Line))
-			VertexShaderCode += "\n" + Line;
-		VertexShaderStream.close();
-	}
+	m_triShader.init();
 
-	// Read the Fragment Shader code from the file
-	std::string FragmentShaderCode;
-	const char* fragmentChar = "GLapp/triFragment.fragmentshader";
-	std::ifstream FragmentShaderStream(fragmentChar, std::ios::in);
-	if(FragmentShaderStream.is_open()){
-		std::string Line = "";
-		while(getline(FragmentShaderStream, Line))
-			FragmentShaderCode += "\n" + Line;
-		FragmentShaderStream.close();
-	}
-	const char* sourceVer = VertexShaderCode.c_str();
-	GLint lengthVer= VertexShaderCode.length();
+	returnValue = m_triShader.createAndCompile(VERTEX_SHADER, "GLUtility/GLSL/triVertex.glsl");
+	if(!returnValue)
+				glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 
-	glShaderSource(shader,1, &sourceVer, &lengthVer);
-	const char* sourceFra = FragmentShaderCode.c_str();
-	GLint lengthFra = FragmentShaderCode.length();
-	glShaderSource(fragment,1,&sourceFra, &lengthFra);
-	glCompileShader(shader);
-	GLint status;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-	if (status == GL_FALSE)
-	{
-		GLint infoLogLength;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+	returnValue = m_triShader.createAndCompile(GEOMETRY_SHADER, "GLUtility/GLSL/triGeometry.glsl");
+	if(!returnValue)
+				glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 
-		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-		glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
-
-		const char *strShaderType = NULL;
-		strShaderType = "vertex";
-
-
-		fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType, strInfoLog);
-		delete[] strInfoLog;
-	}
-
-	glCompileShader(fragment);
-	glGetShaderiv(fragment, GL_COMPILE_STATUS, &status);
-	if (status == GL_FALSE)
-	{
-		GLint infoLogLength;
-		glGetShaderiv(fragment, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-		glGetShaderInfoLog(fragment, infoLogLength, NULL, strInfoLog);
-
-		const char *strShaderType = NULL;
-		strShaderType = "fragment";
-
-
-		fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType, strInfoLog);
-		delete[] strInfoLog;
-	}
-	m_program = glCreateProgram();
-	glAttachShader(m_program, shader);
-	glAttachShader(m_program, fragment);
-	glLinkProgram(m_program);
-	GLint checkErr;
-	glGetProgramiv(m_program, GL_LINK_STATUS, &checkErr);
-	if(checkErr == GL_FALSE)
-	{
-		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
-	}
-
-	//SHADER TEST UGLY FUCK CODE END ---------------------------------------------------------------------
-	//----------------------------------------------------------------------------------------------------
+	returnValue = m_triShader.createAndCompile(FRAGMENT_SHADER, "GLUtility/GLSL/triFragment.glsl");
+	if(!returnValue)
+				glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+	m_triShader.attachAndLink();
 }
 
 void OpenGL::updateScene(float p_dt)
@@ -152,10 +85,11 @@ void OpenGL::updateScene(float p_dt)
 void OpenGL::drawScene()
 {
 	GLApp::drawScene();
-	glUseProgram(m_program);
+	//glUseProgram(m_program);
+	m_triShader.apply();
 	triBuffer.apply();
 	// Draw the triangle !
-	glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+	glDrawArrays(GL_POINTS, 0, 1); // Starting from vertex 0; 3 vertices total -> 1 triangle
 	triBuffer.deApply();
 
 }

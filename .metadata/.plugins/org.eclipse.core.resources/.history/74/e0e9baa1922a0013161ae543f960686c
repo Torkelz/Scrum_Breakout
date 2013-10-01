@@ -1,0 +1,23 @@
+#version 400
+layout (points, invocations = 2) in;
+layout (triangle_strip, max_vertices = 4) out;
+layout (max_vertices = 4) out;
+
+void main()
+{
+	vec3 Pos = gl_in[0].gl_Position.xyz;
+	  
+    gl_Position = vec4(-1.0, -1.0, 0.0, 1.0);
+    EmitVertex();
+
+    gl_Position = vec4(1.0, -1.0, 0.0, 1.0);
+    EmitVertex();
+
+    gl_Position = vec4(-1.0, 1.0, 0.0, 1.0);
+    EmitVertex();
+
+    gl_Position = vec4(1.0, 1.0, 0.0, 1.0);
+    EmitVertex();
+
+    EndPrimitive();
+}

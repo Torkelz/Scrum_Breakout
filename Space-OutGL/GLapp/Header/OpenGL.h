@@ -3,8 +3,10 @@
 
 #include "GLApp.h"
 #include "../../GLUtility/Header/Buffer.h"
+#include "../../GLUtility/Header/Shader.h"
 #include <stdio.h>
 #include <stdlib.h>
+
 
 using namespace glm;
 
@@ -25,7 +27,7 @@ private:
 	float			m_rotation;
 	float			m_ratio;
 	Buffer			triBuffer;
-	GLint 			m_program;
+	Shader			m_triShader;
 };
 
 #endif /* OPENGL_H_ */

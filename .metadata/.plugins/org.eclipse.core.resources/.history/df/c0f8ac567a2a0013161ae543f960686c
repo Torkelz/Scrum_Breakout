@@ -1,0 +1,32 @@
+#ifndef SHADER_H_
+#define SHADER_H_
+
+#include "../../GLapp/Header/GLUtil.h"
+
+enum ShaderType
+{
+	VERTEX_SHADER,
+	FRAGMENT_SHADER,
+	GEOMETRY_SHADER
+};
+
+class Shader
+{
+public:
+	Shader();
+	~Shader();
+
+	bool init();
+	bool createAndCompile();
+	bool attachAndLink();
+
+
+
+};
+
+
+#endif /* SHADER_H_ */
+
+
+
+

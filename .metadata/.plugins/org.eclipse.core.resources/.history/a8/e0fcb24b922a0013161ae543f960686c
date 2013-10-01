@@ -1,0 +1,12 @@
+#version 400
+in vec3 outputColor;
+in vec2 texCoord;
+
+out vec4 fragColor;
+
+void main()
+{
+	//fragColor = texture2D(outputColor, texCoord);
+	
+	fragColor = vec4(outputColor, 1.f);
+}

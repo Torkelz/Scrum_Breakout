@@ -1,0 +1,55 @@
+#include "Header/Shader.h"
+#include <fstream>
+
+Shader::Shader()
+{
+	m_pProgram = NULL;
+	m_vertex = 0;
+	m_fragment = 0;
+	m_geometry = 0;
+}
+
+Shader::~Shader()
+{
+
+}
+
+bool Shader::init(GLint* p_pProgram)
+{
+	m_pProgram = p_pProgram;
+	if(m_pProgram == NULL)
+		return false;
+	return true;
+}
+
+bool Shader::createAndCompile(ShaderType p_shaderType, const char* p_pFilecAddress)
+{
+	std::string shaderCode;
+	std::ifstream shaderStream(p_pFilecAddress,std::ios::in);
+	if(shaderStream.is_open())
+	{
+		std::string Line = "";
+		while(getline(shaderStream, Line))
+			shaderCode += "\n" + Line;
+		shaderStream.close();
+	}
+
+	const char* sourceVersion = shaderCode.c_str();
+	GLint lengthVersion = shaderCode.length();
+
+	switch (p_shaderType)
+	{
+	case VERTEX_SHADER:
+		m_vertex = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(m_vertex,)
+		break;
+	case FRAGMENT_SHADER:
+		break;
+	case GEOMETRY_SHADER:
+		break;
+	default:
+		break;
+	}
+
+	return true;
+}

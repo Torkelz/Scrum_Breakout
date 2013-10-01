@@ -1,0 +1,23 @@
+#include "Header/Shader.h"
+
+Shader::Shader()
+{
+
+}
+
+Shader::~Shader()
+{
+
+}
+
+bool Shader::init()
+{
+
+
+
+
+
+
+
+	return true;
+}

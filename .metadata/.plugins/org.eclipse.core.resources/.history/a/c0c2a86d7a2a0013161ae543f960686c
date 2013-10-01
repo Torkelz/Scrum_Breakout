@@ -1,0 +1,23 @@
+#include "Header/Shader.h"
+
+Shader::Shader()
+{
+	m_program = NULL;
+}
+
+Shader::~Shader()
+{
+
+}
+
+bool Shader::init(GLint p_program)
+{
+
+
+
+
+
+
+
+	return true;
+}
