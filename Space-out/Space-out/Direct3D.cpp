@@ -169,7 +169,7 @@ void Direct3D::initApp()
 	m_ballShader.compileAndCreateShaderFromFile(L"Ball.fx", "GShader", "gs_5_0", GEOMETRY_SHADER, NULL);
 	m_ballShader.compileAndCreateShaderFromFile(L"Ball.fx", "PShader", "ps_5_0", PIXEL_SHADER, NULL);		
 
-	bufferDesc.initData = m_game.getBall()->getPos();
+	bufferDesc.initData = &vec3(0,0,0);
 	bufferDesc.numElements = 1;
 
 	m_ballBuffer.init(m_pDevice, m_pDeviceContext, bufferDesc);
@@ -303,11 +303,11 @@ void Direct3D::drawScene()
 	// end shit
 
 	// Ball draw shit
-	vec3* t_ballPos = m_game.getBall()->getPos();
+	vec3 t_ballPos = ((Ball*)m_game.getBall())->getRealPosition();
 
 	m_cbBall.eyePosW = m_camPosition;
 	m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
-	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos->x, t_ballPos->y - 30.0f, 50.0f));
+	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos.x, t_ballPos.y, t_ballPos.z));
 	//m_cbBall.translation = XMMatrixIdentity();
 	m_cbBall.size = XMFLOAT2(5.0f, 5.0f);
 	m_constantBallBuffer.apply(0);
