@@ -4,14 +4,14 @@
 HIDObservable::HIDObservable(){}
 HIDObservable::~HIDObservable(){}
 
-void HIDObservable::broadcastLeftClick( Vector2 p_mousePosition )
+void HIDObservable::broadcastLeftClick( vec2 p_mousePosition )
 {
 	for ( UINT i = 0; i < m_subscribers.size(); i++ )
 	{
 		m_subscribers.at(i)->broadcastLeftClick( p_mousePosition );
 	}
 }
-void HIDObservable::broadcastRightClick( Vector2 p_mousePosition )
+void HIDObservable::broadcastRightClick( vec2 p_mousePosition )
 {
 	for ( UINT i = 0; i < m_subscribers.size(); i++ )
 	{
@@ -19,7 +19,7 @@ void HIDObservable::broadcastRightClick( Vector2 p_mousePosition )
 	}
 }
 
-void HIDObservable::broadcastMousePos( Vector2 p_mousePosition )
+void HIDObservable::broadcastMousePos( vec2 p_mousePosition )
 {
 	for ( UINT i = 0; i < m_subscribers.size(); i++ )
 	{

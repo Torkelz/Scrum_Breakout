@@ -1,11 +1,17 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "Vector2.h"
+#include <glm.hpp>
+#include <gtc\matrix_transform.hpp>
+#include <vector>
+#include "LevelGenerator.h"
+#include "PlayField.h"
+
+
+using namespace glm;
 
 class Observer;
 class Object;
-class Pad;
 
 class Game
 {
@@ -13,19 +19,34 @@ public:
 	Game();
 	~Game();
 
-	void		init();
+	void					init();
 
-	void		update();
-	void		leftMouseClick( Vector2 p_mousePosition );
-	void		rightMouseClick( Vector2 p_mousePosition );
-	void		mouseMove( Vector2 p_mousePosition );
-	void		keyEvent( unsigned short p_key );
-	Observer*	getObserver();
-	Object*		getPad();
-
+	void		update(float p_screenWidth, float p_dt);
+	void		leftMouseClick( vec2 p_mousePosition );
+	void		rightMouseClick( vec2 p_mousePosition );
+	void		mouseMove( vec2 p_mousePosition );
+	void					keyEvent( unsigned short p_key );
+	Observer*				getObserver();
+	Object*					getPad();
+	vector<ABlock*>*		getBlocks(int p_list);
+	Object*					getBall();
+	PlayField*				getField(int p_id);
+	PlayField*				getActiveField();
+	unsigned int			getActiveFieldNr();
 private:
-	Observer*	m_pObserver;
-	Object*		m_pPad;
+	Observer*				m_pObserver;
+	Object*					m_pPad;
+	Object*					m_pBall;
+	vector<vector<ABlock*>>*m_pBlocks;
+	LevelGenerator			m_loadLevel;
+
+	static const unsigned int		m_nrPlayFields = 4;
+	vec3					m_originWorld;
+
+	unsigned int					m_activePlayField;		
+
+	PlayField*				m_playFields[m_nrPlayFields];
+	
 };
 
 #endif	GAME_H

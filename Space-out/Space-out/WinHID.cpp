@@ -38,7 +38,7 @@ void HID::update( UINT message, LPARAM lParam )
 				if ( m_mouse.click(pRaw, RI_MOUSE_LEFT_BUTTON_DOWN) )
 				{
 					POINT t_point = m_mouse.getPosition();
-					Vector2 t_Vpoint;
+					vec2 t_Vpoint;
 					t_Vpoint.x = (float)t_point.x;
 					t_Vpoint.y = (float)t_point.y;
 					m_observable.broadcastLeftClick( t_Vpoint );
@@ -47,14 +47,14 @@ void HID::update( UINT message, LPARAM lParam )
 				if( m_mouse.click(pRaw, RI_MOUSE_RIGHT_BUTTON_DOWN) )
 				{
 					POINT t_point = m_mouse.getPosition();
-					Vector2 t_Vpoint;
+					vec2 t_Vpoint;
 					t_Vpoint.x = (float)t_point.x;
 					t_Vpoint.y = (float)t_point.y;
 					m_observable.broadcastRightClick(t_Vpoint);
 				}
 
 				POINT t_point = m_mouse.getPosition();
-				Vector2 t_Vpoint;
+				vec2 t_Vpoint;
 				t_Vpoint.x = (float)t_point.x;
 				t_Vpoint.y = (float)t_point.y;
 				m_observable.broadcastMousePos(t_Vpoint);
