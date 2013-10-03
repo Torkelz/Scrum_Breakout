@@ -49,12 +49,17 @@ void Game::update(float p_screenWidth, float p_dt)
 	((Pad*)m_pPad)->update(padTranslation);
 	((Ball*)m_pBall)->update(p_dt);
 	
+	// ## COLLISION STUFF START ##
+
+	// ## PAD ##
 	if(((Pad*)m_pPad)->collide(m_pBall->getBoundingVolume()))
 	{
 		vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 		tempSpeed.y = abs(tempSpeed.y);
 		((Ball*)m_pBall)->setSpeed( tempSpeed );
 	}
+
+	// ## BLOCKS ##
 	for(int i = 0; i < m_playFields[m_activePlayField]->getListSize();i++)
 	{
 		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
@@ -69,6 +74,8 @@ void Game::update(float p_screenWidth, float p_dt)
 			break;
 		}
 	}
+
+	// ## WALLS ##
 	for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
 	{
 		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
@@ -80,6 +87,8 @@ void Game::update(float p_screenWidth, float p_dt)
 			break;
 		}
 	}
+
+	// ## COLLISION STUFF END ##
 }
 
 void Game::keyEvent(unsigned short key)

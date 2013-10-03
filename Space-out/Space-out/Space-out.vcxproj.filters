@@ -91,6 +91,8 @@
     <ClCompile Include="WICTextureLoader.cpp">
       <Filter>Texture</Filter>
     </ClCompile>
+    <ClCompile Include="PowerUp.cpp" />
+    <ClCompile Include="PUFasterBall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -166,6 +168,8 @@
     <ClInclude Include="WICTextureLoader.h">
       <Filter>Texture\Header</Filter>
     </ClInclude>
+    <ClInclude Include="PowerUp.h" />
+    <ClInclude Include="PUFasterBall.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

@@ -91,6 +91,8 @@
     <ClCompile Include="LevelGenerator.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="PlayField.cpp" />
+    <ClCompile Include="PowerUp.cpp" />
+    <ClCompile Include="PUFasterBall.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameTimer.cpp" />
@@ -119,6 +121,8 @@
     <ClInclude Include="LevelGenerator.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PlayField.h" />
+    <ClInclude Include="PowerUp.h" />
+    <ClInclude Include="PUFasterBall.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="HIDObservable.h" />

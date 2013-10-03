@@ -20,11 +20,6 @@ void Ball::updatePosition(float p_dt)
 	m_pos += p_dt * m_speed;
 }
 
-void Ball::setPosition(vec3 p_pos)
-{
-	m_pos = p_pos;
-}
-
 void Ball::setSpeed(vec3 p_speed)
 {
 	m_speed = p_speed;

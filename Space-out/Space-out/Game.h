@@ -21,11 +21,12 @@ public:
 
 	void					init();
 
-	void		update(float p_screenWidth, float p_dt);
-	void		leftMouseClick( vec2 p_mousePosition );
-	void		rightMouseClick( vec2 p_mousePosition );
-	void		mouseMove( vec2 p_mousePosition );
+	void					update(float p_screenWidth, float p_dt);
+	void					leftMouseClick( vec2 p_mousePosition );
+	void					rightMouseClick( vec2 p_mousePosition );
+	void					mouseMove( vec2 p_mousePosition );
 	void					keyEvent( unsigned short p_key );
+	void					powerUpCheck();
 	Observer*				getObserver();
 	Object*					getPad();
 	vector<ABlock*>*		getBlocks(int p_list);
