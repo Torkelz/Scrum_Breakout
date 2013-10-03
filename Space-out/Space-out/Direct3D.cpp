@@ -2,6 +2,7 @@
 #include "Object.h"
 #include "ABlock.h"
 #include "Ball.h"
+#include "Pad.h"
 
 int WINAPI WinMain(HINSTANCE p_hInstance, HINSTANCE p_prevInstance,
 				   PSTR p_cmdLine, int p_showCmd)
@@ -229,6 +230,9 @@ void Direct3D::updateScene(float p_dt)
 		m_game.getField(active)->setUpdateBuffer(false);
 	}
 
+	float x,y;
+	x = ((Pad*)(m_game.getPad()))->getMousePos().x;
+	y = ((Pad*)(m_game.getPad()))->getMousePos().y;
 
 	std::wostringstream outs;   
 	outs.precision(6);
@@ -237,11 +241,14 @@ void Direct3D::updateScene(float p_dt)
 		<< m_game.getPad()->getBoundingVolume()->getPosition()->y << L","
 		<< m_game.getPad()->getBoundingVolume()->getPosition()->z << L","
 		
+		<< L"    MP:" << L" " << x << L"," << y  << L","
+
 		<< L"    BALL:"
 		<< L" " << m_game.getBall()->getBoundingVolume()->getPosition()->x << L"," 
 		<< m_game.getBall()->getBoundingVolume()->getPosition()->y << L","
 		<< m_game.getBall()->getBoundingVolume()->getPosition()->z << L",";
 
+		
 
 	SetWindowTextW(m_hMainWnd,outs.str().c_str());
 

@@ -8,6 +8,7 @@
 class Pad : public Object
 {
 private:
+	vec2 m_mousePos;
 public:
 	Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName);
 	~Pad();
@@ -16,6 +17,8 @@ public:
 	bool collide(BoundingVolume* p_pVolume);
 
 	void setPos(vec2 p_pos);
+
+	vec2 getMousePos();
 };
 
 #endif

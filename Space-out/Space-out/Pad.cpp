@@ -23,5 +23,12 @@ bool Pad::collide(BoundingVolume* p_pVolume)
 
 void Pad::setPos(vec2 p_pos)
 {
+	m_mousePos = p_pos;
+	m_mousePos.x *= -1;
 	m_pos.x = p_pos.x;
+}
+
+vec2 Pad::getMousePos()
+{
+	return m_mousePos;
 }
