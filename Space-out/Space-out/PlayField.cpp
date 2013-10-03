@@ -119,8 +119,6 @@ int PlayField::getListSize()
 }
 
 
-
-
 mat4 PlayField::getRotationMatrix()
 {
 	return m_rotMatrixOriginal;
@@ -157,4 +155,31 @@ BoundingVolume* PlayField::getCollisionBorder(unsigned int p_id)
 unsigned int PlayField::getNrBorders()
 {
 	return m_borders.size();
+}
+
+vec3 PlayField::getOriginalPosition()
+{
+	return m_positionOriginal;
+}
+
+vec2 PlayField::getScreenPosition(mat4 viewproj)
+{
+	vec4 rr = viewproj * vec4(m_positionOriginal,1.f);
+	rr /= rr.w;
+
+	return vec2(rr);
+}
+
+vec3 PlayField::getRightDir()
+{
+	return m_planeVectorX;
+}
+vec3 PlayField::getDownDir()
+{
+	return m_planeVectorY;
+}
+
+vec2 PlayField::getSize()
+{
+	return m_size;
 }

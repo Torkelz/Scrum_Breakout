@@ -48,6 +48,8 @@ void Direct3D::initApp()
 	m_game = Game();
 	m_game.init();
 
+	
+
 
 	//Set up world view proj
 	m_camPosition = XMVectorSet( 0.0f, 0.0f, 250.f, 0.0f );
@@ -60,6 +62,13 @@ void Direct3D::initApp()
 	
 	m_world = XMMatrixIdentity();
 	
+	RECT r;
+	GetClientRect(m_hMainWnd, &r);
+	vec2 playFieldScreen;
+	playFieldScreen.x = (m_game.getActiveField()->getScreenPosition(XMMatrixTomat4(&(m_camView*m_camProjection))).x + 1)/2 * r.right;
+	//playFieldScreen.y = (1 - m_game.getActiveField()->getScreenPosition(XMMatrixTomat4(&(m_camView*m_camProjection))).y)/2 * r.bottom;
+	((Pad*)(m_game.getPad()))->setMouseOffset(m_game.getActiveField()->getSize().x / r.right);
+
 	// PAD ###
 	UINT32 const nrVertices = 4;
 	vec3 data[nrVertices];
@@ -273,15 +282,10 @@ void Direct3D::drawScene()
 	// END DEBUGGING DRAW
 
 	XMMATRIX translatePadMatrix;
+
+	vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
+	translatePadMatrix = XMMatrixTranslation(padPos.x, padPos.y, padPos.z);
 	
-	vec3* t_pos = m_game.getPad()->getPos();
-
-	//Try to get the pad closer to the actual mouse.
-	float tempX = (t_pos->x + m_ScreenViewport.Width * 0.5f);
-	float tempY = -35.0f;
-	float tempZ = 50.0f;
-
-	translatePadMatrix = XMMatrixTranslation(tempX * 0.125f, tempY, tempZ);
 	//translatePadMatrix = XMMatrixTranslation(tempX * 0.125f, t_pos->y, tempZ);
 	//translatePadMatrix = XMMatrixIdentity();
 	m_world = XMMatrixIdentity();

@@ -10,7 +10,7 @@ Game::~Game(){}
 void Game::init()
 {
 	m_pObserver = new Observer(this);
-	m_pPad		= new Pad(&vec3(0.0f, 0.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad");
+	m_pPad		= new Pad(&vec3(0.0f, 125.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad");
 	m_pBall		= new Ball(&vec3(0.0f, 0.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Ball");
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
@@ -39,22 +39,31 @@ void Game::init()
 
 void Game::update(float p_screenWidth, float p_dt)
 {
-	vec3 t_pos = *m_pPad->getPos();
+	vec3 padPos = *m_pPad->getPos();
+	/*vec3 t_pos = *m_pPad->getPos();
 	t_pos.x += (p_screenWidth * 0.5f);
 	t_pos.x *= 0.125f;
 	t_pos.y = -35.0f;
-	t_pos.z = 50.0f;
+	t_pos.z = 50.0f;*/
+	PlayField* pf = m_playFields[m_activePlayField];
+	vec3 t_pos = pf->getOriginalPosition();
+	t_pos -= pf->getRightDir() * padPos.x;
+	t_pos += pf->getDownDir() * padPos.y;
 
 	mat4 padTranslation = translate(mat4(1.0f), t_pos);
+
+	
 	((Pad*)m_pPad)->update(padTranslation);
 	((Ball*)m_pBall)->update(p_dt);
 	
+	//Pad vs Ball
 	if(((Pad*)m_pPad)->collide(m_pBall->getBoundingVolume()))
 	{
 		vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 		tempSpeed.y = abs(tempSpeed.y);
 		((Ball*)m_pBall)->setSpeed( tempSpeed );
 	}
+	//Ball vs boxes
 	for(int i = 0; i < m_playFields[m_activePlayField]->getListSize();i++)
 	{
 		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
@@ -69,6 +78,7 @@ void Game::update(float p_screenWidth, float p_dt)
 			break;
 		}
 	}
+	//Ball vs Borders
 	for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
 	{
 		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
@@ -77,6 +87,34 @@ void Game::update(float p_screenWidth, float p_dt)
 		{
 			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 			((Ball*)m_pBall)->setSpeed( tempSpeed );
+			break;
+		}
+	}
+	//Pad vs Borders NEEDS FINE TUNING
+	for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders()-2; i++)
+	{
+		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
+
+		if(  bv->collide(m_pPad->getBoundingVolume()))
+		{
+			vec3 Bcenter = *bv->getPosition();
+			vec3 Pcenter = *m_pPad->getBoundingVolume()->getPosition();
+			Bcenter.y = Pcenter.y;
+
+			vec3 dir = normalize(Pcenter - Bcenter);
+
+			float x = dot(dir, m_playFields[m_activePlayField]->getRightDir());
+			x *= -1.f;
+			if(i == 0) //Hit Left side
+			{
+				((Pad*)(m_pPad))->changeXCoordXAmount(x*2); // NEEDS FINE TUNING
+			}
+			else //Hit Right side
+			{
+				((Pad*)(m_pPad))->changeXCoordXAmount(x*2);
+			}
+
+
 			break;
 		}
 	}

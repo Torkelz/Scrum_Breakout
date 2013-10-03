@@ -26,6 +26,11 @@ public:
 	void		setUpdateBuffer(bool p_bool);
 	BoundingVolume* getCollisionBorder(unsigned int p_id);
 	unsigned int	getNrBorders();
+	vec3			getOriginalPosition();
+	vec2			getScreenPosition(mat4 viewproj);
+	vec3			getRightDir();
+	vec3			getDownDir();
+	vec2			getSize();
 private:
 	vector<ABlock*> m_blockList;
 	mat4			m_rotMatrixOriginal;
