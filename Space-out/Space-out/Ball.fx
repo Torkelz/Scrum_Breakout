@@ -1,5 +1,6 @@
 
-Texture2D m_texture;
+Texture2D m_texture : register ( t0 );
+SamplerState m_textureSampler : register ( s0 );
 
 struct temp
 {
@@ -17,13 +18,7 @@ cbuffer	cb
 cbuffer cbFixed
 {
 	// Define where to bind the texture
-	float2 quadTexC[4] = 
-	{
-		float2( 0.0f, 1.0f ),
-		float2( 1.0f, 1.0f ),
-		float2( 0.0f, 0.0f ),
-		float2( 1.0f, 0.0f )
-	};
+	
 };
 
 struct PSSceneIn
@@ -72,27 +67,40 @@ void GShader(point temp gIn[1] : SV_POSITION, inout TriangleStream<PSSceneIn> tr
 	// them as a triangle strip.
 	PSSceneIn gOut;
 	//[unroll]
+	float2 quadTexC[] = 
+	{
+		float2( 1.0f, 0.0f ),
+		float2( 1.0f, 1.0f ),
+		float2( 0.0f, 0.0f ),
+		float2( 0.0f, 1.0f )
+	};
+
+	/*gOut.pos		= mul(v[1], WVP);
+	gOut.texturePos	= quadTexC[1];
+	triStream.Append(gOut);
+
+	gOut.pos		= mul(v[2], WVP);
+	gOut.texturePos	= quadTexC[2];
+	triStream.Append(gOut);
+
+	gOut.pos		= mul(v[3], WVP);
+	gOut.texturePos	= quadTexC[3];
+	triStream.Append(gOut);*/
 
 	for(int i = 0; i < 4; ++i)
 	{
-		gOut.pos	= mul(v[i], WVP);
+		gOut.pos		= mul(v[i], WVP);
 		gOut.texturePos	= quadTexC[i];
-		triStream.Append(gOut);
+		triStream.Append(gOut);	
 	}
 }
 
 //-----------------------------------------------------------------------------------------
 // SamplerState: LinearSampler  
 //-----------------------------------------------------------------------------------------
-SamplerState linearSampler
-{
-	Filter		= MIN_MAG_MIP_LINEAR;
-	AddressU	= Wrap;
-	AddressV	= Wrap;
-};
 
 float4 PShader(PSSceneIn p_input) : SV_TARGET
 {
-	return float4(0.0f, 0.0f, 0.0f, 1.0f);
-	//return m_texture.Sample(linearSampler, p_input.texturePos);
+	float4 temp = m_texture.Sample(m_textureSampler, p_input.texturePos);
+	return temp;
 }

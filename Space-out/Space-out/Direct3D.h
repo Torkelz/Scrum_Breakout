@@ -13,11 +13,18 @@
 
 #include "BoundingVolume.h"
 #include "AABB.h"
+#include "D3DTexture.h"
 
 class Object;
 
 using namespace DirectX;
- 
+
+struct Vertex
+{
+	vec3 m_position;
+	vec2 m_textureCoordinates;
+};
+
 struct CBPad
 {
 	XMMATRIX WVP;
@@ -81,6 +88,8 @@ private:
 	int				 m_blockBufferSizeB;
 	int				 m_blockBufferSizeL;
 	int				 m_blockBufferSizeR;
+	D3DTexture		 m_blockTexture;
+
 
 	Buffer			 m_buffer;
 	Buffer			 m_cBuffer;
@@ -92,6 +101,8 @@ private:
 	Buffer		m_constantBallBuffer;
 	Shader		m_ballShader;
 	CBBall		m_cbBall;
+	D3DTexture	m_ballTexture;
+	ID3D11SamplerState* m_pBallSampler;
 
 	//TEST
 	ID3D11Buffer*    mVB;

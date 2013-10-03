@@ -148,3 +148,35 @@ void Shader::setResource(ShaderType p_pShaderType,UINT p_StartSpot,UINT p_NumVie
 		}
 	}
 }
+
+void Shader::setSamplerState(ShaderType p_pShaderType,UINT p_StartSpot,UINT p_NumSamples, ID3D11SamplerState* p_pSamplerState)
+{
+	switch(p_pShaderType)
+	{
+		case VERTEX_SHADER:
+		{
+			m_pDeviceContext->VSSetSamplers(p_StartSpot, p_NumSamples, &p_pSamplerState);
+			break;
+		}
+		case PIXEL_SHADER:
+		{
+			m_pDeviceContext->PSSetSamplers(p_StartSpot, p_NumSamples, &p_pSamplerState);
+			break;
+		}
+		case GEOMETRY_SHADER:
+		{
+			m_pDeviceContext->GSSetSamplers(p_StartSpot, p_NumSamples, &p_pSamplerState);
+			break;
+		}
+		case HULL_SHADER:
+		{
+			m_pDeviceContext->HSSetSamplers(p_StartSpot, p_NumSamples, &p_pSamplerState);
+			break;
+		}
+		case DOMAIN_SHADER:
+		{
+			m_pDeviceContext->DSSetSamplers(p_StartSpot, p_NumSamples, &p_pSamplerState);
+			break;
+		}
+	}
+}

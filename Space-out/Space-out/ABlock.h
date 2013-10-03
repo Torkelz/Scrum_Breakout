@@ -10,7 +10,6 @@ using namespace DirectX;
 struct BlockVertex
 {
 	vec3 pos;
-	vec4 color;
 };
 
 struct cBlockBuffer
