@@ -10,6 +10,7 @@ triangleVertex tri[1];
 
 struct vertexColor
 {
+	vertexVec pos;
 	vertexVec col;
 	//0.78f, 0.651f, 0.8f
 };
@@ -40,7 +41,7 @@ void OpenGL::initApp()
 	GLApp::initApp();
 	m_rotation = 0.0f;
 
-
+	m_r = 0; m_g = 0; m_b = 0;
 
 	tri[0].pos = vertexVec(-1.0f, -1.0f, 0.f);
 	col[0].col = vertexVec(0.78f, 0.651f, 0.8f);
@@ -74,7 +75,7 @@ void OpenGL::initApp()
 	if(!returnValue)
 		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 
-	GLuint bindingPoint = 1, blockIndex;
+	GLuint bindingPoint = 1;
 
 	m_triShader.init();
 
@@ -90,6 +91,10 @@ void OpenGL::initApp()
 	if(!returnValue)
 				glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 	m_triShader.attachAndLink();
+
+	m_triShader.uniformBlockBinding(bindingPoint, "ColorBlock");
+
+	m_uniBuffer.bindBufferBase(bindingPoint);
 }
 
 void OpenGL::updateScene(float p_dt)
@@ -101,6 +106,7 @@ void OpenGL::updateScene(float p_dt)
 	glViewport(0, 0, width, height);
 	m_rotation += p_dt;
 	updateFPSCounter();
+
 }
 
 void OpenGL::drawScene()
@@ -108,10 +114,26 @@ void OpenGL::drawScene()
 	GLApp::drawScene();
 	//glUseProgram(m_program);
 	m_triShader.apply();
+
+	m_r += 0.01f;
+	m_g += 0.05f;
+	m_b += 0.1f;
+
+	if(m_r > 1.0f)
+		m_r = 0;
+	if(m_g > 1.0f)
+		m_g = 0;
+	if(m_b > 1.0f)
+		m_b = 0;
+
+	col[0].col = vertexVec(m_r, m_g, m_b);
 	m_uniBuffer.apply();
+	m_uniBuffer.setSubData(0, sizeof(col), col);
+
 	triBuffer.apply();
 	// Draw the triangle !
 	glDrawArrays(GL_POINTS, 0, 1); // Starting from vertex 0; 3 vertices total -> 1 triangle
+	m_uniBuffer.deApply();
 	triBuffer.deApply();
 
 }

@@ -43,7 +43,7 @@ bool Buffer::apply()
 	{
 		glEnableVertexAttribArray(i);
 	}
-	glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
+	glBindBuffer(m_type, m_buffer);
 	for(i = 0; i < m_numDesc; i++)
 	{
 		glVertexAttribPointer(	i, m_pDesc[i].size, m_pDesc[i].type,
@@ -70,6 +70,16 @@ bool Buffer::deApply()
 		return true;
 	else
 		return false;
+}
+
+void Buffer::bindBufferBase(GLuint p_bindingPoint)
+{
+	glBindBufferBase(m_type, p_bindingPoint, m_buffer);
+}
+
+void Buffer::setSubData(GLintptr p_offset, GLsizeiptr p_sizeof, GLvoid* p_data)
+{
+	glBufferSubData(m_type, p_offset, p_sizeof, p_data);
 }
 
 unsigned int Buffer::getBuffer()

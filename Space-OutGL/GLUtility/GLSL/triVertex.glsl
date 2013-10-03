@@ -4,8 +4,9 @@ layout(location = 0) in vec3 position;
 
 out vec3 outputColor;
 
-uniform ColorBlock
+layout (std140) uniform ColorBlock
 {
+	vec3 pos;
 	vec3 color;
 };
 

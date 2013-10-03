@@ -22,6 +22,8 @@ public:
 	bool 			bufferAdd(unsigned int p_buffer, GLenum p_pUsage, void* p_pType);
 	bool 			apply();
 	bool			deApply();
+	void			bindBufferBase(GLuint p_bindingPoint);
+	void 			setSubData(GLintptr p_offset, GLsizeiptr p_sizeof, GLvoid* p_data);
 	unsigned int 	getBuffer();
 	GLsizei			getNumElem();
 private:
