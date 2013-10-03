@@ -61,16 +61,22 @@ void Direct3D::initApp()
 	
 	// PAD ###
 	UINT32 const nrVertices = 4;
-	vec3 data[nrVertices];
-	std::vector<vec3>* t_data = m_game.getPad()->getVertices();
+	Vertex data[nrVertices];
+	std::vector<Vertex>* t_data;
+	std::vector<vec3>* t_positions = m_game.getPad()->getVertices();
 
 	for(int i = 0; i < nrVertices; i++)
 	{
-		data[i] = t_data->at(i);
+		data[i].m_position = t_positions->at(i);
 	}
 
+	data[0].m_textureCoordinates = vec2(1.0f, 0.0f);
+	data[1].m_textureCoordinates = vec2(1.0f, 1.0f);
+	data[2].m_textureCoordinates = vec2(0.0f, 0.0f);
+	data[3].m_textureCoordinates = vec2(0.0f, 1.0f);
+
 	BufferInitDesc bufferDesc;
-	bufferDesc.elementSize = sizeof(vec3);
+	bufferDesc.elementSize = sizeof(Vertex);
 	bufferDesc.initData = &data;
 	bufferDesc.numElements = nrVertices;
 	bufferDesc.type = VERTEX_BUFFER;
@@ -80,10 +86,11 @@ void Direct3D::initApp()
 	
 	D3D11_INPUT_ELEMENT_DESC desc[] = 
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TEXTUREPOSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 	
-	m_shader.init(m_pDevice, m_pDeviceContext, 1);
+	m_shader.init(m_pDevice, m_pDeviceContext, 2);
 	m_shader.compileAndCreateShaderFromFile(L"VertexShader.fx", "main","vs_5_0", VERTEX_SHADER , desc);
 	m_shader.compileAndCreateShaderFromFile(L"PixelShader.fx", "main", "ps_5_0", PIXEL_SHADER, NULL);
 
@@ -108,9 +115,8 @@ void Direct3D::initApp()
 	D3D11_INPUT_ELEMENT_DESC blockInputdesc[] = 
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"COLOR",	 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
-	m_blockShader.init(m_pDevice, m_pDeviceContext, 2);
+	m_blockShader.init(m_pDevice, m_pDeviceContext, 1);
 	
 	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "VS", "vs_5_0", VERTEX_SHADER, blockInputdesc);
 	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "GS", "gs_5_0", GEOMETRY_SHADER, NULL);
@@ -126,6 +132,8 @@ void Direct3D::initApp()
 	cBlockBufferDesc.usage = BUFFER_DEFAULT;
 	
 	m_cBlockBuffer.init(m_pDevice, m_pDeviceContext, cBlockBufferDesc);
+	m_blockTexture = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_blockTexture.createTexture(m_game.getActiveField()->getBlock(0)->getTexturePath(),  0);
 
 	//TEST BLOCK END
 	
@@ -181,16 +189,21 @@ void Direct3D::initApp()
 	m_constantBallBuffer.apply(0);
 
 	D3D11_SAMPLER_DESC sd;
+	ZeroMemory(&sd, sizeof(sd));
 	sd.Filter				= D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	sd.AddressU				= D3D11_TEXTURE_ADDRESS_WRAP;
-	sd.AddressV				= D3D11_TEXTURE_ADDRESS_WRAP;
-	sd.AddressW				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressU				= D3D11_TEXTURE_ADDRESS_CLAMP;
+	sd.AddressV				= D3D11_TEXTURE_ADDRESS_CLAMP;
+	sd.AddressW				= D3D11_TEXTURE_ADDRESS_CLAMP;
 	sd.ComparisonFunc		= D3D11_COMPARISON_NEVER;
 	sd.MinLOD				= 0;
 	sd.MaxLOD				= D3D11_FLOAT32_MAX;
+	//sd.MipLODBias			= 0.0f;
+	//sd.MaxAnisotropy		= 1;
 	
 
-	m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
+	m_pBallSampler = nullptr;
+
+	hr = m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
 
 	// BALLZZZ FROM THE WALL
 
@@ -292,6 +305,8 @@ void Direct3D::drawScene()
 	m_cBuffer.apply(0);
 	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
 	m_shader.setShaders();
+	m_shader.setResource(PIXEL_SHADER, 0, 1, m_ballTexture.getResourceView());
+	m_shader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	m_buffer.apply(0);
 	m_pDeviceContext->Draw(4, 0);
@@ -310,10 +325,10 @@ void Direct3D::drawScene()
 	m_constantBallBuffer.apply(0);
 
 	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
-
+	m_ballShader.setShaders();
 	m_ballShader.setResource(PIXEL_SHADER, 0, 1, m_ballTexture.getResourceView());
 	m_ballShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
-	m_ballShader.setShaders();
+	
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 	m_ballBuffer.apply(0);
 
@@ -327,7 +342,8 @@ void Direct3D::drawScene()
 	cBlockBufferStruct.WVP = XMMatrixTranspose(m_WVP);
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 	m_blockShader.setShaders();
-
+	m_blockShader.setResource(PIXEL_SHADER, 0, 1, m_blockTexture.getResourceView());
+	m_blockShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 	cBlockBufferStruct.sizeX = g_bvSize.x;
 	cBlockBufferStruct.sizeY = g_bvSize.y;
 	cBlockBufferStruct.sizeZ = g_bvSize.z;

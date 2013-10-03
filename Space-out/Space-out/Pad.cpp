@@ -7,6 +7,7 @@ Pad::Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName) : Object(p_pPos
 	m_vertices.push_back(vec3(-5.0f, 1.0f, 0.0f));
 	m_vertices.push_back(vec3(5.0f, 1.0f, 0.0f));
 	m_boundingVolume = new AABB(m_vertices.at(3), m_vertices.at(0), vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	m_texturePath = new std::wstring(L"Picatures/sphere.png");
 }
 
 Pad::~Pad(){}

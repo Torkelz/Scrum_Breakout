@@ -2,7 +2,7 @@
 
 Ball::Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName):Object(p_pPos, p_pColor, p_objectName)
 {
-	m_texturePath = new std::wstring(L"Picatures/sphere.jpg");
+	m_texturePath = new std::wstring(L"Picatures/sphere.png");
 	m_boundingVolume = new Sphere(2.5f * 0.5f, vec3(p_pPos->x, p_pPos->y - 30.0f, 50.0f));
 	m_speed = vec3(10.0f, -20.0f, 0.0f);
 }

@@ -18,7 +18,13 @@
 class Object;
 
 using namespace DirectX;
- 
+
+struct Vertex
+{
+	vec3 m_position;
+	vec2 m_textureCoordinates;
+};
+
 struct CBPad
 {
 	XMMATRIX WVP;
@@ -82,6 +88,8 @@ private:
 	int				 m_blockBufferSizeB;
 	int				 m_blockBufferSizeL;
 	int				 m_blockBufferSizeR;
+	D3DTexture		 m_blockTexture;
+
 
 	Buffer			 m_buffer;
 	Buffer			 m_cBuffer;

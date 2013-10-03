@@ -16,7 +16,7 @@ D3DTexture::~D3DTexture()
 
 void D3DTexture::release()
 {
-	ReleaseCOM(m_pResource);
+	//ReleaseCOM(m_pResource);
 	ReleaseCOM(m_pResourceView);
 }
 
@@ -61,11 +61,12 @@ ID3D11Texture2D* D3DTexture::createTextureResource(DXGI_FORMAT p_dxFormat, UINT 
 
 void D3DTexture::createTexture(std::wstring* p_pTextureFilename, char* p_pDebugName)
 {
-	m_pResource = createTextureResource(DXGI_FORMAT_R8G8B8A8_UNORM, 173, 178, 0, NULL);
+	//m_pResource = createTextureResource(DXGI_FORMAT_R8G8B8A8_UNORM, 173, 178, 0, NULL);
 	const wchar_t* temp = p_pTextureFilename->c_str();
 	if(SUCCEEDED(CreateWICTextureFromFile(m_pDevice, m_pDeviceContext, temp, (ID3D11Resource**)m_pResource, &m_pResourceView, NULL)))
 	{
-		m_pResourceView = createTextureSRV(m_pResource);
+		int lol = 0;
+		//m_pResourceView = createTextureSRV(m_pResource);
 		
 		/*if(p_pDebugName)
 		{
