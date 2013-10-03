@@ -85,8 +85,12 @@
     <ClCompile Include="PlayField.cpp">
       <Filter>Level</Filter>
     </ClCompile>
-    <ClCompile Include="WICTextureLoader.cpp" />
-    <ClCompile Include="D3DTexture.cpp" />
+    <ClCompile Include="D3DTexture.cpp">
+      <Filter>Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="WICTextureLoader.cpp">
+      <Filter>Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -156,8 +160,12 @@
     <ClInclude Include="PlayField.h">
       <Filter>Level\Header</Filter>
     </ClInclude>
-    <ClInclude Include="WICTextureLoader.h" />
-    <ClInclude Include="D3DTexture.h" />
+    <ClInclude Include="D3DTexture.h">
+      <Filter>Texture\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="WICTextureLoader.h">
+      <Filter>Texture\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">
@@ -198,6 +206,12 @@
     </Filter>
     <Filter Include="Level\Header">
       <UniqueIdentifier>{4483bfe0-6c58-4580-86d0-10116030b12f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{bf6ade55-0ff8-4ae4-9064-ad04cd7503f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture\Header">
+      <UniqueIdentifier>{558f0cb8-a03a-4879-a60e-ff6a70250569}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
