@@ -10,7 +10,8 @@ enum BUFFER_TYPE
 	CONSTANT_BUFFER_VS,
 	CONSTANT_BUFFER_GS,
 	CONSTANT_BUFFER_PS,
-	BUFFER_TYPE_COUNT
+	BUFFER_TYPE_COUNT,
+	CONSTANT_BUFFER_ALL
 };
 
 enum BUFFER_USAGE
@@ -65,7 +66,7 @@ public:
 	void* map();
 	void unmap();
 
-	D3D11_MAPPED_SUBRESOURCE getMappedResource();
+	D3D11_MAPPED_SUBRESOURCE* getMappedResource();
 
 	ID3D11Buffer* getBufferPointer();
 	void setBuffer(ID3D11Buffer* p_pBuffer);

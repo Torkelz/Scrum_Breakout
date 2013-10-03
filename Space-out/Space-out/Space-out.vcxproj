@@ -41,6 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)\glm;C:\git\Scrum_Breakout\Space-out\cppUnit;C:\Users\BTH\Documents\GitHub\Scrum_Breakout\Space-out\glm;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -77,10 +78,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ABlock.cpp" />
+    <ClCompile Include="Block.cpp" />
+    <ClCompile Include="AABB.cpp" />
+    <ClCompile Include="Ball.cpp" />
+    <ClCompile Include="BoundingVolume.cpp" />
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="Direct3D.cpp" />
+    <ClCompile Include="LevelGenerator.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="PlayField.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameTimer.cpp" />
@@ -88,31 +96,55 @@
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="Pad.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="WinHID.cpp" />
     <ClCompile Include="WinKeyboard.cpp" />
     <ClCompile Include="WinMouse.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ABlock.h" />
+    <ClInclude Include="Block.h" />
+    <ClInclude Include="AABB.h" />
+    <ClInclude Include="Ball.h" />
+    <ClInclude Include="BoundingVolume.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="d3dApp.h" />
     <ClInclude Include="d3dUtil.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="LevelGenerator.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="PlayField.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="HIDObservable.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="Pad.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="Vector2.h" />
+    <ClInclude Include="Sphere.h" />
     <ClInclude Include="WinHID.h" />
     <ClInclude Include="WinKeyboard.h" />
     <ClInclude Include="WinMouse.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Ball.fx">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="BoundingBox.fx">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="GeometryShader.fx">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="BlockShader.fx">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Geometry</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
