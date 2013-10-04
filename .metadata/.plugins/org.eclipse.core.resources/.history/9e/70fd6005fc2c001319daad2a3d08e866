@@ -1,0 +1,11 @@
+#include "Header/LinKeyboard.h"
+
+LinKeyboard::LinKeyboard() {
+	// TODO Auto-generated constructor stub
+
+}
+
+LinKeyboard::~LinKeyboard() {
+	// TODO Auto-generated destructor stub
+}
+

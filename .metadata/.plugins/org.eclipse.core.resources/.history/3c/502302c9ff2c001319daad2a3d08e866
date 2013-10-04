@@ -1,0 +1,16 @@
+#include "Header/LinHid.h"
+
+HID::HID()
+{
+
+}
+
+HID::~HID()
+{
+
+}
+
+void HID::update(int i);
+{
+
+}

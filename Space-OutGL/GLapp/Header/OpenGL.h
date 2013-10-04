@@ -29,8 +29,6 @@ private:
 	Buffer			triBuffer;
 	Buffer			m_uniBuffer;
 	Shader			m_triShader;
-
-	float			m_r, m_g, m_b;
 };
 
 #endif /* OPENGL_H_ */

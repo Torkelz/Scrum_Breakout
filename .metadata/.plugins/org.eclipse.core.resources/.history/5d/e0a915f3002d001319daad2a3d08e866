@@ -1,0 +1,18 @@
+#ifndef HID_H_
+#define HID_H_
+
+#include <glm/glm.hpp>
+#include "GLUtil.h"
+
+using namespace glm;
+
+class HID
+{
+public:
+	HID(GLFWwindow p_hwnd);
+	~HID();
+
+	void update();
+};
+
+#endif /* LINHID_H_ */
