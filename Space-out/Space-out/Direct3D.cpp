@@ -2,6 +2,7 @@
 #include "Object.h"
 #include "ABlock.h"
 #include "Ball.h"
+#include "Pad.h"
 
 int WINAPI WinMain(HINSTANCE p_hInstance, HINSTANCE p_prevInstance,
 				   PSTR p_cmdLine, int p_showCmd)
@@ -63,7 +64,6 @@ void Direct3D::initApp()
 	// PAD ###
 	UINT32 const nrVertices = 4;
 	Vertex data[nrVertices];
-	std::vector<Vertex>* t_data;
 	std::vector<vec3>* t_positions = m_game.getPad()->getVertices();
 
 	for(int i = 0; i < nrVertices; i++)
@@ -192,13 +192,17 @@ void Direct3D::initApp()
 	D3D11_SAMPLER_DESC sd;
 	ZeroMemory(&sd, sizeof(sd));
 	sd.Filter				= D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	sd.AddressU				= D3D11_TEXTURE_ADDRESS_CLAMP;
-	sd.AddressV				= D3D11_TEXTURE_ADDRESS_CLAMP;
-	sd.AddressW				= D3D11_TEXTURE_ADDRESS_CLAMP;
+	sd.AddressU				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressV				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressW				= D3D11_TEXTURE_ADDRESS_WRAP;
 	sd.ComparisonFunc		= D3D11_COMPARISON_NEVER;
 	sd.MinLOD				= 0;
 	sd.MaxLOD				= D3D11_FLOAT32_MAX;
 	
+	D3D11_BLEND_DESC bd;
+	bd.AlphaToCoverageEnable = true;
+	bd.IndependentBlendEnable = true;
+	m_pDevice->CreateBlendState(&bd, &m_pPowerBlend);
 
 	m_pBallSampler = nullptr;
 
@@ -236,10 +240,10 @@ void Direct3D::initApp()
 	initData[1].m_position = vec3(2.0f, -2.0f, 0.0f);
 	initData[2].m_position = vec3(-2.0f, 2.0f, 0.0f);
 	initData[3].m_position = vec3(2.0f, 2.0f, 0.0f);
-	initData[0].m_textureCoordinates = vec2(1.0f, 0.0f);
-	initData[1].m_textureCoordinates = vec2(1.0f, 1.0f);
-	initData[2].m_textureCoordinates = vec2(0.0f, 0.0f);
-	initData[3].m_textureCoordinates = vec2(0.0f, 1.0f);
+	initData[0].m_textureCoordinates = vec2(1.0f, 1.0f);
+	initData[1].m_textureCoordinates = vec2(0.0f, 1.0f);
+	initData[2].m_textureCoordinates = vec2(1.0f, 0.0f);
+	initData[3].m_textureCoordinates = vec2(0.0f, 0.0f);
 
 	vbDesc.initData = initData;
 
@@ -251,10 +255,16 @@ void Direct3D::initApp()
 	m_powerShader.compileAndCreateShaderFromFile(L"VertexShader.fx", "main", "vs_5_0", VERTEX_SHADER, desc);
 	m_powerShader.compileAndCreateShaderFromFile(L"PixelShader.fx", "main", "ps_5_0", PIXEL_SHADER, NULL);
 
-	m_powerTextures[0] = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_powerTextures[0].createTexture(m_game.getBall()->getTexturePath(), 0);
-	m_powerTextures[1] = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_powerTextures[1].createTexture(m_game.getBall()->getTexturePath(), 0);
+	m_powerTextures[FASTERBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[FASTERBALL].createTexture(new std::wstring(L"Picatures/fastAndFurious7.png"), 0);
+	m_powerTextures[SLOWERBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[SLOWERBALL].createTexture(new std::wstring(L"Picatures/slow.png"), 0);
+	m_powerTextures[BIGGERPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[BIGGERPAD].createTexture(new std::wstring(L"Picatures/biggerPad.png"), 0);
+	m_powerTextures[SMALLERPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[SMALLERPAD].createTexture(new std::wstring(L"Picatures/smallerPad.png"), 0);
+	m_powerTextures[STICKYPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[STICKYPAD].createTexture(m_game.getBall()->getTexturePath(), 0);
 	//POWER UP END!
 }
 
@@ -312,8 +322,6 @@ void Direct3D::drawScene()
 	D3DApp::drawScene();
 	cBlockBuffer cBlockBufferStruct;
 
-
-
 	// Bounding Volume DEBUGGING DRAW
 	//BoundingVolume* t_v;
 	//t_v = m_game.getBall()->getBoundingVolume();
@@ -338,7 +346,10 @@ void Direct3D::drawScene()
 	//translatePadMatrix = XMMatrixTranslation(tempX * 0.125f, t_pos->y, tempZ);
 	//translatePadMatrix = XMMatrixIdentity();
 	m_world = XMMatrixIdentity();
-	m_WVP = m_world*translatePadMatrix * m_camView * m_camProjection;
+	XMMATRIX t_scaleMatrix = XMMatrixIdentity() * ((Pad*)(m_game.getPad()))->getScale();
+	t_scaleMatrix.r[3].m128_f32[3] = 1.0f;
+	XMMATRIX temp = t_scaleMatrix * translatePadMatrix;
+	m_WVP = m_world * t_scaleMatrix * translatePadMatrix * m_camView * m_camProjection;
 
 	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
 	m_cBuffer.apply(0);
@@ -398,12 +409,13 @@ void Direct3D::drawScene()
 
 
 	//POWERUP DRAW
-	if(m_powerUps.size() > 0);
+	if(m_powerUps.size() > 0)
 	{
 		m_powerShader.setShaders();
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_powerShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
-		for(int i = 0; i < m_powerUps.size(); i++)
+		m_powerShader.setBlendState(m_pPowerBlend);
+		for(unsigned int i = 0; i < m_powerUps.size(); i++)
 		{
 			PowerUp* pu;
 			pu = m_powerUps.at(i);
@@ -414,6 +426,7 @@ void Direct3D::drawScene()
 			m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
 			m_powerShader.setResource(PIXEL_SHADER, 0, 1, m_powerTextures[pu->getType()].getResourceView());
 			m_powerBuffer.apply();
+			
 			m_pDeviceContext->Draw(4, 0);
 		}
 		

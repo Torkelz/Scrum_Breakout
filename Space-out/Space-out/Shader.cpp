@@ -180,3 +180,8 @@ void Shader::setSamplerState(ShaderType p_pShaderType,UINT p_StartSpot,UINT p_Nu
 		}
 	}
 }
+
+void Shader::setBlendState(ID3D11BlendState* p_pBlendState)
+{
+	m_pDeviceContext->OMSetBlendState(p_pBlendState, NULL, NULL);
+}

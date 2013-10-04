@@ -35,6 +35,8 @@ public:
 	PlayField*				getActiveField();
 	unsigned int			getActiveFieldNr();
 private:
+	void					powerUpSpawn(vec3 pos);
+	int					    random();
 	void					powerUpCheck(int i);
 
 	Observer*				m_pObserver;
@@ -50,6 +52,7 @@ private:
 	vec3					m_originWorld;
 	unsigned int			m_activePlayField;
 	PlayField*				m_playFields[m_nrPlayFields];
+	float					m_counter;
 };
 
 #endif	GAME_H

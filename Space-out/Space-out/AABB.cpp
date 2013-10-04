@@ -52,7 +52,7 @@ void AABB::calculateBounds()
 void AABB::updatePosition(mat4 p_scale, mat4 p_translate)
 {
 	mat4 scalate;
-	scalate = p_scale * p_translate;
+	//scalate = p_scale * p_translate;
 
 	//for (int i = 0; i < 4; i++)
 	//{
@@ -62,7 +62,9 @@ void AABB::updatePosition(mat4 p_scale, mat4 p_translate)
 	//	m_translate.r[i].m128_f32[3] = scalate[i].w;
 	//}
 
-	scalate = transpose(scalate);
+	p_scale = transpose(p_scale);
+	p_translate = transpose(p_translate);
+	scalate = p_scale * p_translate;
 	
 	vec4 v = vec4(m_bottom, 1.0f) * scalate;
 	m_bounds[0].x = v.x;

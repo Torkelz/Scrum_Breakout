@@ -96,6 +96,9 @@
     <ClCompile Include="PUSlowerBall.cpp" />
     <ClCompile Include="PUObserver.cpp" />
     <ClCompile Include="PUObservable.cpp" />
+    <ClCompile Include="PUBiggerPad.cpp" />
+    <ClCompile Include="PUSmallerPad.cpp" />
+    <ClCompile Include="PUStickyPad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -177,6 +180,9 @@
     <ClInclude Include="PowerUpInclude.h" />
     <ClInclude Include="PUObserver.h" />
     <ClInclude Include="PUObservable.h" />
+    <ClInclude Include="PUBiggerPad.h" />
+    <ClInclude Include="PUSmallerPad.h" />
+    <ClInclude Include="PUStickyPad.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

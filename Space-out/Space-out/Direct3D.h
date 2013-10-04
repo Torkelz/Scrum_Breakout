@@ -116,6 +116,7 @@ private:
 	Buffer			 m_powerBuffer;
 	D3DTexture		 m_powerTextures[10];
 	Shader			 m_powerShader;
+	ID3D11BlendState* m_pPowerBlend;
 	// DEBUGGING DRAW
 	
 };

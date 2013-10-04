@@ -8,6 +8,7 @@ class Ball : public Object
 {
 private:
 	vec3			m_speed;
+	bool			m_stuck;
 public:
 	Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName);
 	~Ball();
@@ -19,6 +20,8 @@ public:
 	vec3			getSpeed();
 	void			speedUp();
 	void			speedDown();
+	void			setStuck(bool p_stuck);
+	bool			getStuck();
 };
 
 #endif BALL_H

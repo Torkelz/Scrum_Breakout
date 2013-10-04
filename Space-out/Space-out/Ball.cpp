@@ -5,6 +5,7 @@ Ball::Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName):Object(p_pPos
 	m_texturePath = new std::wstring(L"Picatures/sphere.png");
 	m_boundingVolume = new Sphere(2.5f, vec3(p_pPos->x, p_pPos->y - 30.0f, 50.0f));
 	m_speed = vec3(10.0f, -20.0f, 0.0f);
+	m_stuck = false;
 }
 
 Ball::~Ball(){}
@@ -38,4 +39,14 @@ void Ball::speedUp()
 void Ball::speedDown()
 {
 	m_speed *= 0.75f;
+}
+
+void Ball::setStuck(bool p_stuck)
+{
+	m_stuck = p_stuck;
+}
+
+bool Ball::getStuck()
+{
+	return m_stuck;
 }

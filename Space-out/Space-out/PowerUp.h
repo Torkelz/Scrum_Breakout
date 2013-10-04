@@ -8,7 +8,8 @@ enum PowerUpType
 	FASTERBALL = 0,
 	SLOWERBALL,
 	BIGGERPAD,
-	SMALLERPAD
+	SMALLERPAD,
+	STICKYPAD
 };
 
 class PowerUp : public Object
