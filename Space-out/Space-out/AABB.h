@@ -36,6 +36,7 @@ public:
 	vec3				findNewDirection(vec3 p_sphereCenter, vec3 p_speed);
 	int					findPlane(vec3 p_sphereCenter);
 	void				calculateAngle();
+	void				calculateAngle(vec3 p_right, vec3 p_down);
 	//void				calculateCornerVectors();
 
 	//DEBUGGING

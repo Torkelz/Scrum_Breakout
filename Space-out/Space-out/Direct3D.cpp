@@ -269,6 +269,8 @@ void Direct3D::drawScene()
 	D3DApp::drawScene();
 	cBlockBuffer cBlockBufferStruct;
 
+	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
+
 
 	// Bounding Volume DEBUGGING DRAW
 	BoundingVolume* t_v;
@@ -289,7 +291,8 @@ void Direct3D::drawScene()
 	//translatePadMatrix = XMMatrixTranslation(tempX * 0.125f, t_pos->y, tempZ);
 	//translatePadMatrix = XMMatrixIdentity();
 	m_world = XMMatrixIdentity();
-	m_WVP = m_world*translatePadMatrix * m_camView * m_camProjection;
+	
+	m_WVP = m_world * playFieldRotation * translatePadMatrix * m_camView * m_camProjection;
 
 	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
 	m_cBuffer.apply(0);

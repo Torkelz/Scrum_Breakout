@@ -285,6 +285,27 @@ void AABB::calculateAngle()
 	cornerAngles[6] = m_v + m_v2 + (m_w2 * 2) - temp;
 	cornerAngles[7] = m_v + m_v2 + (m_w2 * 2) + temp;
 }
+void AABB::calculateAngle(vec3 p_right, vec3 p_down)
+{
+	float x,y;
+	x = abs(dot(m_bounds[0], p_right));
+	y = abs(dot(m_bounds[0], p_down));
+	// For some reason abs works. Remove if it bugs. :)
+	m_v = abs(atan(x / y ));
+	m_w = (3.14159265358f * 0.5f) - m_v;
+	m_v2 = m_v * 2;
+	m_w2 = m_w * 2;
+	float temp = 0.08727f*2.f; //10.0f degrees
+
+	cornerAngles[0] = m_v - temp;
+	cornerAngles[1] = m_v + temp;
+	cornerAngles[2] = m_v + m_w2 - temp;
+	cornerAngles[3] = m_v + m_w2 + temp;
+	cornerAngles[4] = m_v + m_v2 + m_w2 - temp;
+	cornerAngles[5] = m_v + m_v2 + m_w2 + temp;
+	cornerAngles[6] = m_v + m_v2 + (m_w2 * 2) - temp;
+	cornerAngles[7] = m_v + m_v2 + (m_w2 * 2) + temp;
+}
 
 void AABB::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext)
 {

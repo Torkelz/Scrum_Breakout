@@ -24,8 +24,9 @@ PlayField::PlayField(vec3 p_positionOriginal, float p_angle, vec2 p_size)
 	//Rotate the direction of the plane
 	vec4 tempX	= vec4(m_planeVectorX,0.f);
 	vec4 tempY	= vec4(m_planeVectorY,0.f);
-	tempX		= m_rotMatrixOriginal * tempX;
-	tempY		= m_rotMatrixOriginal * tempY;
+	mat4 rot = rotate(mat4(1.0f), m_angle, vec3(0,1,0));
+	tempX		= rot * tempX;
+	tempY		= rot * tempY;
 	
 	m_planeVectorX = vec3(RoundDoneRight(tempX.x),RoundDoneRight(tempX.y),RoundDoneRight(tempX.z));
 	m_planeVectorY = vec3(RoundDoneRight(tempY.x),RoundDoneRight(tempY.y),RoundDoneRight(tempY.z));
@@ -56,12 +57,14 @@ void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 	m_borders.push_back(new AABB(borderSize,-borderSize,vec4(1.0f, 1.0f, 1.0f, 1.0f)));
 	trans = translate(mat4(1.0f), center);
 	m_borders.back()->updatePosition(mat4(1.0f),trans);
+	((AABB*)m_borders.back())->calculateAngle(m_planeVectorX,m_planeVectorY);
 	
 	//Right AABB
 	center += m_planeVectorX * (m_size.x + (abs(dot(m_planeVectorX, borderSize))*2));
 	m_borders.push_back(new AABB(borderSize,-borderSize, vec4(1.0f, 1.0f, 1.0f, 1.0f)));
 	trans = translate(mat4(1.0f), center);
 	m_borders.back()->updatePosition(mat4(1.0f),trans);
+	((AABB*)m_borders.back())->calculateAngle(m_planeVectorX,m_planeVectorY);
 
 	//Top AABB	
 	center = m_positionOriginal + m_planeVectorX * abs(dot(m_planeVectorX, borderSize));
@@ -70,12 +73,14 @@ void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 	m_borders.push_back(new AABB (borderSize,-borderSize,	vec4(1.0f, 1.0f, 1.0f, 1.0f)));
 	trans = translate(mat4(1.0f), center);
 	m_borders.back()->updatePosition(mat4(1.0f),trans);
+	((AABB*)m_borders.back())->calculateAngle(m_planeVectorX,m_planeVectorY);
 
 	//Bottom AABB
 	center += m_planeVectorY * (m_size.y + (abs(dot(m_planeVectorY, borderSize))*2));
 	m_borders.push_back(new AABB(borderSize,-borderSize, vec4(1.0f, 1.0f, 1.0f, 1.0f)));
 	trans = translate(mat4(1.0f), center);
 	m_borders.back()->updatePosition(mat4(1.0f),trans);
+	((AABB*)m_borders.back())->calculateAngle(m_planeVectorX,m_planeVectorY);
 	
 	//Block Placement STUFF!
 	unsigned int l = m_blockList.size();
@@ -89,6 +94,7 @@ void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 		pos += dirX * 0.5f + dirX * temp.x;
 		pos += dirY * 0.5f + dirY * temp.y;  
 		m_blockList.at(i)->setPos(pos, &m_rotMatrixOriginal);
+		((AABB*)m_blockList.at(i)->getBoundingVolume())->calculateAngle(m_planeVectorX,m_planeVectorY);
 	}
 }
 
