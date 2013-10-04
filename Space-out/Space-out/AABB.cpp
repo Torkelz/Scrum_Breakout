@@ -54,13 +54,13 @@ void AABB::updatePosition(mat4 p_scale, mat4 p_translate)
 	mat4 scalate;
 	scalate = p_scale * p_translate;
 
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	m_translate.r[i].m128_f32[0] = scalate[i].x;
-	//	m_translate.r[i].m128_f32[1] = scalate[i].y;
-	//	m_translate.r[i].m128_f32[2] = scalate[i].z;
-	//	m_translate.r[i].m128_f32[3] = scalate[i].w;
-	//}
+	for (int i = 0; i < 4; i++)
+	{
+		m_translate.r[i].m128_f32[0] = scalate[i].x;
+		m_translate.r[i].m128_f32[1] = scalate[i].y;
+		m_translate.r[i].m128_f32[2] = scalate[i].z;
+		m_translate.r[i].m128_f32[3] = scalate[i].w;
+	}
 
 	scalate = transpose(scalate);
 	
@@ -226,6 +226,7 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 			speed = length(p_speed);
 			p_speed = normalize(p_speed);
 			direction = normalize( t_centerVector + p_speed );
+			//direction *= -1.f;
 			returnVector = speed * direction;
 			speed = length(returnVector);
 			//returnVector = -p_speed;

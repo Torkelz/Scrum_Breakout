@@ -44,46 +44,42 @@ void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 	m_blockList		= p_blockList;
 	vec3 orto;		// planevecX * planeVecY pekar mot mot center
 	orto			= cross( m_planeVectorX, m_planeVectorY );
-	float offsetX	= 0.f, offsetY = 150.f, offsetZ = -1.f, sizeX = 150.f, sizeZ = 150.f;
+	float sizeZ = 150.f;
+	vec3 borderSize = vec3((m_size.x/2) ,(m_size.y/2), sizeZ/2);
 	mat4 trans;
+	borderSize = vec3(m_rotMatrixOriginal * vec4(borderSize,0.f));
 
-	//Left AABB
-	vec3 top	= m_positionOriginal - (m_planeVectorX * (offsetX + sizeX)) -(m_planeVectorY * offsetY) + (orto * ((offsetZ + sizeZ)/2));
-	vec3 bottom	= m_positionOriginal - (m_planeVectorX * offsetX) +(m_planeVectorY * (offsetY + m_size.y)) - (orto * ((offsetZ + sizeZ)/2));
+	vec3 center = m_positionOriginal - m_planeVectorX * abs(dot(m_planeVectorX, borderSize));
+	center		+= m_planeVectorY * abs(dot(m_planeVectorY, borderSize));
 	
-	m_borders.push_back(new AABB(top,bottom,vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	//Left AABB
+	m_borders.push_back(new AABB(borderSize,-borderSize,vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	trans = translate(mat4(1.0f), center);
+	m_borders.back()->updatePosition(mat4(1.0f),trans);
 	
 	//Right AABB
-	trans			= translate(mat4(1.0f),vec3(-(m_size.x + sizeX),0.f,0.f));
-	vec4 temptop	= vec4(top, 1.0f);
-	vec4 tempbottom = vec4(bottom, 1.0f);
-	temptop			= trans * temptop;
-	tempbottom		= trans * tempbottom;
-	top				= vec3(temptop);
-	bottom			= vec3(tempbottom);
+	center += m_planeVectorX * (m_size.x + (abs(dot(m_planeVectorX, borderSize))*2));
+	m_borders.push_back(new AABB(borderSize,-borderSize, vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	trans = translate(mat4(1.0f), center);
+	m_borders.back()->updatePosition(mat4(1.0f),trans);
 
-	m_borders.push_back(new AABB(top, bottom, vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	//Top AABB	
+	center = m_positionOriginal + m_planeVectorX * abs(dot(m_planeVectorX, borderSize));
+	center		+= -m_planeVectorY * abs(dot(m_planeVectorY, borderSize));
 
-	//Top AABB
-	top		= m_positionOriginal - (m_planeVectorX * (offsetY)) -(m_planeVectorY * (offsetX + sizeX)) + (orto * ((offsetZ + sizeZ)/2));
-	bottom	= m_positionOriginal + (m_planeVectorX * (m_size.x + offsetY)) -(m_planeVectorY) - (orto * ((offsetZ + sizeZ)/2));
+	m_borders.push_back(new AABB (borderSize,-borderSize,	vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	trans = translate(mat4(1.0f), center);
+	m_borders.back()->updatePosition(mat4(1.0f),trans);
 
-	m_borders.push_back(new AABB ( top,	bottom,	vec4(1.0f, 1.0f, 1.0f, 1.0f)));
-	
 	//Bottom AABB
-	trans		= translate(mat4(1.0f),vec3(0.f,-(m_size.y+sizeZ),0.f));
-	temptop		= vec4(top, 1.0f);
-	tempbottom	= vec4(bottom, 1.0f);
-	temptop		= trans * temptop;
-	tempbottom	= trans * tempbottom;
-	top			= vec3(temptop);
-	bottom		= vec3(tempbottom);
-
-	m_borders.push_back(new AABB ( top, bottom,	vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	center += m_planeVectorY * (m_size.y + (abs(dot(m_planeVectorY, borderSize))*2));
+	m_borders.push_back(new AABB(borderSize,-borderSize, vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	trans = translate(mat4(1.0f), center);
+	m_borders.back()->updatePosition(mat4(1.0f),trans);
 	
 	//Block Placement STUFF!
 	unsigned int l = m_blockList.size();
-	for(int i = 0; i < l; i++)
+	for(unsigned int i = 0; i < l; i++)
 	{
 		vec2 temp = m_blockList.at(i)->getBlockID();
 		vec3 pos = m_positionOriginal;
@@ -106,7 +102,7 @@ BlockVertex* PlayField::getBufferData()
   BlockVertex* temp = NULL;
   unsigned int size = m_blockList.size();
   temp				= new BlockVertex[size];
-  for(int i = 0; i < size; i++)
+  for(unsigned int i = 0; i < size; i++)
   {
 	  temp[i] = m_blockList.at(i)->getBlockVertex();
   }

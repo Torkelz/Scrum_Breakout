@@ -4,6 +4,7 @@
 #include "Object.h"
 #include "AABB.h"
 #include <DirectXMath.h>
+#include <gtc\matrix_transform.hpp>
 
 using namespace DirectX;
 

@@ -67,7 +67,8 @@ void Game::update(float p_screenWidth, float p_dt)
 	//Pad vs Ball
 	if(((Pad*)m_pPad)->collide(m_pBall->getBoundingVolume()))
 	{
-		vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+		vec3 s = ((Ball*)m_pBall)->getSpeed();
+		vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), s);
 		tempSpeed.y = tempSpeed.y;
 		((Ball*)m_pBall)->setSpeed( tempSpeed );
 	}
@@ -78,7 +79,8 @@ void Game::update(float p_screenWidth, float p_dt)
 
 		if(  bv->collide(m_pBall->getBoundingVolume()))
 		{
-			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+			vec3 s = ((Ball*)m_pBall)->getSpeed();
+			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), s);
 			((Ball*)m_pBall)->setSpeed( tempSpeed );
 
 			m_playFields[m_activePlayField]->deleteBlock(i);

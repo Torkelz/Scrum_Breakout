@@ -20,6 +20,7 @@ public:
 	static enum { OUTSIDE = 0, INTERSECT, INSIDE };
 	static enum { TOP = 0, BOTTOM, LEFT, RIGHT, CORNER };
 
+	// ## MUST BE BUILT IN MODEL SPACE! ##
 	AABB( vec3 p_top, vec3 p_bot, vec4 p_color );
 	~AABB();
 
