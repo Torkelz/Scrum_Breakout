@@ -1,21 +1,21 @@
 #include "Header/OpenGL.h"
 
 
-struct triangleVertex
-{
-	vertexVec pos;
-	//vertexVec col;
-};
-triangleVertex tri[1];
+//struct triangleVertex
+//{
+//	vec3 pos;
+//	vec3 col;
+//};
+//triangleVertex tri[1];
 
 struct vertexColor
 {
-	vertexVec pos;
-	vertexVec col;
+	vec4 pos;
+	vec4 col;
 	//0.78f, 0.651f, 0.8f
 };
 vertexColor col[1];
-
+float colValue;
 int main(void)
 {
 	OpenGL theApp;
@@ -39,43 +39,29 @@ OpenGL::~OpenGL()
 void OpenGL::initApp()
 {
 	GLApp::initApp();
-	m_rotation = 0.0f;
 
-	m_r = 0; m_g = 0; m_b = 0;
+	col[0].pos = vec4(-1.0f, -1.0f, 0.f,1.0f); //Uniform performs a padding on the buffer that can make
+	col[0].col = vec4(1.f, 0.f, 0.f,0);        //the result look really odd. Always use vec4 or mat4x4;
 
-	tri[0].pos = vertexVec(-1.0f, -1.0f, 0.f);
-	col[0].col = vertexVec(0.78f, 0.651f, 0.8f);
-//	tri[0].col = vertexVec(1.0f,0.0f,0.0f);
-//	tri[1].pos = vertexVec(1.0f, -1.0f, 0.f);
-//	tri[1].col = vertexVec(0.0f,1.0f,0.0f);
-//	tri[2].pos = vertexVec(0.f, 1.0f, 0.f);
-//	tri[2].col = vertexVec(0.0f,0.0f,1.0f);
-
-	BufferInputDesc* desc = new BufferInputDesc[0];
-	desc[0].size = 3;
-	desc[0].type = GL_FLOAT;
-	desc[0].normalized = GL_FALSE;
-	desc[0].pointer = sizeof(vertexVec);
+//	BufferInputDesc* desc = new BufferInputDesc[2];
+//	desc[0].size = 3;
+//	desc[0].type = GL_FLOAT;
+//	desc[0].normalized = GL_FALSE;
+//	desc[0].pointer = sizeof(vec3);
 //	desc[1].size = 3;
 //	desc[1].type = GL_FLOAT;
 //	desc[1].normalized = GL_FALSE;
 //	desc[1].pointer = sizeof(vec3);
+//
+	bool returnValue;// =	triBuffer.init(GL_ARRAY_BUFFER, tri, sizeof(triangleVertex),1, GL_STATIC_DRAW, desc, 2);
+//	if(!returnValue)
+//		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 
-	bool returnValue =	triBuffer.init(GL_ARRAY_BUFFER, tri, sizeof(triangleVertex),3, GL_STATIC_DRAW, desc, 1);
+	returnValue =	m_uniBuffer.init(GL_UNIFORM_BUFFER, col, sizeof(vertexColor), 1, GL_DYNAMIC_DRAW, NULL, 0);
 	if(!returnValue)
 		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 
-	BufferInputDesc* colDesc = new BufferInputDesc[0];
-	colDesc[0].size = 3;
-	colDesc[0].type = GL_FLOAT;
-	colDesc[0].normalized = GL_FALSE;
-	colDesc[0].pointer = sizeof(vertexVec);
-
-	returnValue =	m_uniBuffer.init(GL_UNIFORM_BUFFER, col, sizeof(vertexColor),3, GL_DYNAMIC_DRAW, colDesc, 1);
-	if(!returnValue)
-		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
-
-	GLuint bindingPoint = 1;
+	GLuint bindingPoint = 0; // Different data to be sent need to be different bindingPoint
 
 	m_triShader.init();
 
@@ -92,8 +78,10 @@ void OpenGL::initApp()
 				glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 	m_triShader.attachAndLink();
 
-	m_triShader.uniformBlockBinding(bindingPoint, "ColorBlock");
 
+	// Fetch bindingPoint for uniform buffering.
+	m_triShader.uniformBlockBinding(bindingPoint, "ColorBlock");
+	// Bind the bindingPoint to the right buffer.
 	m_uniBuffer.bindBufferBase(bindingPoint);
 }
 
@@ -106,29 +94,18 @@ void OpenGL::updateScene(float p_dt)
 	glViewport(0, 0, width, height);
 	m_rotation += p_dt;
 	updateFPSCounter();
-
 }
 
 void OpenGL::drawScene()
 {
 	GLApp::drawScene();
-	//glUseProgram(m_program);
 	m_triShader.apply();
 
-	m_r += 0.01f;
-	m_g += 0.05f;
-	m_b += 0.1f;
+	//Update buffer here!
 
-	if(m_r > 1.0f)
-		m_r = 0;
-	if(m_g > 1.0f)
-		m_g = 0;
-	if(m_b > 1.0f)
-		m_b = 0;
-
-	col[0].col = vertexVec(m_r, m_g, m_b);
-	m_uniBuffer.apply();
 	m_uniBuffer.setSubData(0, sizeof(col), col);
+
+	// stop updating here!
 
 	triBuffer.apply();
 	// Draw the triangle !
