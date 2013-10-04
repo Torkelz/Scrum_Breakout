@@ -1,0 +1,14 @@
+#version 400
+layout (points) in;
+layout (triangle_strip, max_vertices = 9) out;
+
+void main()
+{
+	for (int i = 0; i < 3; i++)
+	{
+	
+		vec3 vPos = (gl_in[0].gl_Position.xyz + gl_in[1].gl_Position.xyz + gl_in[2].gl_Position.xyz)/3.0;
+		EmitVertex();
+		EndPrimitive();
+	}
+}

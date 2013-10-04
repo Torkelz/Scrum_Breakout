@@ -1,0 +1,9 @@
+#version 400
+//in vec3 colorGem;
+
+out vec4 fragColor;
+
+void main()
+{
+	fragColor = vec4( 0.78f, 0.651f, 0.8f, 1.0f);
+}

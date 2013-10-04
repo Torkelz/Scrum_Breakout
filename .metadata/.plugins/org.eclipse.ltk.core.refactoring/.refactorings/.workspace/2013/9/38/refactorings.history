@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Delete resource &apos;Spaced-OutGL/GLapp/Header/GLapp.cpp&apos;" deleteContents="false" description="Delete resource &apos;Spaced-OutGL/GLapp/Header/GLapp.cpp&apos;" element1="/Spaced-OutGL/GLapp/Header/GLapp.cpp" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1379336889450"/>
-</session>
