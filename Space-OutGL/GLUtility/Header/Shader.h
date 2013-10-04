@@ -22,6 +22,7 @@ public:
 	// ## applying ##
 	void apply();
 	void uniformBlockBinding(GLuint p_bindingPoint, const char* p_pUniformName);
+	GLint getProgram();
 
 private:
 	bool errorCheckShader(GLuint p_pShader, const char* p_pStrShaderType);

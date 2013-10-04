@@ -30,6 +30,7 @@ void GLApp::initApp()
 	{
 		glfwTerminate();
 	}
+	glEnable(GL_CULL_FACE);
 }
 
 int GLApp::run()
