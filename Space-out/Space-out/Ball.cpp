@@ -29,3 +29,13 @@ vec3 Ball::getSpeed()
 {
 	return m_speed;
 }
+
+void Ball::speedUp()
+{
+	m_speed *= 1.5f;
+}
+
+void Ball::speedDown()
+{
+	m_speed *= 0.75f;
+}

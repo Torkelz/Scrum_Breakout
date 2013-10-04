@@ -14,6 +14,7 @@
 #include "BoundingVolume.h"
 #include "AABB.h"
 #include "D3DTexture.h"
+#include "PUObserver.h"
 
 class Object;
 
@@ -64,7 +65,9 @@ public:
 	void updateScene(float p_dt);
 	void drawScene();
 
-	LRESULT msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
+	LRESULT			msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
+	void			addPowerUp(PowerUp* p_pPowerUp);
+	void			removePowerUp(int i);
 private:
 	//Camera Variables
 	XMMATRIX		 m_camView;
@@ -107,6 +110,12 @@ private:
 	//TEST
 	ID3D11Buffer*    mVB;
 
+	//POWERUP
+	PUObserver*		 m_pPUObserver;
+	vector<PowerUp*> m_powerUps;
+	Buffer			 m_powerBuffer;
+	D3DTexture		 m_powerTextures[10];
+	Shader			 m_powerShader;
 	// DEBUGGING DRAW
 	
 };

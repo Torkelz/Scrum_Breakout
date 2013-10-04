@@ -12,10 +12,10 @@ PowerUp::PowerUp(vec3* p_pPos, vec3* p_pColor, std::string p_objectName) : Objec
 
 PowerUp::~PowerUp(){}
 
-void PowerUp::update(float p_dt)
+void PowerUp::update(float p_dt, mat4 p_translate)
 {
 	updatePosition(p_dt);
-	m_boundingVolume->updatePosition(m_pos);
+	m_boundingVolume->updatePosition(mat4(1.0f),p_translate);
 }
 
 void PowerUp::updatePosition(float p_dt)
@@ -26,4 +26,9 @@ void PowerUp::updatePosition(float p_dt)
 int PowerUp::getType()
 {
 	return m_type;
+}
+
+bool PowerUp::collide(BoundingVolume* p_pVolume)
+{
+	return ((AABB*)m_boundingVolume)->collide(p_pVolume);
 }

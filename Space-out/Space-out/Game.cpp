@@ -7,7 +7,7 @@
 Game::Game(){}
 Game::~Game(){}
 
-void Game::init()
+void Game::init(PUObserver* p_pPUObserver)
 {
 	m_pObserver = new Observer(this);
 	m_pPad		= new Pad(&vec3(0.0f, 0.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad");
@@ -17,7 +17,6 @@ void Game::init()
 
 	m_activePlayField = 0;
 	m_originWorld = vec3(0.f,0.f,0.f);
-
 
 	vec2 size = m_loadLevel.getFieldSize();
 	size *= 0.5f;
@@ -35,6 +34,9 @@ void Game::init()
 		m_playFields[i]->init(m_loadLevel.getBlockList(i), m_loadLevel.getNrBlocks());
 	}
 	m_loadLevel.~LevelGenerator();
+
+	m_pPUObservable = new PUObservable();
+	m_pPUObservable->addSubscriber(p_pPUObserver);
 }
 
 void Game::update(float p_screenWidth, float p_dt)
@@ -88,6 +90,21 @@ void Game::update(float p_screenWidth, float p_dt)
 		}
 	}
 
+	for(int i = 0; i < m_powerUps.size(); i++)
+	{
+		// Update position for power ups.
+		mat4 powTranslation = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, t_pos.z));
+		m_powerUps.at(i)->update(p_dt, powTranslation);
+		AABB* bv = (AABB*)(m_powerUps.at(i)->getBoundingVolume());
+
+		if( bv->collide(m_pPad->getBoundingVolume()) )
+		{
+			powerUpCheck(m_powerUps.at(i)->getType());
+			m_pPUObservable->broadcastDeath(i);
+			m_powerUps.erase(m_powerUps.begin() + i);
+		}
+	}
+
 	// ## COLLISION STUFF END ##
 }
 
@@ -113,15 +130,20 @@ void Game::keyEvent(unsigned short key)
 	if(key == 0x1B) //ESC
 		PostQuitMessage(0);
 
-	//if(key == 0x52) // R
-	//{
-	//}
-	//else if( key == 0x46) // F
-	//{
-	//}
-	//else{}
-
-	//DEBUG REMOVE
+	if(key == 0x52) // R
+	{
+		PUSlowerBall* powerUp = new PUSlowerBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+		powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
+		m_pPUObservable->broadcastRebirth(powerUp);
+		m_powerUps.push_back(powerUp);
+	}
+	if( key == 0x46) // F
+	{
+		PUFasterBall* powerUp = new PUFasterBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+		powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
+		m_pPUObservable->broadcastRebirth(powerUp);
+		m_powerUps.push_back(powerUp);
+	}
 	if(key == 0x4C) // L
 	{
 	}
@@ -164,4 +186,27 @@ PlayField* Game::getActiveField()
 unsigned int Game::getActiveFieldNr()
 {
 	return m_activePlayField;
+}
+
+void Game::powerUpCheck(int i)
+{
+	switch (i)
+	{
+	case FASTERBALL:
+		((Ball*)m_pBall)->speedUp();
+		break;
+	case SLOWERBALL:
+		((Ball*)m_pBall)->speedDown();
+		break;
+	case BIGGERPAD:
+		((Pad*)m_pPad)->bigger();
+		break;
+	case SMALLERPAD:
+		((Pad*)m_pPad)->smaller();
+		break;
+	default:
+		break;
+	}
+
+	//Remember to remove the power up outside this function!
 }

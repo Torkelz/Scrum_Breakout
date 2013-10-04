@@ -7,7 +7,7 @@
 class Ball : public Object
 {
 private:
-	vec3 m_speed;
+	vec3			m_speed;
 public:
 	Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName);
 	~Ball();
@@ -17,6 +17,8 @@ public:
 	void			setPosition(vec3 p_pos);
 	void			setSpeed(vec3 p_speed);
 	vec3			getSpeed();
+	void			speedUp();
+	void			speedDown();
 };
 
 #endif BALL_H

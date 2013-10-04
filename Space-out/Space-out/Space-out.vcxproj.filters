@@ -93,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="PUFasterBall.cpp" />
+    <ClCompile Include="PUSlowerBall.cpp" />
+    <ClCompile Include="PUObserver.cpp" />
+    <ClCompile Include="PUObservable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -170,6 +173,10 @@
     </ClInclude>
     <ClInclude Include="PowerUp.h" />
     <ClInclude Include="PUFasterBall.h" />
+    <ClInclude Include="PUSlowerBall.h" />
+    <ClInclude Include="PowerUpInclude.h" />
+    <ClInclude Include="PUObserver.h" />
+    <ClInclude Include="PUObservable.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

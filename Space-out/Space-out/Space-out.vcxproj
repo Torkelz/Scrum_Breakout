@@ -93,6 +93,9 @@
     <ClCompile Include="PlayField.cpp" />
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="PUFasterBall.cpp" />
+    <ClCompile Include="PUObservable.cpp" />
+    <ClCompile Include="PUObserver.cpp" />
+    <ClCompile Include="PUSlowerBall.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameTimer.cpp" />
@@ -122,7 +125,11 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="PlayField.h" />
     <ClInclude Include="PowerUp.h" />
+    <ClInclude Include="PowerUpInclude.h" />
     <ClInclude Include="PUFasterBall.h" />
+    <ClInclude Include="PUObservable.h" />
+    <ClInclude Include="PUObserver.h" />
+    <ClInclude Include="PUSlowerBall.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="HIDObservable.h" />

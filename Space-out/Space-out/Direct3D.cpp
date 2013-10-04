@@ -44,8 +44,9 @@ void Direct3D::initApp()
 
 	m_blockShader		= Shader();
 	m_cBlockBuffer		= Buffer();
+	m_pPUObserver		= new PUObserver(this);
 	m_game = Game();
-	m_game.init();
+	m_game.init(m_pPUObserver);
 
 
 	//Set up world view proj
@@ -197,8 +198,6 @@ void Direct3D::initApp()
 	sd.ComparisonFunc		= D3D11_COMPARISON_NEVER;
 	sd.MinLOD				= 0;
 	sd.MaxLOD				= D3D11_FLOAT32_MAX;
-	//sd.MipLODBias			= 0.0f;
-	//sd.MaxAnisotropy		= 1;
 	
 
 	m_pBallSampler = nullptr;
@@ -224,6 +223,39 @@ void Direct3D::initApp()
 	m_HID.getObservable()->addSubscriber(m_game.getObserver());
 
 	// END HID-STUFF
+
+	//POWER UP START!
+	BufferInitDesc vbDesc;
+	vbDesc.elementSize = sizeof(Vertex);
+	vbDesc.numElements = 4;
+	vbDesc.type = VERTEX_BUFFER;
+	vbDesc.usage = BUFFER_CPU_WRITE;
+
+	Vertex initData[4];
+	initData[0].m_position = vec3(-2.0f, -2.0f, 0.0f);
+	initData[1].m_position = vec3(2.0f, -2.0f, 0.0f);
+	initData[2].m_position = vec3(-2.0f, 2.0f, 0.0f);
+	initData[3].m_position = vec3(2.0f, 2.0f, 0.0f);
+	initData[0].m_textureCoordinates = vec2(1.0f, 0.0f);
+	initData[1].m_textureCoordinates = vec2(1.0f, 1.0f);
+	initData[2].m_textureCoordinates = vec2(0.0f, 0.0f);
+	initData[3].m_textureCoordinates = vec2(0.0f, 1.0f);
+
+	vbDesc.initData = initData;
+
+	m_powerBuffer = Buffer();
+	m_powerBuffer.init(m_pDevice, m_pDeviceContext, vbDesc);
+	
+	m_powerShader = Shader();
+	m_powerShader.init(m_pDevice, m_pDeviceContext, 2);
+	m_powerShader.compileAndCreateShaderFromFile(L"VertexShader.fx", "main", "vs_5_0", VERTEX_SHADER, desc);
+	m_powerShader.compileAndCreateShaderFromFile(L"PixelShader.fx", "main", "ps_5_0", PIXEL_SHADER, NULL);
+
+	m_powerTextures[0] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[0].createTexture(m_game.getBall()->getTexturePath(), 0);
+	m_powerTextures[1] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[1].createTexture(m_game.getBall()->getTexturePath(), 0);
+	//POWER UP END!
 }
 
 void Direct3D::onResize()
@@ -279,6 +311,7 @@ void Direct3D::drawScene()
 {
 	D3DApp::drawScene();
 	cBlockBuffer cBlockBufferStruct;
+
 
 
 	// Bounding Volume DEBUGGING DRAW
@@ -343,7 +376,6 @@ void Direct3D::drawScene()
 
 	
 	//TEST BLOCK DRAW!
-	
 	m_WVP = m_world *m_camView * m_camProjection;
 	cBlockBufferStruct.WVP = XMMatrixTranspose(m_WVP);
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
@@ -358,33 +390,36 @@ void Direct3D::drawScene()
 	unsigned int active = m_game.getActiveFieldNr();
 	cBlockBufferStruct.rotation = mat4ToXMMatrix(m_game.getField(active)->getRotationMatrix());
 		//cBlockBufferStruct.WVP = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()) * m_WVP);
-		m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
-		m_blockBuffers[active].apply(0);
-		m_pDeviceContext->Draw(m_game.getField(active)->getListSize(), 0);
+	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
+	m_blockBuffers[active].apply(0);
+	m_pDeviceContext->Draw(m_game.getField(active)->getListSize(), 0);
 
-	//for(int i = 0; i < 4; i++)
-	//{
-	//	cBlockBufferStruct.rotation = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()));
-	//	//cBlockBufferStruct.WVP = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()) * m_WVP);
-	//	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
-	//	m_blockBuffers[i].apply(0);
-	//	m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
-	//}
+	//BLOCK/PLAYFIELD DRAW END
 
-	
-	//m_blockBuffers[1].apply(0);
-	//m_pDeviceContext->Draw(m_blockBufferSizeB, 0);
 
-	//cBlockBufferStruct.sizeX = g_bvSize.z;
-	//cBlockBufferStruct.sizeY = g_bvSize.y;
-	//cBlockBufferStruct.sizeZ = g_bvSize.x;
-	//m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
-	//m_cBlockBuffer.apply(0);
-	//m_blockBuffers[2].apply(0);
-	//m_pDeviceContext->Draw(m_blockBufferSizeL, 0);
-	//m_blockBuffers[3].apply(0);
-	//m_pDeviceContext->Draw(m_blockBufferSizeR, 0);
-	//
+	//POWERUP DRAW
+	if(m_powerUps.size() > 0);
+	{
+		m_powerShader.setShaders();
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		m_powerShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
+		for(int i = 0; i < m_powerUps.size(); i++)
+		{
+			PowerUp* pu;
+			pu = m_powerUps.at(i);
+			translatePadMatrix = XMMatrixTranslation(pu->getPos()->x, pu->getPos()->y, tempZ); // Translate powerup
+			m_WVP = m_world * translatePadMatrix * m_camView * m_camProjection;
+			m_cbPad.WVP = XMMatrixTranspose(m_WVP);
+			m_cBuffer.apply(0);
+			m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+			m_powerShader.setResource(PIXEL_SHADER, 0, 1, m_powerTextures[pu->getType()].getResourceView());
+			m_powerBuffer.apply();
+			m_pDeviceContext->Draw(4, 0);
+		}
+		
+	}
+	//POWERUP DRAW END
+
 	m_pSwapChain->Present(1, 0);
 }
 
@@ -393,4 +428,15 @@ LRESULT Direct3D::msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
 	m_HID.update(p_msg, p_lParam);
 
 	return D3DApp::msgProc(p_msg, p_wParam, p_lParam);;
+}
+
+void Direct3D::addPowerUp(PowerUp* p_pPowerUp)
+{
+	m_powerUps.push_back(p_pPowerUp);
+	//Update buffer
+}
+
+void Direct3D::removePowerUp(int i)
+{
+	m_powerUps.erase(m_powerUps.begin() + i);
 }

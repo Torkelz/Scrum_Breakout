@@ -6,20 +6,23 @@
 enum PowerUpType
 {
 	FASTERBALL = 0,
-	SLOWERBALL
+	SLOWERBALL,
+	BIGGERPAD,
+	SMALLERPAD
 };
 
 class PowerUp : public Object
 {
-private:
+protected:
 	vec3			m_speed;
 	PowerUpType		m_type;
 public:
 	PowerUp(vec3* p_pPos, vec3* p_pColor, std::string p_objectName);
 	~PowerUp();
 
-	void	update(float p_dt);
+	void	update(float p_dt, mat4 p_translate);
 	void	updatePosition(float p_dt);
 	int		getType();
+	bool	collide(BoundingVolume* p_pVolume);
 };
 
