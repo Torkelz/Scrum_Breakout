@@ -48,7 +48,7 @@ void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 	float sizeZ = 150.f;
 	vec3 borderSize = vec3((m_size.x/2) ,(m_size.y/2), sizeZ/2);
 	mat4 trans;
-	borderSize = vec3(m_rotMatrixOriginal * vec4(borderSize,0.f));
+	//borderSize = vec3(m_rotMatrixOriginal * vec4(borderSize,0.f));
 
 	vec3 center = m_positionOriginal - m_planeVectorX * abs(dot(m_planeVectorX, borderSize));
 	center		+= m_planeVectorY * abs(dot(m_planeVectorY, borderSize));

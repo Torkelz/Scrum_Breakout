@@ -15,7 +15,7 @@ void Game::init()
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
 
-	m_activePlayField = 0;
+	m_activePlayField = 1;
 	m_originWorld = vec3(0.f,0.f,0.f);
 
 
