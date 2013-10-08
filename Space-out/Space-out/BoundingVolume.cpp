@@ -31,7 +31,7 @@ int	BoundingVolume::getType()
 	return m_type;
 }
 
-void BoundingVolume::updatePosition( mat4 p_scale, mat4 p_translate )
+void BoundingVolume::updatePosition( mat4 p_scale, mat4 p_rotation,mat4 p_translate )
 {
 	m_prevPosition = m_position;
 

@@ -52,7 +52,20 @@ inline XMMATRIX mat4ToXMMatrix(mat4 p)
 
 	return r;
 };
+inline mat4 XMMatrixTomat4(XMMATRIX* p)
+{
+	mat4 r;
 
+	for (int i = 0; i < 4; i++)
+	{
+		r[i].x = p->r[i].m128_f32[0];
+		r[i].y = p->r[i].m128_f32[1];
+		r[i].z = p->r[i].m128_f32[2];
+		r[i].w = p->r[i].m128_f32[3];
+	}
+
+	return r;
+};
 class Direct3D : public D3DApp
 {
 public:

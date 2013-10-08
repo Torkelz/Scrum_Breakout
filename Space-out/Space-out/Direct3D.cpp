@@ -2,6 +2,7 @@
 #include "Object.h"
 #include "ABlock.h"
 #include "Ball.h"
+#include "Pad.h"
 
 int WINAPI WinMain(HINSTANCE p_hInstance, HINSTANCE p_prevInstance,
 				   PSTR p_cmdLine, int p_showCmd)
@@ -49,7 +50,7 @@ void Direct3D::initApp()
 
 
 	//Set up world view proj
-	m_camPosition = XMVectorSet( 0.0f, 0.0f, 250.f, 0.0f );
+	m_camPosition = XMVectorSet( -250.0f, 0.0f, 0.f, 0.0f );
 	m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
 	m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
@@ -59,6 +60,12 @@ void Direct3D::initApp()
 	
 	m_world = XMMatrixIdentity();
 	
+	RECT r;
+	GetClientRect(m_hMainWnd, &r);
+	vec2 playFieldScreen;
+	playFieldScreen.x = (m_game.getActiveField()->getScreenPosition(XMMatrixTomat4(&(m_camView*m_camProjection))).x + 1)/2 * r.right;
+	((Pad*)(m_game.getPad()))->setMouseOffset(m_game.getActiveField()->getSize().x / r.right);
+
 	// PAD ###
 	UINT32 const nrVertices = 4;
 	Vertex data[nrVertices];
@@ -167,7 +174,7 @@ void Direct3D::initApp()
 	m_ballShader.compileAndCreateShaderFromFile(L"Ball.fx", "GShader", "gs_5_0", GEOMETRY_SHADER, NULL);
 	m_ballShader.compileAndCreateShaderFromFile(L"Ball.fx", "PShader", "ps_5_0", PIXEL_SHADER, NULL);		
 
-	bufferDesc.initData = m_game.getBall()->getPos();
+	bufferDesc.initData = &vec3(0,0,0);
 	bufferDesc.numElements = 1;
 	
 	//char* debugName;
@@ -208,14 +215,27 @@ void Direct3D::initApp()
 	// BALLZZZ FROM THE WALL
 
 	// Bounding Volume DEBUGGING DRAW
-	//BoundingVolume* t_v;
-	//t_v = m_game.getPad()->getBoundingVolume();
-	//((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	BoundingVolume* t_v;
+	t_v = m_game.getPad()->getBoundingVolume();
+	((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
 
-	//
-	//t_v = m_game.getBall()->getBoundingVolume();
-	//((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	for(int i = 0; i < 4; i++)
+	{
+		t_v = m_game.getActiveField()->getCollisionBorder(i);
+		((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	}
+	
+	t_v = m_game.getBall()->getBoundingVolume();
+	((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
 	// END DEBUGGING DRAW
+
+
+	//DEBUG
+	for (int i = 0; i  < 4; i ++)
+	{
+		m_game.getField(i)->transBorders(i % 2);
+	}
+	//m_game.getActiveField()->transBorders(m_game.getActiveFieldNr() % 2);
 
 	// HID-STUFF
 
@@ -256,6 +276,9 @@ void Direct3D::updateScene(float p_dt)
 		m_game.getField(active)->setUpdateBuffer(false);
 	}
 
+	float x,y;
+	x = ((Pad*)(m_game.getPad()))->getMousePos().x;
+	y = ((Pad*)(m_game.getPad()))->getMousePos().y;
 
 	std::wostringstream outs;   
 	outs.precision(6);
@@ -264,11 +287,14 @@ void Direct3D::updateScene(float p_dt)
 		<< m_game.getPad()->getBoundingVolume()->getPosition()->y << L","
 		<< m_game.getPad()->getBoundingVolume()->getPosition()->z << L","
 		
+		<< L"    MP:" << L" " << x << L"," << y  << L","
+
 		<< L"    BALL:"
 		<< L" " << m_game.getBall()->getBoundingVolume()->getPosition()->x << L"," 
 		<< m_game.getBall()->getBoundingVolume()->getPosition()->y << L","
 		<< m_game.getBall()->getBoundingVolume()->getPosition()->z << L",";
 
+		
 
 	SetWindowTextW(m_hMainWnd,outs.str().c_str());
 
@@ -280,32 +306,37 @@ void Direct3D::drawScene()
 	D3DApp::drawScene();
 	cBlockBuffer cBlockBufferStruct;
 
+	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
+
 
 	// Bounding Volume DEBUGGING DRAW
-	//BoundingVolume* t_v;
-	//t_v = m_game.getBall()->getBoundingVolume();
-	//Sphere t_sphere = *((Sphere*)t_v);
-	//t_sphere.draw(m_world, m_camView, m_camProjection);
+	BoundingVolume* t_v;
+	t_v = m_game.getBall()->getBoundingVolume();
+	Sphere t_sphere = *((Sphere*)t_v);
+	t_sphere.draw(m_world, m_camView, m_camProjection);
 
-	//t_v = m_game.getPad()->getBoundingVolume();
-	//AABB t_bb = *((AABB*)t_v);
-	//t_bb.draw(m_world, m_camView, m_camProjection);
+	t_v = m_game.getPad()->getBoundingVolume();
+	AABB t_bb = *((AABB*)t_v);
+	t_bb.draw(m_world, m_camView, m_camProjection);
 	// END DEBUGGING DRAW
 
+	for(int i = 0; i < 4; i++)
+	{
+		t_v = m_game.getActiveField()->getCollisionBorder(i);
+		AABB t_bb = *((AABB*)t_v);
+		t_bb.draw(m_world, m_camView, m_camProjection);
+	}
+
 	XMMATRIX translatePadMatrix;
+
+	vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
+	translatePadMatrix = XMMatrixTranslation(padPos.x, padPos.y, padPos.z);
 	
-	vec3* t_pos = m_game.getPad()->getPos();
-
-	//Try to get the pad closer to the actual mouse.
-	float tempX = (t_pos->x + m_ScreenViewport.Width * 0.5f);
-	float tempY = -35.0f;
-	float tempZ = 50.0f;
-
-	translatePadMatrix = XMMatrixTranslation(tempX * 0.125f, tempY, tempZ);
 	//translatePadMatrix = XMMatrixTranslation(tempX * 0.125f, t_pos->y, tempZ);
 	//translatePadMatrix = XMMatrixIdentity();
 	m_world = XMMatrixIdentity();
-	m_WVP = m_world*translatePadMatrix * m_camView * m_camProjection;
+	
+	m_WVP = m_world * playFieldRotation * translatePadMatrix * m_camView * m_camProjection;
 
 	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
 	m_cBuffer.apply(0);
@@ -321,11 +352,11 @@ void Direct3D::drawScene()
 	// end shit
 
 	// Ball draw shit
-	vec3* t_ballPos = m_game.getBall()->getPos();
+	vec3 t_ballPos = ((Ball*)m_game.getBall())->getRealPosition();
 
 	m_cbBall.eyePosW = m_camPosition;
 	m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
-	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos->x, t_ballPos->y - 30.0f, 50.0f));
+	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos.x, t_ballPos.y, t_ballPos.z));
 	//m_cbBall.translation = XMMatrixIdentity();
 	m_cbBall.size = XMFLOAT2(5.0f, 5.0f);
 	m_constantBallBuffer.apply(0);

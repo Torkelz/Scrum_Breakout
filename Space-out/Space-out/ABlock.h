@@ -4,6 +4,7 @@
 #include "Object.h"
 #include "AABB.h"
 #include <DirectXMath.h>
+#include <gtc\matrix_transform.hpp>
 
 using namespace DirectX;
 
@@ -21,7 +22,7 @@ struct cBlockBuffer
 	float sizeZ;
 };
 
-const vec3 g_bvSize(3.0f, 3.0f, 1.0f);
+const vec3 g_bvSize(3.2f, 3.7f, 1.0f);
 
 class ABlock : public Object
 {

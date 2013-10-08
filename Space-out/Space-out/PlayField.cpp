@@ -24,14 +24,17 @@ PlayField::PlayField(vec3 p_positionOriginal, float p_angle, vec2 p_size)
 	//Rotate the direction of the plane
 	vec4 tempX	= vec4(m_planeVectorX,0.f);
 	vec4 tempY	= vec4(m_planeVectorY,0.f);
-	tempX		= m_rotMatrixOriginal * tempX;
-	tempY		= m_rotMatrixOriginal * tempY;
+	mat4 rot = rotate(mat4(1.0f), m_angle, vec3(0,1,0));
+	tempX		= rot * tempX;
+	tempY		= rot * tempY;
 	
 	m_planeVectorX = vec3(RoundDoneRight(tempX.x),RoundDoneRight(tempX.y),RoundDoneRight(tempX.z));
 	m_planeVectorY = vec3(RoundDoneRight(tempY.x),RoundDoneRight(tempY.y),RoundDoneRight(tempY.z));
 
 	m_size			= p_size;
 	m_updateBuffer	= false;
+
+	m_borderOffset = vec3(20,20,20);
 }
 
 PlayField::~PlayField()
@@ -39,51 +42,58 @@ PlayField::~PlayField()
 
 }
 
-void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
+void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks, bool p_x)
 {
 	m_blockList		= p_blockList;
-	vec3 orto;		// planevecX * planeVecY pekar mot mot center
-	orto			= cross( m_planeVectorX, m_planeVectorY );
-	float offsetX	= 0.f, offsetY = 150.f, offsetZ = -1.f, sizeX = 150.f, sizeZ = 150.f;
-	mat4 trans;
+	//vec3 orto;		// planevecX * planeVecY pekar mot mot center
+	//orto			= cross( m_planeVectorX, m_planeVectorY );
+	//float sizeZ = 150.f;
+	m_borderSize = vec3((m_size.x/2) ,(m_size.y/2), m_size.x/2 );
+	vec3 tBorders = m_borderSize;
+	//m_borderSize += m_borderOffset;
+	////vec3 borderSize = vec3(20 ,20,20);
+	//mat4 trans;
+	////borderSize = vec3(m_rotMatrixOriginal * vec4(borderSize,0.f));
 
+	//vec3 center = m_positionOriginal - m_planeVectorX * abs(dot(m_planeVectorX, borderSize));
+	//center		+= m_planeVectorY * abs(dot(m_planeVectorY, borderSize));
+	tBorders.y += m_borderOffset.y;
 	//Left AABB
-	vec3 top	= m_positionOriginal - (m_planeVectorX * (offsetX + sizeX)) -(m_planeVectorY * offsetY) + (orto * ((offsetZ + sizeZ)/2));
-	vec3 bottom	= m_positionOriginal - (m_planeVectorX * offsetX) +(m_planeVectorY * (offsetY + m_size.y)) - (orto * ((offsetZ + sizeZ)/2));
-	
-	m_borders.push_back(new AABB(top,bottom,vec4(1.0f, 1.0f, 1.0f, 1.0f)));
-	
+	m_borders.push_back(new AABB(tBorders,-tBorders,vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	/*trans = translate(mat4(1.0f), vec3(50,0,0));
+	m_borders.back()->updatePosition(mat4(1.0f),trans);
+	((AABB*)m_borders.back())->calculateAngle(p_x);
+	*/
 	//Right AABB
-	trans			= translate(mat4(1.0f),vec3(-(m_size.x + sizeX),0.f,0.f));
-	vec4 temptop	= vec4(top, 1.0f);
-	vec4 tempbottom = vec4(bottom, 1.0f);
-	temptop			= trans * temptop;
-	tempbottom		= trans * tempbottom;
-	top				= vec3(temptop);
-	bottom			= vec3(tempbottom);
+	/*center += m_planeVectorX * (m_size.x + (abs(dot(m_planeVectorX, borderSize))*2));*/
+	m_borders.push_back(new AABB(tBorders,-tBorders, vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	/*trans = translate(mat4(1.0f), center);
+	m_borders.back()->updatePosition(mat4(1.0f),trans);
+	((AABB*)m_borders.back())->calculateAngle(p_x);*/
+	tBorders.y -= m_borderOffset.y;
+	//Top AABB	
+	/*center = m_positionOriginal + m_planeVectorX * abs(dot(m_planeVectorX, borderSize));
+	center		+= -m_planeVectorY * abs(dot(m_planeVectorY, borderSize));
+*/
+	tBorders.x += m_borderOffset.x;
+	tBorders.z += m_borderOffset.z;
+	m_borders.push_back(new AABB (tBorders,-tBorders,	vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	/*trans = translate(mat4(1.0f), center);
+	m_borders.back()->updatePosition(mat4(1.0f),trans);
+	((AABB*)m_borders.back())->calculateAngle(p_x);*/
 
-	m_borders.push_back(new AABB(top, bottom, vec4(1.0f, 1.0f, 1.0f, 1.0f)));
-
-	//Top AABB
-	top		= m_positionOriginal - (m_planeVectorX * (offsetY)) -(m_planeVectorY * (offsetX + sizeX)) + (orto * ((offsetZ + sizeZ)/2));
-	bottom	= m_positionOriginal + (m_planeVectorX * (m_size.x + offsetY)) -(m_planeVectorY) - (orto * ((offsetZ + sizeZ)/2));
-
-	m_borders.push_back(new AABB ( top,	bottom,	vec4(1.0f, 1.0f, 1.0f, 1.0f)));
-	
 	//Bottom AABB
-	trans		= translate(mat4(1.0f),vec3(0.f,-(m_size.y+sizeZ),0.f));
-	temptop		= vec4(top, 1.0f);
-	tempbottom	= vec4(bottom, 1.0f);
-	temptop		= trans * temptop;
-	tempbottom	= trans * tempbottom;
-	top			= vec3(temptop);
-	bottom		= vec3(tempbottom);
-
-	m_borders.push_back(new AABB ( top, bottom,	vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	/*center += m_planeVectorY * (m_size.y + (abs(dot(m_planeVectorY, borderSize))*2));*/
+	m_borders.push_back(new AABB(tBorders,-tBorders, vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+	tBorders.x -= m_borderOffset.x;
+	tBorders.z -= m_borderOffset.z;
+	/*trans = translate(mat4(1.0f), center);
+	m_borders.back()->updatePosition(mat4(1.0f),trans);
+	((AABB*)m_borders.back())->calculateAngle(p_x);*/
 	
 	//Block Placement STUFF!
 	unsigned int l = m_blockList.size();
-	for(int i = 0; i < l; i++)
+	for(unsigned int i = 0; i < l; i++)
 	{
 		vec2 temp = m_blockList.at(i)->getBlockID();
 		vec3 pos = m_positionOriginal;
@@ -93,7 +103,42 @@ void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks)
 		pos += dirX * 0.5f + dirX * temp.x;
 		pos += dirY * 0.5f + dirY * temp.y;  
 		m_blockList.at(i)->setPos(pos, &m_rotMatrixOriginal);
+		((AABB*)m_blockList.at(i)->getBoundingVolume())->calculateAngle(p_x, false);
 	}
+}
+
+void PlayField::transBorders(bool p_x)
+{
+	vec3 orto;		// planevecX * planeVecY pekar mot mot center
+	orto			= cross( m_planeVectorX, m_planeVectorY );
+	//vec3 borderSize = vec3(20 ,20,20);
+	mat4 trans;
+	//borderSize = vec3(m_rotMatrixOriginal * vec4(borderSize,0.f));
+
+	vec3 center = m_positionOriginal - m_planeVectorX * abs(dot(m_planeVectorX, m_borderSize));
+	center		+= m_planeVectorY * abs(dot(m_planeVectorY, m_borderSize));
+	//Left
+	((AABB*)m_borders.at(0))->calculateAngle(p_x, true);
+	trans = translate(mat4(1.0f), center);
+	m_borders[0]->updatePosition(mat4(1.0f),mat4(1.0f),trans);
+	
+	center += m_planeVectorX * (m_size.x + (abs(dot(m_planeVectorX, m_borderSize))*2));
+	trans = translate(mat4(1.0f), center);
+	//Right
+	((AABB*)m_borders.at(1))->calculateAngle(p_x, true);
+	m_borders[1]->updatePosition(mat4(1.0f),mat4(1.0f),trans);
+
+	center = m_positionOriginal + m_planeVectorX * abs(dot(m_planeVectorX, m_borderSize));
+	center		+= -m_planeVectorY * abs(dot(m_planeVectorY, m_borderSize));
+	//Top
+	((AABB*)m_borders.at(2))->calculateAngle(p_x, true);
+	trans = translate(mat4(1.0f), center);
+	m_borders[2]->updatePosition(mat4(1.0f),mat4(1.0f),trans);
+	//Bottom
+	((AABB*)m_borders.at(3))->calculateAngle(p_x, true);
+	center += m_planeVectorY * (m_size.y + (abs(dot(m_planeVectorY, m_borderSize))*2));
+	trans = translate(mat4(1.0f), center);
+	m_borders[3]->updatePosition(mat4(1.0f),mat4(1.0f),trans);
 }
 
 void PlayField::update()
@@ -106,7 +151,7 @@ BlockVertex* PlayField::getBufferData()
   BlockVertex* temp = NULL;
   unsigned int size = m_blockList.size();
   temp				= new BlockVertex[size];
-  for(int i = 0; i < size; i++)
+  for(unsigned int i = 0; i < size; i++)
   {
 	  temp[i] = m_blockList.at(i)->getBlockVertex();
   }
@@ -117,8 +162,6 @@ int PlayField::getListSize()
 {
 	return m_blockList.size();
 }
-
-
 
 
 mat4 PlayField::getRotationMatrix()
@@ -157,4 +200,31 @@ BoundingVolume* PlayField::getCollisionBorder(unsigned int p_id)
 unsigned int PlayField::getNrBorders()
 {
 	return m_borders.size();
+}
+
+vec3 PlayField::getOriginalPosition()
+{
+	return m_positionOriginal;
+}
+
+vec2 PlayField::getScreenPosition(mat4 viewproj)
+{
+	vec4 rr = viewproj * vec4(m_positionOriginal,1.f);
+	rr /= rr.w;
+
+	return vec2(rr);
+}
+
+vec3 PlayField::getRightDir()
+{
+	return m_planeVectorX;
+}
+vec3 PlayField::getDownDir()
+{
+	return m_planeVectorY;
+}
+
+vec2 PlayField::getSize()
+{
+	return m_size;
 }

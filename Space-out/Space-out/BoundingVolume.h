@@ -14,7 +14,7 @@ public:
 	int				getIndex();
 	bool			compair( BoundingVolume* p_volume );
 
-	virtual void	updatePosition( mat4 p_scale, mat4 p_translation );
+	virtual void	updatePosition( mat4 p_scale, mat4 p_rotation,mat4 p_translation );
 	virtual void	updatePosition( vec3 p_position );
 	vec3*			getPosition();
 	vec3*			getPrevPosition();

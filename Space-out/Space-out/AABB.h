@@ -20,12 +20,13 @@ public:
 	static enum { OUTSIDE = 0, INTERSECT, INSIDE };
 	static enum { TOP = 0, BOTTOM, LEFT, RIGHT, CORNER };
 
+	// ## MUST BE BUILT IN MODEL SPACE! ##
 	AABB( vec3 p_top, vec3 p_bot, vec4 p_color );
 	~AABB();
 
 	void				calculateBounds();
 	void				buildCubeIndices( int offset );
-	void				updatePosition( mat4 p_scale, mat4 p_translate );
+	void				updatePosition( mat4 p_scale,mat4 p_rotation,mat4 p_translate );
 	void				initialize();
 	vec3*				getMax();
 	vec3*				getMin();
@@ -34,7 +35,10 @@ public:
 	bool				collide( BoundingVolume* p_pVolume );
 	vec3				findNewDirection(vec3 p_sphereCenter, vec3 p_speed);
 	int					findPlane(vec3 p_sphereCenter);
+	// ## NOT FOR BORDERS, EVER ##
 	void				calculateAngle();
+	// ## FOR BORDERS AND BLOCKS, MAYBE POWERUPS ##
+	void				calculateAngle( bool p_x, bool p_border);
 	//void				calculateCornerVectors();
 
 	//DEBUGGING

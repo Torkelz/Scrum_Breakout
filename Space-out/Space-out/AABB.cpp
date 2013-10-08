@@ -49,18 +49,18 @@ void AABB::calculateBounds()
 	m_sphere.updatePosition(m_position);
 }
 
-void AABB::updatePosition(mat4 p_scale, mat4 p_translate)
+void AABB::updatePosition(mat4 p_scale, mat4 p_rotation,mat4 p_translate)
 {
 	mat4 scalate;
-	scalate = p_scale * p_translate;
+	scalate =  p_scale * p_translate * p_rotation;
 
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	m_translate.r[i].m128_f32[0] = scalate[i].x;
-	//	m_translate.r[i].m128_f32[1] = scalate[i].y;
-	//	m_translate.r[i].m128_f32[2] = scalate[i].z;
-	//	m_translate.r[i].m128_f32[3] = scalate[i].w;
-	//}
+	for (int i = 0; i < 4; i++)
+	{
+		m_translate.r[i].m128_f32[0] = scalate[i].x;
+		m_translate.r[i].m128_f32[1] = scalate[i].y;
+		m_translate.r[i].m128_f32[2] = scalate[i].z;
+		m_translate.r[i].m128_f32[3] = scalate[i].w;
+	}
 
 	scalate = transpose(scalate);
 	
@@ -223,9 +223,17 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 		case CORNER:
 			t_centerVector = p_sphereCenter - m_position;
 			t_centerVector = normalize(t_centerVector);
+			t_centerVector.y = -t_centerVector.y;
 			speed = length(p_speed);
 			p_speed = normalize(p_speed);
 			direction = normalize( t_centerVector + p_speed );
+			if (direction.x < abs(direction.z))
+			{
+				direction.x = -direction.z;
+				direction.z = 0.0f;
+			}
+			//direction *= -1.f;
+			direction = normalize(direction);
 			returnVector = speed * direction;
 			speed = length(returnVector);
 			//returnVector = -p_speed;
@@ -251,19 +259,20 @@ int AABB::findPlane(vec3 p_sphereCenter)
 	
 	if(angle >= cornerAngles[7] || angle <= cornerAngles[0]) // More than 320 or less than 40 degrees. 0,0174532925
 		return TOP;
-	if(angle >= cornerAngles[1] && angle <= cornerAngles[2]) // More than 50 and less than 130 degrees.
+	else if(angle >= cornerAngles[1] && angle <= cornerAngles[2]) // More than 50 and less than 130 degrees.
 		return RIGHT;
-	if(angle >= cornerAngles[3] && angle <= cornerAngles[4]) // More than 140 and less than 220 degrees.
+	else if(angle >= cornerAngles[3] && angle <= cornerAngles[4]) // More than 140 and less than 220 degrees.
 		return BOTTOM;
-	if(angle >= cornerAngles[5] && angle <= cornerAngles[6]) // More than 230 and less than 310
+	else if(angle >= cornerAngles[5] && angle <= cornerAngles[6]) // More than 230 and less than 310
 		return LEFT;
-	if(	angle > cornerAngles[0] && angle < cornerAngles[1] ||
+	else if(	angle > cornerAngles[0] && angle < cornerAngles[1] ||
 		angle > cornerAngles[2] && angle < cornerAngles[3] ||
 		angle > cornerAngles[4] && angle < cornerAngles[5] ||
 		angle > cornerAngles[6] && angle < cornerAngles[7] )
 		return CORNER;
-
-	return -1;
+	
+	else
+		return -1;
 }
 
 void AABB::calculateAngle()
@@ -273,7 +282,35 @@ void AABB::calculateAngle()
 	m_w = (3.14159265358f * 0.5f) - m_v;
 	m_v2 = m_v * 2;
 	m_w2 = m_w * 2;
-	float temp = 0.08727f*2.f; //10.0f degrees
+	float temp = 0.08727f*3.f; //10.0f degrees
+
+	cornerAngles[0] = m_v - temp;
+	cornerAngles[1] = m_v + temp;
+	cornerAngles[2] = m_v + m_w2 - temp;
+	cornerAngles[3] = m_v + m_w2 + temp;
+	cornerAngles[4] = m_v + m_v2 + m_w2 - temp;
+	cornerAngles[5] = m_v + m_v2 + m_w2 + temp;
+	cornerAngles[6] = m_v + m_v2 + (m_w2 * 2) - temp;
+	cornerAngles[7] = m_v + m_v2 + (m_w2 * 2) + temp;
+}
+
+void AABB::calculateAngle(bool p_x, bool p_border)
+{
+	// For some reason abs works. Remove if it bugs. :)
+	if( !p_x )
+	m_v = abs(atan(m_bounds[0].x / m_bounds[0].y ));
+	else
+		m_v = abs(atan(m_bounds[0].z / m_bounds[0].y ));
+
+	m_w = (3.14159265358f * 0.5f) - m_v;
+	m_v2 = m_v * 2;
+	m_w2 = m_w * 2;
+	
+	float temp;
+	if (!p_border)
+		temp = 0.08727f*3.f; //10.0f degrees
+	else
+		temp = 0.0f;
 
 	cornerAngles[0] = m_v - temp;
 	cornerAngles[1] = m_v + temp;
