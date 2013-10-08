@@ -15,7 +15,7 @@ PowerUp::~PowerUp(){}
 void PowerUp::update(float p_dt, mat4 p_translate)
 {
 	updatePosition(p_dt);
-	m_boundingVolume->updatePosition(mat4(1.0f),p_translate);
+	m_boundingVolume->updatePosition(mat4(1.0f),mat4(1.0f),p_translate);
 }
 
 void PowerUp::updatePosition(float p_dt)

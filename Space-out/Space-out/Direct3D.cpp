@@ -443,14 +443,13 @@ void Direct3D::drawScene()
 		{
 			PowerUp* pu;
 			pu = m_powerUps.at(i);
-			translatePadMatrix = XMMatrixTranslation(pu->getPos()->x, pu->getPos()->y, tempZ); // Translate powerup
+			translatePadMatrix = XMMatrixTranslation(pu->getPos()->x, pu->getPos()->y, padPos.z); // Translate powerup
 			m_WVP = m_world * translatePadMatrix * m_camView * m_camProjection;
 			m_cbPad.WVP = XMMatrixTranspose(m_WVP);
 			m_cBuffer.apply(0);
 			m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
 			m_powerShader.setResource(PIXEL_SHADER, 0, 1, m_powerTextures[pu->getType()].getResourceView());
 			m_powerBuffer.apply();
-	//m_blockBuffers[2].apply(0);
 			m_pDeviceContext->Draw(4, 0);
 		}
 	//

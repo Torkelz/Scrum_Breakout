@@ -64,8 +64,6 @@ void Game::update(float p_screenWidth, float p_dt)
 	
 	((Pad*)m_pPad)->update(padTranslation, pf->getRotationMatrix());
 
-	pf = NULL;
-
 	if(!((Ball*)m_pBall)->getStuck())
 	{
 		((Ball*)m_pBall)->update(p_dt);
@@ -91,6 +89,8 @@ void Game::update(float p_screenWidth, float p_dt)
 			((Pad*)m_pPad)->setSavedVector( *m_pBall->getPos() - *m_pPad->getBoundingVolume()->getPosition() );
 		}
 	}
+
+	pf = NULL;
 
 	// ## BLOCKS ##
 	for(int i = 0; i < m_playFields[m_activePlayField]->getListSize();i++)
