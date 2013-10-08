@@ -18,12 +18,12 @@ void Game::init()
 	m_activePlayField = 3;
 	m_originWorld = vec3(0.f,0.f,0.f);
 
-
 	vec2 size = m_loadLevel.getFieldSize();
 	size *= 0.5f;
 	vec3 startPosition(m_originWorld.x+size.x, m_originWorld.y + size.y, m_originWorld.z + size.x);
 	size *= 2;
 	float angle = 0;
+
 	//Create Fields
 	for(UINT i = 0; i < m_nrPlayFields; i++, angle += 90)
 	{
@@ -46,19 +46,12 @@ void Game::init()
 void Game::update(float p_screenWidth, float p_dt)
 {
 	vec3 padPos = *m_pPad->getPos();
-	/*vec3 t_pos = *m_pPad->getPos();
-	t_pos.x += (p_screenWidth * 0.5f);
-	t_pos.x *= 0.125f;
-	t_pos.y = -35.0f;
-	t_pos.z = 50.0f;*/
 	PlayField* pf = m_playFields[m_activePlayField];
 	vec3 t_pos = pf->getOriginalPosition();
 	t_pos -= pf->getRightDir() * padPos.x;
 	t_pos += pf->getDownDir() * padPos.y;
-	
 
 	mat4 padTranslation = translate(mat4(1.0f), t_pos);
-
 	
 	((Pad*)m_pPad)->update(padTranslation, pf->getRotationMatrix());
 	((Ball*)m_pBall)->update(p_dt);
@@ -82,7 +75,6 @@ void Game::update(float p_screenWidth, float p_dt)
 		{
 			vec3 s = ((Ball*)m_pBall)->getSpeed();
 			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), s);
-			//tempSpeed.y = -tempSpeed.y;
 			((Ball*)m_pBall)->setSpeed( tempSpeed );
 
 			m_playFields[m_activePlayField]->deleteBlock(i);
@@ -158,12 +150,9 @@ void Game::keyEvent(unsigned short key)
 	//if(key == 0x52) // R
 	//{
 	//}
-	//else if( key == 0x46) // F
+	//if( key == 0x46) // F
 	//{
 	//}
-	//else{}
-
-	//DEBUG REMOVE
 	if(key == 0x4C) // L
 	{
 	}

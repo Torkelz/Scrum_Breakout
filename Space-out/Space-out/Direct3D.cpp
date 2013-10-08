@@ -55,7 +55,6 @@ void Direct3D::initApp()
 	m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
 	m_camView = XMMatrixLookAtLH( m_camPosition, m_camTarget, m_camUp );
-	//m_camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
 	m_camProjection = XMMatrixPerspectiveFovLH( PI*0.25f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
 	
 	m_world = XMMatrixIdentity();
@@ -66,7 +65,7 @@ void Direct3D::initApp()
 	playFieldScreen.x = (m_game.getActiveField()->getScreenPosition(XMMatrixTomat4(&(m_camView*m_camProjection))).x + 1)/2 * r.right;
 	((Pad*)(m_game.getPad()))->setMouseOffset(m_game.getActiveField()->getSize().x / r.right);
 
-	// PAD ###
+	// ## PAD ##
 	UINT32 const nrVertices = 4;
 	Vertex data[nrVertices];
 	std::vector<Vertex>* t_data;
@@ -100,12 +99,25 @@ void Direct3D::initApp()
 	m_shader.init(m_pDevice, m_pDeviceContext, 2);
 	m_shader.compileAndCreateShaderFromFile(L"VertexShader.fx", "main","vs_5_0", VERTEX_SHADER , desc);
 	m_shader.compileAndCreateShaderFromFile(L"PixelShader.fx", "main", "ps_5_0", PIXEL_SHADER, NULL);
+	
+	m_WVP	= m_world * m_camView * m_camProjection;
+	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
+	BufferInitDesc cbbd;	
 
+	cbbd.elementSize = sizeof(CBPad);
+	cbbd.initData = NULL;
+	cbbd.numElements = 1;
+	cbbd.type = CONSTANT_BUFFER_VS;
+	cbbd.usage = BUFFER_DEFAULT;
+	
+	m_cBuffer.init(m_pDevice, m_pDeviceContext, cbbd);
 
-	//TEST BLOCK START
+	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+	m_cBuffer.apply(0);
 
+	//## PAD END ##
+	//## BLOCK START ##
 
-	//TEST BLOCK START
 	for(int i = 0; i < 4; i++)
 	{
 		BufferInitDesc blockBufferDesc;
@@ -142,29 +154,8 @@ void Direct3D::initApp()
 	m_blockTexture = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_blockTexture.createTexture(m_game.getActiveField()->getBlock(0)->getTexturePath(),  0);
 
-	//TEST BLOCK END
-	
-	m_WVP	= m_world * m_camView * m_camProjection;
-	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
-	//m_cbPad.WVP = m_WVP;
-	BufferInitDesc cbbd;	
-
-	cbbd.elementSize = sizeof(CBPad);
-	cbbd.initData = NULL;
-	cbbd.numElements = 1;
-	cbbd.type = CONSTANT_BUFFER_VS;
-	cbbd.usage = BUFFER_DEFAULT;
-	
-	m_cBuffer.init(m_pDevice, m_pDeviceContext, cbbd);
-
-	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
-	m_cBuffer.apply(0);
-
-
-
-	// PAD END ###
-
-	// BALLZZZ TO THE WALL
+	//## BLOCK END ##
+	//## BALL START ##
 	m_ballBuffer =  Buffer();
 	m_constantBallBuffer = Buffer();
 	m_ballShader = Shader();
@@ -176,8 +167,7 @@ void Direct3D::initApp()
 
 	bufferDesc.initData = &vec3(0,0,0);
 	bufferDesc.numElements = 1;
-	
-	//char* debugName;
+
 	m_ballBuffer.init(m_pDevice, m_pDeviceContext, bufferDesc);
 	m_ballTexture = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_ballTexture.createTexture(m_game.getBall()->getTexturePath(), 0);
@@ -204,46 +194,38 @@ void Direct3D::initApp()
 	sd.ComparisonFunc		= D3D11_COMPARISON_NEVER;
 	sd.MinLOD				= 0;
 	sd.MaxLOD				= D3D11_FLOAT32_MAX;
-	//sd.MipLODBias			= 0.0f;
-	//sd.MaxAnisotropy		= 1;
-	
 
 	m_pBallSampler = nullptr;
-
 	hr = m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
 
-	// BALLZZZ FROM THE WALL
+	//## BALL END ##
 
-	// Bounding Volume DEBUGGING DRAW
-	BoundingVolume* t_v;
-	t_v = m_game.getPad()->getBoundingVolume();
-	((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	////## Bounding Volume DEBUGGING DRAW ##
+	//BoundingVolume* t_v;
+	//t_v = m_game.getPad()->getBoundingVolume();
+	//((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	//for(int i = 0; i < 4; i++)
+	//{
+	//	t_v = m_game.getActiveField()->getCollisionBorder(i);
+	//	((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	//}
+	//
+	//t_v = m_game.getBall()->getBoundingVolume();
+	//((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	//
+	////## END DEBUGGING DRAW ##
 
-	for(int i = 0; i < 4; i++)
-	{
-		t_v = m_game.getActiveField()->getCollisionBorder(i);
-		((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
-	}
-	
-	t_v = m_game.getBall()->getBoundingVolume();
-	((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
-	// END DEBUGGING DRAW
-
-
-	//DEBUG
+	//## PLAYFIELD FINAL SETUP ##
 	for (int i = 0; i  < 4; i ++)
 	{
 		m_game.getField(i)->transBorders(i % 2);
 	}
-	//m_game.getActiveField()->transBorders(m_game.getActiveFieldNr() % 2);
 
-	// HID-STUFF
-
+	//## HID START ##
 	m_HID = HID( getMainWnd() );
 	// Add subscriber to the HID component. 
 	m_HID.getObservable()->addSubscriber(m_game.getObserver());
-
-	// END HID-STUFF
+	//## HID END ##
 }
 
 void Direct3D::onResize()
@@ -256,22 +238,17 @@ void Direct3D::updateScene(float p_dt)
 	D3DApp::updateScene(p_dt);
 	m_game.update(m_ScreenViewport.Width, p_dt);
 
-
-	//Update Active block buffer
+	//## Update Active block buffer ##
 	unsigned int active = m_game.getActiveFieldNr();
 	if(m_game.getField(active)->getUpdateBuffer())
 	{
 		m_blockBuffers[active].map();
 		D3D11_MAPPED_SUBRESOURCE* ms = m_blockBuffers[active].getMappedResource();
-		//m_blockBuffers[active].getMappedResource()->pData = m_game.getField(active)->getBufferData();
 		int u = sizeof(BlockVertex);
 
 		memcpy(ms->pData, m_game.getField(active)->getBufferData(), u *m_game.getField(active)->getListSize() );
 
 		m_blockBuffers[active].unmap();
-
-		//D3D11_BOX bla; ZeroMemory( &bla, sizeof(D3D11_BOX));
-		//m_pDeviceContext->UpdateSubresource( m_blockBuffers[active].getBufferPointer(), 0,NULL, m_game.getField(active)->getBufferData(), 0, 0 );
 		
 		m_game.getField(active)->setUpdateBuffer(false);
 	}
@@ -307,33 +284,29 @@ void Direct3D::drawScene()
 	cBlockBuffer cBlockBufferStruct;
 
 	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
-
-
-	// Bounding Volume DEBUGGING DRAW
-	BoundingVolume* t_v;
-	t_v = m_game.getBall()->getBoundingVolume();
-	Sphere t_sphere = *((Sphere*)t_v);
-	t_sphere.draw(m_world, m_camView, m_camProjection);
-
-	t_v = m_game.getPad()->getBoundingVolume();
-	AABB t_bb = *((AABB*)t_v);
-	t_bb.draw(m_world, m_camView, m_camProjection);
-	// END DEBUGGING DRAW
-
-	for(int i = 0; i < 4; i++)
-	{
-		t_v = m_game.getActiveField()->getCollisionBorder(i);
-		AABB t_bb = *((AABB*)t_v);
-		t_bb.draw(m_world, m_camView, m_camProjection);
-	}
-
+	
+	//// Bounding Volume DEBUGGING DRAW
+	//BoundingVolume* t_v;
+	//t_v = m_game.getBall()->getBoundingVolume();
+	//Sphere t_sphere = *((Sphere*)t_v);
+	//t_sphere.draw(m_world, m_camView, m_camProjection);
+	//t_v = m_game.getPad()->getBoundingVolume();
+	//AABB t_bb = *((AABB*)t_v);
+	//t_bb.draw(m_world, m_camView, m_camProjection);
+	//for(int i = 0; i < 4; i++)
+	//{
+	//	t_v = m_game.getActiveField()->getCollisionBorder(i);
+	//	AABB t_bb = *((AABB*)t_v);
+	//	t_bb.draw(m_world, m_camView, m_camProjection);
+	//}
+	//// END DEBUGGING DRAW
+	
+	//## PAD DRAW START ##
 	XMMATRIX translatePadMatrix;
 
 	vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
 	translatePadMatrix = XMMatrixTranslation(padPos.x, padPos.y, padPos.z);
-	
-	//translatePadMatrix = XMMatrixTranslation(tempX * 0.125f, t_pos->y, tempZ);
-	//translatePadMatrix = XMMatrixIdentity();
+
 	m_world = XMMatrixIdentity();
 	
 	m_WVP = m_world * playFieldRotation * translatePadMatrix * m_camView * m_camProjection;
@@ -347,17 +320,14 @@ void Direct3D::drawScene()
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	m_buffer.apply(0);
 	m_pDeviceContext->Draw(4, 0);
+	//## PAD DRAW END ##
 
-	
-	// end shit
-
-	// Ball draw shit
+	//## BALL DRAW START ##
 	vec3 t_ballPos = ((Ball*)m_game.getBall())->getRealPosition();
 
 	m_cbBall.eyePosW = m_camPosition;
 	m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
 	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos.x, t_ballPos.y, t_ballPos.z));
-	//m_cbBall.translation = XMMatrixIdentity();
 	m_cbBall.size = XMFLOAT2(5.0f, 5.0f);
 	m_constantBallBuffer.apply(0);
 
@@ -370,11 +340,9 @@ void Direct3D::drawScene()
 	m_ballBuffer.apply(0);
 
 	m_pDeviceContext->Draw(1, 0);
+	//## BALL DRAW END ##
 
-
-	
-	//TEST BLOCK DRAW!
-	
+	//## BLOCK DRAW START ##
 	m_WVP = m_world *m_camView * m_camProjection;
 	cBlockBufferStruct.WVP = XMMatrixTranspose(m_WVP);
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
@@ -387,36 +355,17 @@ void Direct3D::drawScene()
 	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 	m_cBlockBuffer.apply(0);
 	unsigned int active = m_game.getActiveFieldNr();
-	cBlockBufferStruct.rotation = mat4ToXMMatrix(m_game.getField(active)->getRotationMatrix());
-		//cBlockBufferStruct.WVP = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()) * m_WVP);
+
+	for(int i = 0; i < 4; i++)
+	{
+		cBlockBufferStruct.rotation = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()));
 		m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
-		m_blockBuffers[active].apply(0);
-		m_pDeviceContext->Draw(m_game.getField(active)->getListSize(), 0);
+		m_blockBuffers[i].apply(0);
+		m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
+	}
+	//## BLOCK DRAW END ##
 
-	//for(int i = 0; i < 4; i++)
-	//{
-	//	cBlockBufferStruct.rotation = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()));
-	//	//cBlockBufferStruct.WVP = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()) * m_WVP);
-	//	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
-	//	m_blockBuffers[i].apply(0);
-	//	m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
-	//}
-
-	
-	//m_blockBuffers[1].apply(0);
-	//m_pDeviceContext->Draw(m_blockBufferSizeB, 0);
-
-	//cBlockBufferStruct.sizeX = g_bvSize.z;
-	//cBlockBufferStruct.sizeY = g_bvSize.y;
-	//cBlockBufferStruct.sizeZ = g_bvSize.x;
-	//m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
-	//m_cBlockBuffer.apply(0);
-	//m_blockBuffers[2].apply(0);
-	//m_pDeviceContext->Draw(m_blockBufferSizeL, 0);
-	//m_blockBuffers[3].apply(0);
-	//m_pDeviceContext->Draw(m_blockBufferSizeR, 0);
-	//
-	m_pSwapChain->Present(1, 0);
+	m_pSwapChain->Present(0, 0);
 }
 
 LRESULT Direct3D::msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)

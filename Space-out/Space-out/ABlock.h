@@ -42,7 +42,6 @@ protected:
 	int m_hp;
 	vec2 m_blockID;
 	BlockVertex m_vertex;
-
 };
 
 

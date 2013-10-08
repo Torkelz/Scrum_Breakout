@@ -11,7 +11,7 @@ private:
 	vec3 m_realPosition;
 	vec2 m_internPosition;
 public:
-	Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName); // when setting startposition only use x,y not z
+	Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName); // when setting startposition only use x, y not z
 	~Ball();
 
 	void			init(vec3 p_origPos, vec3 p_right, vec3 p_down);
