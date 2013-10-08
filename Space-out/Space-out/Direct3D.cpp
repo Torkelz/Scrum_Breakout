@@ -45,18 +45,26 @@ void Direct3D::initApp()
 
 	m_blockShader		= Shader();
 	m_cBlockBuffer		= Buffer();
+	m_pPUObserver		= new PUObserver(this);
 	m_game = Game();
-	m_game.init();
+	m_game.init(m_pPUObserver);
 
 
 	//Set up world view proj
-	m_camPosition = XMVectorSet( -250.0f, 0.0f, 0.f, 0.0f );
-	m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
-	m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
+	//m_camPosition = XMVectorSet( 0.0f, 0.0f, 250.f, 0.0f );
+	//m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
+	//m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
+	//
+	//m_camView = XMMatrixLookAtLH( m_camPosition, m_camTarget, m_camUp );
+	//m_camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
+	//m_camProjection = XMMatrixPerspectiveFovLH( PI*0.25f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
 
-	m_camView = XMMatrixLookAtLH( m_camPosition, m_camTarget, m_camUp );
-	m_camProjection = XMMatrixPerspectiveFovLH( PI*0.25f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
-	
+	m_camera = new Camera(vec3(0.0f, 0.0f, 250.0f));
+	m_camera->setViewMatrix(vec3(0.0f, 0.0f, 250.0f));
+	m_camera->createProjectionMatrix(PI*0.25f,(float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
+	m_camView = mat4ToXMMatrix(m_camera->getViewMatrix());
+	m_camProjection = mat4ToXMMatrix(m_camera->getProjectionMatrix());
+	m_camPosition = vec3ToXMVector(m_camera->getPosition());
 	m_world = XMMatrixIdentity();
 	
 	RECT r;
@@ -68,7 +76,6 @@ void Direct3D::initApp()
 	// ## PAD ##
 	UINT32 const nrVertices = 4;
 	Vertex data[nrVertices];
-	std::vector<Vertex>* t_data;
 	std::vector<vec3>* t_positions = m_game.getPad()->getVertices();
 
 	for(int i = 0; i < nrVertices; i++)
@@ -188,9 +195,9 @@ void Direct3D::initApp()
 	D3D11_SAMPLER_DESC sd;
 	ZeroMemory(&sd, sizeof(sd));
 	sd.Filter				= D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	sd.AddressU				= D3D11_TEXTURE_ADDRESS_CLAMP;
-	sd.AddressV				= D3D11_TEXTURE_ADDRESS_CLAMP;
-	sd.AddressW				= D3D11_TEXTURE_ADDRESS_CLAMP;
+	sd.AddressU				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressV				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressW				= D3D11_TEXTURE_ADDRESS_WRAP;
 	sd.ComparisonFunc		= D3D11_COMPARISON_NEVER;
 	sd.MinLOD				= 0;
 	sd.MaxLOD				= D3D11_FLOAT32_MAX;
@@ -226,6 +233,62 @@ void Direct3D::initApp()
 	// Add subscriber to the HID component. 
 	m_HID.getObservable()->addSubscriber(m_game.getObserver());
 	//## HID END ##
+
+	//POWER UP START!
+	BufferInitDesc vbDesc;
+	vbDesc.elementSize = sizeof(Vertex);
+	vbDesc.numElements = 4;
+	vbDesc.type = VERTEX_BUFFER;
+	vbDesc.usage = BUFFER_CPU_WRITE;
+
+	Vertex initData[4];
+	initData[0].m_position = vec3(-2.0f, -2.0f, 0.0f);
+	initData[1].m_position = vec3(2.0f, -2.0f, 0.0f);
+	initData[2].m_position = vec3(-2.0f, 2.0f, 0.0f);
+	initData[3].m_position = vec3(2.0f, 2.0f, 0.0f);
+	initData[0].m_textureCoordinates = vec2(1.0f, 1.0f);
+	initData[1].m_textureCoordinates = vec2(0.0f, 1.0f);
+	initData[2].m_textureCoordinates = vec2(1.0f, 0.0f);
+	initData[3].m_textureCoordinates = vec2(0.0f, 0.0f);
+
+	vbDesc.initData = initData;
+
+	m_powerBuffer = Buffer();
+	m_powerBuffer.init(m_pDevice, m_pDeviceContext, vbDesc);
+	
+	m_powerShader = Shader();
+	m_powerShader.init(m_pDevice, m_pDeviceContext, 2);
+	m_powerShader.compileAndCreateShaderFromFile(L"VertexShader.fx", "main", "vs_5_0", VERTEX_SHADER, desc);
+	m_powerShader.compileAndCreateShaderFromFile(L"PixelShader.fx", "main", "ps_5_0", PIXEL_SHADER, NULL);
+
+	m_powerTextures[FASTERBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[FASTERBALL].createTexture(new std::wstring(L"Picatures/fastAndFurious7.png"), 0);
+	m_powerTextures[SLOWERBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[SLOWERBALL].createTexture(new std::wstring(L"Picatures/slow.png"), 0);
+	m_powerTextures[BIGGERPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[BIGGERPAD].createTexture(new std::wstring(L"Picatures/biggerPad.png"), 0);
+	m_powerTextures[SMALLERPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[SMALLERPAD].createTexture(new std::wstring(L"Picatures/smallerPad.png"), 0);
+	m_powerTextures[STICKYPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[STICKYPAD].createTexture(m_game.getBall()->getTexturePath(), 0);
+
+	D3D11_BLEND_DESC bd;
+	bd.AlphaToCoverageEnable = false;
+	bd.IndependentBlendEnable = false;
+	bd.RenderTarget[0].BlendEnable = true;
+	bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	bd.RenderTarget[0].DestBlend =  D3D11_BLEND_INV_SRC_ALPHA;
+	bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+	bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+	bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	m_pDevice->CreateBlendState(&bd, &m_pPowerBlend);
+	m_powerShader.setBlendState(m_pPowerBlend);
+	m_pBallSampler = nullptr;
+
+	hr = m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
+	//POWER UP END!
 }
 
 void Direct3D::onResize()
@@ -237,8 +300,12 @@ void Direct3D::updateScene(float p_dt)
 {
 	D3DApp::updateScene(p_dt);
 	m_game.update(m_ScreenViewport.Width, p_dt);
-
-	//## Update Active block buffer ##
+	m_camView = mat4ToXMMatrix(m_camera->getViewMatrix());
+	m_camProjection = mat4ToXMMatrix(m_camera->getProjectionMatrix());
+	m_camPosition = vec3ToXMVector(m_camera->getPosition());
+	m_camera->updateCameraPos();
+	
+	//Update Active block buffer
 	unsigned int active = m_game.getActiveFieldNr();
 	if(m_game.getField(active)->getUpdateBuffer())
 	{
@@ -309,7 +376,9 @@ void Direct3D::drawScene()
 
 	m_world = XMMatrixIdentity();
 	
-	m_WVP = m_world * playFieldRotation * translatePadMatrix * m_camView * m_camProjection;
+	XMMATRIX t_scaleMatrix = XMMatrixIdentity() * ((Pad*)(m_game.getPad()))->getScale();
+	t_scaleMatrix.r[3].m128_f32[3] = 1.0f;
+	m_WVP = m_world * playFieldRotation * t_scaleMatrix * translatePadMatrix * m_camView * m_camProjection;
 
 	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
 	m_cBuffer.apply(0);
@@ -363,7 +432,30 @@ void Direct3D::drawScene()
 		m_blockBuffers[i].apply(0);
 		m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
 	}
-	//## BLOCK DRAW END ##
+	//POWERUP DRAW
+	if(m_powerUps.size() > 0)
+	{
+		m_powerShader.setShaders();
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		m_powerShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
+	
+		for(unsigned int i = 0; i < m_powerUps.size(); i++)
+		{
+			PowerUp* pu;
+			pu = m_powerUps.at(i);
+			translatePadMatrix = XMMatrixTranslation(pu->getPos()->x, pu->getPos()->y, tempZ); // Translate powerup
+			m_WVP = m_world * translatePadMatrix * m_camView * m_camProjection;
+			m_cbPad.WVP = XMMatrixTranspose(m_WVP);
+			m_cBuffer.apply(0);
+			m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+			m_powerShader.setResource(PIXEL_SHADER, 0, 1, m_powerTextures[pu->getType()].getResourceView());
+			m_powerBuffer.apply();
+	//m_blockBuffers[2].apply(0);
+			m_pDeviceContext->Draw(4, 0);
+		}
+	//
+	}
+	//POWERUP DRAW END
 
 	m_pSwapChain->Present(0, 0);
 }
@@ -373,4 +465,15 @@ LRESULT Direct3D::msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
 	m_HID.update(p_msg, p_lParam);
 
 	return D3DApp::msgProc(p_msg, p_wParam, p_lParam);;
+}
+
+void Direct3D::addPowerUp(PowerUp* p_pPowerUp)
+{
+	m_powerUps.push_back(p_pPowerUp);
+	//Update buffer
+}
+
+void Direct3D::removePowerUp(int i)
+{
+	m_powerUps.erase(m_powerUps.begin() + i);
 }

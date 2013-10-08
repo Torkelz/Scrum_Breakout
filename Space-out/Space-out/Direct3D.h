@@ -14,6 +14,8 @@
 #include "BoundingVolume.h"
 #include "AABB.h"
 #include "D3DTexture.h"
+#include "PUObserver.h"
+#include "Camera.h"
 
 class Object;
 
@@ -66,6 +68,15 @@ inline mat4 XMMatrixTomat4(XMMATRIX* p)
 
 	return r;
 };
+
+inline XMVECTOR vec3ToXMVector(vec3 p)
+{
+	XMVECTOR r;
+	r = XMVectorSet(p.x, p.y, p.z, 0.0f);
+
+	return r;
+};
+
 class Direct3D : public D3DApp
 {
 public:
@@ -77,7 +88,9 @@ public:
 	void updateScene(float p_dt);
 	void drawScene();
 
-	LRESULT msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
+	LRESULT			msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam);
+	void			addPowerUp(PowerUp* p_pPowerUp);
+	void			removePowerUp(int i);
 private:
 	//Camera Variables
 	XMMATRIX		 m_camView;
@@ -102,7 +115,7 @@ private:
 	int				 m_blockBufferSizeL;
 	int				 m_blockBufferSizeR;
 	D3DTexture		 m_blockTexture;
-
+	Camera			 *m_camera;
 
 	Buffer			 m_buffer;
 	Buffer			 m_cBuffer;
@@ -120,6 +133,13 @@ private:
 	//TEST
 	ID3D11Buffer*    mVB;
 
+	//POWERUP
+	PUObserver*		 m_pPUObserver;
+	vector<PowerUp*> m_powerUps;
+	Buffer			 m_powerBuffer;
+	D3DTexture		 m_powerTextures[10];
+	Shader			 m_powerShader;
+	ID3D11BlendState* m_pPowerBlend;
 	// DEBUGGING DRAW
 	
 };

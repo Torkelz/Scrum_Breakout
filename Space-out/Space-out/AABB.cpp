@@ -64,7 +64,9 @@ void AABB::updatePosition(mat4 p_scale, mat4 p_rotation,mat4 p_translate)
 	//}
 	//## DEBUG END ##
 
-	scalate = transpose(scalate);
+	p_scale = transpose(p_scale);
+	p_translate = transpose(p_translate);
+	scalate = p_scale * p_translate;
 	
 	vec4 v = vec4(m_bottom, 1.0f) * scalate;
 	m_bounds[0].x = v.x;

@@ -17,7 +17,7 @@ D3DTexture::~D3DTexture()
 void D3DTexture::release()
 {
 	//ReleaseCOM(m_pResource);
-	ReleaseCOM(m_pResourceView);
+	//ReleaseCOM(m_pResourceView);
 }
 
 ID3D11Texture2D* D3DTexture::getResource()
