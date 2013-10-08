@@ -1,11 +1,11 @@
 #include "Header/LinMouse.h"
 
-LinMouse::LinMouse()
+Mouse::Mouse(GLFWwindow* p_phwnd)
 {
 
 }
 
-LinMouse::~LinMouse()
+Mouse::~Mouse()
 {
 
 }

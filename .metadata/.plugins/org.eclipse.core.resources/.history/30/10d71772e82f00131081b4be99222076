@@ -1,0 +1,33 @@
+#include "Header/LinHid.h"
+
+HID::HID(GLFWwindow* p_pHwnd)
+{
+	m_pHwnd = p_pHwnd;
+
+	m_pMouse	= new Mouse(p_pHwnd);
+	m_pKeyboard = new Keyboard(p_pHwnd);
+}
+
+HID::~HID()
+{
+	//m_mouse.~LinMouse();
+	//m_mouse = NULL;
+	//m_keyboard.~LinKeyboard();
+	//m_keyboard = NULL;
+}
+
+void HID::init()
+{
+	//m_mouse		= LinMouse(m_pHwnd);
+	//m_keyboard 	= LinKeyboard(m_pHwnd);
+}
+
+void HID::update(int p_action)
+{
+	switch(p_action)
+	{
+	case GLFW_PRESS:
+
+		break;
+	}
+}

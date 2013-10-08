@@ -85,6 +85,13 @@ void OpenGL::initApp()
 	m_triShader.uniformBlockBinding(bindingPoint, "ColorBlock");
 	// Bind the bindingPoint to the right buffer.
 	m_uniBuffer.bindBufferBase(bindingPoint);
+
+	m_pGame = new Game();
+	m_pGame->init();
+
+	m_pHID = new HID(m_hMainWnd);
+
+	m_pHID->getObservable()->addSubscriber(m_pGame->getObserver());
 }
 
 void OpenGL::updateScene(float p_dt)
@@ -172,11 +179,17 @@ void OpenGL::drawScene()
 
 }
 
-void OpenGL::messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods)
+void  messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods)
 {
-
+	m_action = p_action;
+	m_key = p_key;
 	if(p_key == GLFW_KEY_ESCAPE && p_action == GLFW_PRESS)
 		{glfwSetWindowShouldClose(p_pMainWnd, GL_TRUE);}
+}
+
+ messageCallback(int p_key, int p_action)
+{
+
 }
 
 void OpenGL::updateFPSCounter()

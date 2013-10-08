@@ -1,11 +1,13 @@
 #ifndef LINMOUSE_H_
 #define LINMOUSE_H_
 
-class LinMouse
+#include "GLUtil.h"
+
+class Mouse
 {
 public:
-	LinMouse();
-	virtual ~LinMouse();
+	Mouse(GLFWwindow* p_pHwnd);
+	~Mouse();
 };
 
 #endif /* LINMOUSE_H_ */

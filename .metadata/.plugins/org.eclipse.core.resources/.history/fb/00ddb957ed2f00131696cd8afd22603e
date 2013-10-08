@@ -1,0 +1,34 @@
+#include "Header/LinKeyboard.h"
+
+Keyboard::Keyboard(GLFWwindow* p_pHwnd)
+{
+	m_pHwnd = p_pHwnd;
+}
+
+Keyboard::~Keyboard()
+{
+	m_pHwnd = NULL;
+}
+
+unsigned short Keyboard::KeyDown(unsigned short p_key)
+{
+	unsigned short ushort =  glfwGetKey(m_pHwnd, p_key);
+
+	switch(ushort)
+	{
+	case GLFW_KEY_W:
+
+		break;
+	case GLFW_KEY_A:
+
+		break;
+	case GLFW_KEY_S:
+
+		break;
+	case GLFW_KEY_D:
+
+		break;
+	}
+
+	return
+}
