@@ -15,6 +15,8 @@ void Game::init(PUObserver* p_pPUObserver)
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
 
+	m_newVolume = 0.5f;
+
 	m_activePlayField = 0;
 	m_originWorld = vec3(0.f,0.f,0.f);
 
@@ -37,10 +39,15 @@ void Game::init(PUObserver* p_pPUObserver)
 
 	m_pPUObservable = new PUObservable();
 	m_pPUObservable->addSubscriber(p_pPUObserver);
+
+	loadSounds();
 }
 
 void Game::update(float p_screenWidth, float p_dt)
 {
+	m_soundManager.update();
+
+
 	if(m_counter > 0.0f)
 	{
 		m_counter -= p_dt;
@@ -90,6 +97,8 @@ void Game::update(float p_screenWidth, float p_dt)
 
 		if(  bv->collide(m_pBall->getBoundingVolume()))
 		{
+			m_soundManager.play(m_pSoundList[COLLISION], 0);
+			//m_soundManager.setVolume(m_newVolume, 0);
 			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 			((Ball*)m_pBall)->setSpeed( tempSpeed );
 			powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
@@ -319,3 +328,16 @@ int Game::random()
 	else 
 		return STICKYPAD;
 }
+
+void Game::loadSounds()
+{
+	m_pSoundList.resize(2);
+	m_soundManager.init();
+
+	 m_pSoundList.at(COLLISION) = m_soundManager.loadSound("Sounds/thunder.wav", false);
+}
+
+
+
+
+

@@ -8,11 +8,21 @@
 #include "PlayField.h"
 #include "PowerUpInclude.h"
 #include "PUObservable.h"
+#include "FSound.h"
 
 using namespace glm;
 
 class Observer;
 class Object;
+
+enum SOUNDS
+{
+	BACKGROUND,
+	COLLISION,
+	POWERUP,
+	POWERDOWN,
+	DEATH
+};
 
 class Game
 {
@@ -35,6 +45,14 @@ public:
 	PlayField*				getActiveField();
 	unsigned int			getActiveFieldNr();
 private:
+	void					loadSounds();
+	FSound					m_soundManager;
+	float					m_newVolume;
+
+	vector<FMOD::Sound*>	m_pSoundList;
+	
+
+
 	void					powerUpSpawn(vec3 pos);
 	int					    random();
 	void					powerUpCheck(int i);

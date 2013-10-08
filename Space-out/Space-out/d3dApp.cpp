@@ -34,7 +34,7 @@ D3DApp::D3DApp(HINSTANCE p_hInstance)
 
 	m_FrameStats = (LPCWSTR)"";
  
-	m_pDevice          = 0;
+	m_pDevice			  = 0;
 	m_pSwapChain          = 0;
 	m_pDepthStencilBuffer = 0;
 	m_pRenderTargetView   = 0;
