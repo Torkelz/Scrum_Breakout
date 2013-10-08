@@ -49,10 +49,10 @@ void AABB::calculateBounds()
 	m_sphere.updatePosition(m_position);
 }
 
-void AABB::updatePosition(mat4 p_scale, mat4 p_translate)
+void AABB::updatePosition(mat4 p_scale, mat4 p_rotation,mat4 p_translate)
 {
 	mat4 scalate;
-	scalate = p_scale * p_translate;
+	scalate =  p_scale * p_translate * p_rotation;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -223,10 +223,17 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 		case CORNER:
 			t_centerVector = p_sphereCenter - m_position;
 			t_centerVector = normalize(t_centerVector);
+			t_centerVector.y = -t_centerVector.y;
 			speed = length(p_speed);
 			p_speed = normalize(p_speed);
 			direction = normalize( t_centerVector + p_speed );
+			if (direction.x < abs(direction.z))
+			{
+				direction.x = -direction.z;
+				direction.z = 0.0f;
+			}
 			//direction *= -1.f;
+			direction = normalize(direction);
 			returnVector = speed * direction;
 			speed = length(returnVector);
 			//returnVector = -p_speed;
@@ -275,7 +282,7 @@ void AABB::calculateAngle()
 	m_w = (3.14159265358f * 0.5f) - m_v;
 	m_v2 = m_v * 2;
 	m_w2 = m_w * 2;
-	float temp = 0.08727f*1.f; //10.0f degrees
+	float temp = 0.08727f*3.f; //10.0f degrees
 
 	cornerAngles[0] = m_v - temp;
 	cornerAngles[1] = m_v + temp;
@@ -301,7 +308,7 @@ void AABB::calculateAngle(bool p_x, bool p_border)
 	
 	float temp;
 	if (!p_border)
-		temp = 0.08727f*1.f; //10.0f degrees
+		temp = 0.08727f*3.f; //10.0f degrees
 	else
 		temp = 0.0f;
 

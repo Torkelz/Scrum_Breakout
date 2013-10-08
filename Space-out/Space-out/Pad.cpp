@@ -13,11 +13,11 @@ Pad::Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName) : Object(p_pPos
 
 Pad::~Pad(){}
 
-void Pad::update(mat4 p_translate)
+void Pad::update(mat4 p_translate, mat4 p_rotation)
 {
 	m_realPosition = vec3(p_translate[3].x,p_translate[3].y,p_translate[3].z);
 
-	m_boundingVolume->updatePosition(mat4(1.0f),p_translate);
+	m_boundingVolume->updatePosition(mat4(1.0f),p_rotation,p_translate);
 }
 
 bool Pad::collide(BoundingVolume* p_pVolume)

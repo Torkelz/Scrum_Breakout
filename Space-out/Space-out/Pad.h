@@ -15,7 +15,7 @@ public:
 	Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName);
 	~Pad();
 
-	void update(mat4 p_translate);
+	void update(mat4 p_translate, mat4 p_rotation);
 	bool collide(BoundingVolume* p_pVolume);
 
 	void setPos(vec2 p_pos);

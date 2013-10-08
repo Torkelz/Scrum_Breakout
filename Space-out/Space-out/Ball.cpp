@@ -18,7 +18,7 @@ void Ball::init(vec3 p_origPos, vec3 p_right, vec3 p_down)
 	bPos += p_right * m_internPosition.x;
 	bPos += p_down * m_internPosition.y;
 	m_realPosition = bPos;
-	m_boundingVolume = new Sphere(2.5f, vec3(bPos.x, bPos.y, bPos.z));
+	m_boundingVolume = new Sphere(3.0f, vec3(bPos.x, bPos.y, bPos.z));
 }
 
 void Ball::update(float p_dt)

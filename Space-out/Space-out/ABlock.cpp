@@ -32,7 +32,7 @@ void ABlock::setPos(vec3 p_pos, mat4* p_pRotMat)
 	m_boundingVolume = new AABB((g_bvSize), (- g_bvSize), vec4(m_color, 1));
 	//m_boundingVolume = new AABB((temp1), (- temp1), vec4(m_color, 1));
 	mat4 trans = translate(mat4(1.0f), m_pos);
-	m_boundingVolume->updatePosition(mat4(1.0f), trans);
+	m_boundingVolume->updatePosition(mat4(1.0f),mat4(1.0f), trans);
 }
 
 int ABlock::getHp()

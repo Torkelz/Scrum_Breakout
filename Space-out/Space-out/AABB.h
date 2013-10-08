@@ -26,7 +26,7 @@ public:
 
 	void				calculateBounds();
 	void				buildCubeIndices( int offset );
-	void				updatePosition( mat4 p_scale, mat4 p_translate );
+	void				updatePosition( mat4 p_scale,mat4 p_rotation,mat4 p_translate );
 	void				initialize();
 	vec3*				getMax();
 	vec3*				getMin();

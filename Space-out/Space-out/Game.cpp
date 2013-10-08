@@ -60,7 +60,7 @@ void Game::update(float p_screenWidth, float p_dt)
 	mat4 padTranslation = translate(mat4(1.0f), t_pos);
 
 	
-	((Pad*)m_pPad)->update(padTranslation);
+	((Pad*)m_pPad)->update(padTranslation, pf->getRotationMatrix());
 	((Ball*)m_pBall)->update(p_dt);
 	((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 	pf = NULL;

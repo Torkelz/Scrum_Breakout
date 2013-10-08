@@ -118,27 +118,27 @@ void PlayField::transBorders(bool p_x)
 	vec3 center = m_positionOriginal - m_planeVectorX * abs(dot(m_planeVectorX, m_borderSize));
 	center		+= m_planeVectorY * abs(dot(m_planeVectorY, m_borderSize));
 	//Left
+	((AABB*)m_borders.at(0))->calculateAngle(p_x, true);
 	trans = translate(mat4(1.0f), center);
-	m_borders[0]->updatePosition(mat4(1.0f),trans);
-	((AABB*)m_borders.back())->calculateAngle(p_x, true);
+	m_borders[0]->updatePosition(mat4(1.0f),mat4(1.0f),trans);
 	
 	center += m_planeVectorX * (m_size.x + (abs(dot(m_planeVectorX, m_borderSize))*2));
 	trans = translate(mat4(1.0f), center);
 	//Right
-	m_borders[1]->updatePosition(mat4(1.0f),trans);
-	((AABB*)m_borders.back())->calculateAngle(p_x, true);
+	((AABB*)m_borders.at(1))->calculateAngle(p_x, true);
+	m_borders[1]->updatePosition(mat4(1.0f),mat4(1.0f),trans);
 
 	center = m_positionOriginal + m_planeVectorX * abs(dot(m_planeVectorX, m_borderSize));
 	center		+= -m_planeVectorY * abs(dot(m_planeVectorY, m_borderSize));
 	//Top
+	((AABB*)m_borders.at(2))->calculateAngle(p_x, true);
 	trans = translate(mat4(1.0f), center);
-	m_borders[2]->updatePosition(mat4(1.0f),trans);
-	((AABB*)m_borders.back())->calculateAngle(p_x, true);
+	m_borders[2]->updatePosition(mat4(1.0f),mat4(1.0f),trans);
 	//Bottom
+	((AABB*)m_borders.at(3))->calculateAngle(p_x, true);
 	center += m_planeVectorY * (m_size.y + (abs(dot(m_planeVectorY, m_borderSize))*2));
 	trans = translate(mat4(1.0f), center);
-	m_borders[3]->updatePosition(mat4(1.0f),trans);
-	((AABB*)m_borders.back())->calculateAngle(p_x, true);
+	m_borders[3]->updatePosition(mat4(1.0f),mat4(1.0f),trans);
 }
 
 void PlayField::update()

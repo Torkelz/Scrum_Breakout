@@ -204,7 +204,11 @@ void Direct3D::initApp()
 
 
 	//DEBUG
-	m_game.getActiveField()->transBorders(m_game.getActiveFieldNr() % 2);
+	for (int i = 0; i  < 4; i ++)
+	{
+		m_game.getField(i)->transBorders(i % 2);
+	}
+	//m_game.getActiveField()->transBorders(m_game.getActiveFieldNr() % 2);
 
 	// HID-STUFF
 
