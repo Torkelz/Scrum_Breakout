@@ -99,6 +99,7 @@
     <ClCompile Include="PUBiggerPad.cpp" />
     <ClCompile Include="PUSmallerPad.cpp" />
     <ClCompile Include="PUStickyPad.cpp" />
+    <ClCompile Include="Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="PUBiggerPad.h" />
     <ClInclude Include="PUSmallerPad.h" />
     <ClInclude Include="PUStickyPad.h" />
+    <ClInclude Include="Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

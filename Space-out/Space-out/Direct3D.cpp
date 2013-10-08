@@ -51,14 +51,20 @@ void Direct3D::initApp()
 
 
 	//Set up world view proj
-	m_camPosition = XMVectorSet( 0.0f, 0.0f, 250.f, 0.0f );
-	m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
-	m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
-
-	m_camView = XMMatrixLookAtLH( m_camPosition, m_camTarget, m_camUp );
+	//m_camPosition = XMVectorSet( 0.0f, 0.0f, 250.f, 0.0f );
+	//m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
+	//m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
+	//
+	//m_camView = XMMatrixLookAtLH( m_camPosition, m_camTarget, m_camUp );
 	//m_camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
-	m_camProjection = XMMatrixPerspectiveFovLH( PI*0.25f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
-	
+	//m_camProjection = XMMatrixPerspectiveFovLH( PI*0.25f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
+
+	m_camera = new Camera(vec3(0.0f, 0.0f, 250.0f));
+	m_camera->setViewMatrix(vec3(0.0f, 0.0f, 250.0f));
+	m_camera->createProjectionMatrix(PI*0.25f,(float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
+	m_camView = mat4ToXMMatrix(m_camera->getViewMatrix());
+	m_camProjection = mat4ToXMMatrix(m_camera->getProjectionMatrix());
+	m_camPosition = vec3ToXMVector(m_camera->getPosition());
 	m_world = XMMatrixIdentity();
 	
 	// PAD ###
@@ -140,7 +146,7 @@ void Direct3D::initApp()
 	
 	m_WVP	= m_world * m_camView * m_camProjection;
 	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
-	//m_cbPad.WVP = m_WVP;
+	m_cbPad.WVP = m_WVP;
 	BufferInitDesc cbbd;	
 
 	cbbd.elementSize = sizeof(CBPad);
@@ -198,15 +204,6 @@ void Direct3D::initApp()
 	sd.ComparisonFunc		= D3D11_COMPARISON_NEVER;
 	sd.MinLOD				= 0;
 	sd.MaxLOD				= D3D11_FLOAT32_MAX;
-	
-	D3D11_BLEND_DESC bd;
-	bd.AlphaToCoverageEnable = true;
-	bd.IndependentBlendEnable = true;
-	m_pDevice->CreateBlendState(&bd, &m_pPowerBlend);
-
-	m_pBallSampler = nullptr;
-
-	hr = m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
 
 	// BALLZZZ FROM THE WALL
 
@@ -265,6 +262,23 @@ void Direct3D::initApp()
 	m_powerTextures[SMALLERPAD].createTexture(new std::wstring(L"Picatures/smallerPad.png"), 0);
 	m_powerTextures[STICKYPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_powerTextures[STICKYPAD].createTexture(m_game.getBall()->getTexturePath(), 0);
+
+	D3D11_BLEND_DESC bd;
+	bd.AlphaToCoverageEnable = false;
+	bd.IndependentBlendEnable = false;
+	bd.RenderTarget[0].BlendEnable = true;
+	bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	bd.RenderTarget[0].DestBlend =  D3D11_BLEND_INV_SRC_ALPHA;
+	bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+	bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+	bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	m_pDevice->CreateBlendState(&bd, &m_pPowerBlend);
+	m_powerShader.setBlendState(m_pPowerBlend);
+	m_pBallSampler = nullptr;
+
+	hr = m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
 	//POWER UP END!
 }
 
@@ -277,8 +291,11 @@ void Direct3D::updateScene(float p_dt)
 {
 	D3DApp::updateScene(p_dt);
 	m_game.update(m_ScreenViewport.Width, p_dt);
-
-
+	m_camView = mat4ToXMMatrix(m_camera->getViewMatrix());
+	m_camProjection = mat4ToXMMatrix(m_camera->getProjectionMatrix());
+	m_camPosition = vec3ToXMVector(m_camera->getPosition());
+	m_camera->updateCameraPos();
+	
 	//Update Active block buffer
 	unsigned int active = m_game.getActiveFieldNr();
 	if(m_game.getField(active)->getUpdateBuffer())
@@ -414,7 +431,7 @@ void Direct3D::drawScene()
 		m_powerShader.setShaders();
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_powerShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
-		m_powerShader.setBlendState(m_pPowerBlend);
+		
 		for(unsigned int i = 0; i < m_powerUps.size(); i++)
 		{
 			PowerUp* pu;

@@ -15,6 +15,7 @@
 #include "AABB.h"
 #include "D3DTexture.h"
 #include "PUObserver.h"
+#include "Camera.h"
 
 class Object;
 
@@ -50,6 +51,14 @@ inline XMMATRIX mat4ToXMMatrix(mat4 p)
 		r.r[i].m128_f32[2] = p[i].z;
 		r.r[i].m128_f32[3] = p[i].w;
 	}
+
+	return r;
+};
+
+inline XMVECTOR vec3ToXMVector(vec3 p)
+{
+	XMVECTOR r;
+	r = XMVectorSet(p.x, p.y, p.z, 0.0f);
 
 	return r;
 };
@@ -92,7 +101,7 @@ private:
 	int				 m_blockBufferSizeL;
 	int				 m_blockBufferSizeR;
 	D3DTexture		 m_blockTexture;
-
+	Camera			 *m_camera;
 
 	Buffer			 m_buffer;
 	Buffer			 m_cBuffer;

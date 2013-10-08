@@ -183,5 +183,7 @@ void Shader::setSamplerState(ShaderType p_pShaderType,UINT p_StartSpot,UINT p_Nu
 
 void Shader::setBlendState(ID3D11BlendState* p_pBlendState)
 {
-	m_pDeviceContext->OMSetBlendState(p_pBlendState, NULL, NULL);
+	float blendfactor[] = {0.0f, 0.0f, 0.0f, 0.0f};
+	UINT sampleMask = 0xffffffff;
+	m_pDeviceContext->OMSetBlendState(p_pBlendState, blendfactor, sampleMask);
 }

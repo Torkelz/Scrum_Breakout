@@ -121,7 +121,14 @@ void Game::update(float p_screenWidth, float p_dt)
 
 		if( bv->collide(m_pPad->getBoundingVolume()) )
 		{
+			//Power Up catch.
 			powerUpCheck(m_powerUps.at(i)->getType());
+			m_pPUObservable->broadcastDeath(i);
+			m_powerUps.erase(m_powerUps.begin() + i);
+		}
+		if( bv->collide(m_playFields[m_activePlayField]->getCollisionBorder(3)))
+		{
+			//Power Up missed.
 			m_pPUObservable->broadcastDeath(i);
 			m_powerUps.erase(m_powerUps.begin() + i);
 		}

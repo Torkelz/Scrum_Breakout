@@ -85,6 +85,7 @@
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="BoundingVolume.cpp" />
     <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="D3DTexture.cpp" />
     <ClCompile Include="Direct3D.cpp" />
@@ -119,6 +120,7 @@
     <ClInclude Include="Ball.h" />
     <ClInclude Include="BoundingVolume.h" />
     <ClInclude Include="Buffer.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="d3dApp.h" />
     <ClInclude Include="D3DTexture.h" />
     <ClInclude Include="d3dUtil.h" />
