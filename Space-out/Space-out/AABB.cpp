@@ -252,19 +252,20 @@ int AABB::findPlane(vec3 p_sphereCenter)
 	
 	if(angle >= cornerAngles[7] || angle <= cornerAngles[0]) // More than 320 or less than 40 degrees. 0,0174532925
 		return TOP;
-	if(angle >= cornerAngles[1] && angle <= cornerAngles[2]) // More than 50 and less than 130 degrees.
+	else if(angle >= cornerAngles[1] && angle <= cornerAngles[2]) // More than 50 and less than 130 degrees.
 		return RIGHT;
-	if(angle >= cornerAngles[3] && angle <= cornerAngles[4]) // More than 140 and less than 220 degrees.
+	else if(angle >= cornerAngles[3] && angle <= cornerAngles[4]) // More than 140 and less than 220 degrees.
 		return BOTTOM;
-	if(angle >= cornerAngles[5] && angle <= cornerAngles[6]) // More than 230 and less than 310
+	else if(angle >= cornerAngles[5] && angle <= cornerAngles[6]) // More than 230 and less than 310
 		return LEFT;
-	if(	angle > cornerAngles[0] && angle < cornerAngles[1] ||
+	else if(	angle > cornerAngles[0] && angle < cornerAngles[1] ||
 		angle > cornerAngles[2] && angle < cornerAngles[3] ||
 		angle > cornerAngles[4] && angle < cornerAngles[5] ||
 		angle > cornerAngles[6] && angle < cornerAngles[7] )
 		return CORNER;
-
-	return -1;
+	
+	else
+		return -1;
 }
 
 void AABB::calculateAngle()
@@ -274,7 +275,7 @@ void AABB::calculateAngle()
 	m_w = (3.14159265358f * 0.5f) - m_v;
 	m_v2 = m_v * 2;
 	m_w2 = m_w * 2;
-	float temp = 0.08727f*2.f; //10.0f degrees
+	float temp = 0.08727f*1.f; //10.0f degrees
 
 	cornerAngles[0] = m_v - temp;
 	cornerAngles[1] = m_v + temp;
@@ -285,17 +286,24 @@ void AABB::calculateAngle()
 	cornerAngles[6] = m_v + m_v2 + (m_w2 * 2) - temp;
 	cornerAngles[7] = m_v + m_v2 + (m_w2 * 2) + temp;
 }
-void AABB::calculateAngle(vec3 p_right, vec3 p_down)
+
+void AABB::calculateAngle(bool p_x, bool p_border)
 {
-	float x,y;
-	x = abs(dot(m_bounds[0], p_right));
-	y = abs(dot(m_bounds[0], p_down));
 	// For some reason abs works. Remove if it bugs. :)
-	m_v = abs(atan(x / y ));
+	if( !p_x )
+	m_v = abs(atan(m_bounds[0].x / m_bounds[0].y ));
+	else
+		m_v = abs(atan(m_bounds[0].z / m_bounds[0].y ));
+
 	m_w = (3.14159265358f * 0.5f) - m_v;
 	m_v2 = m_v * 2;
 	m_w2 = m_w * 2;
-	float temp = 0.08727f*2.f; //10.0f degrees
+	
+	float temp;
+	if (!p_border)
+		temp = 0.08727f*1.f; //10.0f degrees
+	else
+		temp = 0.0f;
 
 	cornerAngles[0] = m_v - temp;
 	cornerAngles[1] = m_v + temp;

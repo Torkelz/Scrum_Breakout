@@ -15,7 +15,7 @@ void Game::init()
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
 
-	m_activePlayField = 1;
+	m_activePlayField = 3;
 	m_originWorld = vec3(0.f,0.f,0.f);
 
 
@@ -32,7 +32,8 @@ void Game::init()
 
 	for(UINT i = 0; i < m_nrPlayFields; i++)
 	{
-		m_playFields[i]->init(m_loadLevel.getBlockList(i), m_loadLevel.getNrBlocks());
+		int t = i % 2;
+		m_playFields[i]->init(m_loadLevel.getBlockList(i), m_loadLevel.getNrBlocks(), t);
 	}
 
 	//Set ball bounding box
@@ -69,7 +70,7 @@ void Game::update(float p_screenWidth, float p_dt)
 	{
 		vec3 s = ((Ball*)m_pBall)->getSpeed();
 		vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), s);
-		tempSpeed.y = tempSpeed.y;
+		tempSpeed.y = -abs(tempSpeed.y);
 		((Ball*)m_pBall)->setSpeed( tempSpeed );
 	}
 	//Ball vs boxes
@@ -77,10 +78,11 @@ void Game::update(float p_screenWidth, float p_dt)
 	{
 		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
 
-		if(  bv->collide(m_pBall->getBoundingVolume()))
+		if(bv->collide(m_pBall->getBoundingVolume()))
 		{
 			vec3 s = ((Ball*)m_pBall)->getSpeed();
 			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), s);
+			//tempSpeed.y = -tempSpeed.y;
 			((Ball*)m_pBall)->setSpeed( tempSpeed );
 
 			m_playFields[m_activePlayField]->deleteBlock(i);
@@ -96,6 +98,7 @@ void Game::update(float p_screenWidth, float p_dt)
 		if(  bv->collide(m_pBall->getBoundingVolume()))
 		{
 			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+			tempSpeed.y = tempSpeed.y;
 			((Ball*)m_pBall)->setSpeed( tempSpeed );
 			break;
 		}
@@ -143,11 +146,11 @@ void Game::keyEvent(unsigned short key)
 	}
 	if(key == 0x57) // W
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f));
 	}
 	if(key == 0x53) // S
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f));
 	}
 	if(key == 0x1B) //ESC
 		PostQuitMessage(0);

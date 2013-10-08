@@ -48,11 +48,9 @@ void Direct3D::initApp()
 	m_game = Game();
 	m_game.init();
 
-	
-
 
 	//Set up world view proj
-	m_camPosition = XMVectorSet( 250.0f, 0.0f, 0.f, 0.0f );
+	m_camPosition = XMVectorSet( -250.0f, 0.0f, 0.f, 0.0f );
 	m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
 	m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
@@ -66,7 +64,6 @@ void Direct3D::initApp()
 	GetClientRect(m_hMainWnd, &r);
 	vec2 playFieldScreen;
 	playFieldScreen.x = (m_game.getActiveField()->getScreenPosition(XMMatrixTomat4(&(m_camView*m_camProjection))).x + 1)/2 * r.right;
-	//playFieldScreen.y = (1 - m_game.getActiveField()->getScreenPosition(XMMatrixTomat4(&(m_camView*m_camProjection))).y)/2 * r.bottom;
 	((Pad*)(m_game.getPad()))->setMouseOffset(m_game.getActiveField()->getSize().x / r.right);
 
 	// PAD ###
@@ -195,10 +192,19 @@ void Direct3D::initApp()
 	t_v = m_game.getPad()->getBoundingVolume();
 	((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
 
+	for(int i = 0; i < 4; i++)
+	{
+		t_v = m_game.getActiveField()->getCollisionBorder(i);
+		((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	}
 	
 	t_v = m_game.getBall()->getBoundingVolume();
 	((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
 	// END DEBUGGING DRAW
+
+
+	//DEBUG
+	m_game.getActiveField()->transBorders(m_game.getActiveFieldNr() % 2);
 
 	// HID-STUFF
 
@@ -282,6 +288,13 @@ void Direct3D::drawScene()
 	AABB t_bb = *((AABB*)t_v);
 	t_bb.draw(m_world, m_camView, m_camProjection);
 	// END DEBUGGING DRAW
+
+	for(int i = 0; i < 4; i++)
+	{
+		t_v = m_game.getActiveField()->getCollisionBorder(i);
+		AABB t_bb = *((AABB*)t_v);
+		t_bb.draw(m_world, m_camView, m_camProjection);
+	}
 
 	XMMATRIX translatePadMatrix;
 

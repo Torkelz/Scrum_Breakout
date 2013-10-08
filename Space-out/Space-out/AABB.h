@@ -35,8 +35,10 @@ public:
 	bool				collide( BoundingVolume* p_pVolume );
 	vec3				findNewDirection(vec3 p_sphereCenter, vec3 p_speed);
 	int					findPlane(vec3 p_sphereCenter);
+	// ## NOT FOR BORDERS, EVER ##
 	void				calculateAngle();
-	void				calculateAngle(vec3 p_right, vec3 p_down);
+	// ## FOR BORDERS AND BLOCKS, MAYBE POWERUPS ##
+	void				calculateAngle( bool p_x, bool p_border);
 	//void				calculateCornerVectors();
 
 	//DEBUGGING
