@@ -26,6 +26,7 @@ public:
 	void			speedDown();
 	void			setStuck(bool p_stuck);
 	bool			getStuck();
+	void			setInternalPosition(vec3 p_position, vec3 p_origPos, vec3 p_right, vec3 p_down);
 	vec3			getRealPosition();
 };
 

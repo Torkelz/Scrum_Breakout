@@ -59,8 +59,8 @@ void Direct3D::initApp()
 	//m_camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
 	//m_camProjection = XMMatrixPerspectiveFovLH( PI*0.25f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
 
-	m_camera = new Camera(vec3(0.0f, 0.0f, 250.0f));
-	m_camera->setViewMatrix(vec3(0.0f, 0.0f, 250.0f));
+	m_camera = new Camera(vec3(-250.0f, 0.0f, 0.0f));
+	m_camera->setViewMatrix(vec3(-250.0f, 0.0f, 0.0f));
 	m_camera->createProjectionMatrix(PI*0.25f,(float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
 	m_camView = mat4ToXMMatrix(m_camera->getViewMatrix());
 	m_camProjection = mat4ToXMMatrix(m_camera->getProjectionMatrix());
@@ -208,18 +208,18 @@ void Direct3D::initApp()
 	//## BALL END ##
 
 	////## Bounding Volume DEBUGGING DRAW ##
-	//BoundingVolume* t_v;
-	//t_v = m_game.getPad()->getBoundingVolume();
-	//((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
-	//for(int i = 0; i < 4; i++)
-	//{
-	//	t_v = m_game.getActiveField()->getCollisionBorder(i);
-	//	((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
-	//}
-	//
-	//t_v = m_game.getBall()->getBoundingVolume();
-	//((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
-	//
+	BoundingVolume* t_v;
+	t_v = m_game.getPad()->getBoundingVolume();
+	((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	for(int i = 0; i < 4; i++)
+	{
+		t_v = m_game.getActiveField()->getCollisionBorder(i);
+		((AABB*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	}
+	
+	t_v = m_game.getBall()->getBoundingVolume();
+	((Sphere*)t_v)->initDraw(m_pDevice, m_pDeviceContext);
+	
 	////## END DEBUGGING DRAW ##
 
 	//## PLAYFIELD FINAL SETUP ##
@@ -353,19 +353,19 @@ void Direct3D::drawScene()
 	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
 	
 	//// Bounding Volume DEBUGGING DRAW
-	//BoundingVolume* t_v;
-	//t_v = m_game.getBall()->getBoundingVolume();
-	//Sphere t_sphere = *((Sphere*)t_v);
-	//t_sphere.draw(m_world, m_camView, m_camProjection);
-	//t_v = m_game.getPad()->getBoundingVolume();
-	//AABB t_bb = *((AABB*)t_v);
-	//t_bb.draw(m_world, m_camView, m_camProjection);
-	//for(int i = 0; i < 4; i++)
-	//{
-	//	t_v = m_game.getActiveField()->getCollisionBorder(i);
-	//	AABB t_bb = *((AABB*)t_v);
-	//	t_bb.draw(m_world, m_camView, m_camProjection);
-	//}
+	BoundingVolume* t_v;
+	t_v = m_game.getBall()->getBoundingVolume();
+	Sphere t_sphere = *((Sphere*)t_v);
+	t_sphere.draw(m_world, m_camView, m_camProjection);
+	t_v = m_game.getPad()->getBoundingVolume();
+	AABB t_bb = *((AABB*)t_v);
+	t_bb.draw(m_world, m_camView, m_camProjection);
+	for(int i = 0; i < 4; i++)
+	{
+		t_v = m_game.getActiveField()->getCollisionBorder(i);
+		AABB t_bb = *((AABB*)t_v);
+		t_bb.draw(m_world, m_camView, m_camProjection);
+	}
 	//// END DEBUGGING DRAW
 	
 	//## PAD DRAW START ##
@@ -438,13 +438,16 @@ void Direct3D::drawScene()
 		m_powerShader.setShaders();
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_powerShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
-	
+
 		for(unsigned int i = 0; i < m_powerUps.size(); i++)
 		{
 			PowerUp* pu;
 			pu = m_powerUps.at(i);
-			translatePadMatrix = XMMatrixTranslation(pu->getPos()->x, pu->getPos()->y, padPos.z); // Translate powerup
-			m_WVP = m_world * translatePadMatrix * m_camView * m_camProjection;
+			if (active == 0 || active == 2)
+				translatePadMatrix = XMMatrixTranslation(pu->getPos()->x, pu->getPos()->y, padPos.z); // Translate powerup
+			else
+				translatePadMatrix = XMMatrixTranslation(padPos.x, pu->getPos()->y, pu->getPos()->z);
+			m_WVP = m_world * playFieldRotation * translatePadMatrix * m_camView * m_camProjection;
 			m_cbPad.WVP = XMMatrixTranspose(m_WVP);
 			m_cBuffer.apply(0);
 			m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);

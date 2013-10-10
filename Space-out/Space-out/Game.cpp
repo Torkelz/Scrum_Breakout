@@ -68,59 +68,60 @@ void Game::update(float p_screenWidth, float p_dt)
 	{
 		((Ball*)m_pBall)->update(p_dt);
 		((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
+
+		//Pad vs Ball
+		if(((Pad*)m_pPad)->collide(m_pBall->getBoundingVolume()))
+		{
+			if(!((Pad*)m_pPad)->getSticky())
+			{
+				vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+				tempSpeed.y = -abs(tempSpeed.y);
+				((Ball*)m_pBall)->setSpeed( tempSpeed );
+			}
+			else
+			{
+				((Ball*)m_pBall)->setStuck(true);
+				((Pad*)m_pPad)->setSavedVector( ((Ball*)m_pBall)->getRealPosition()- *m_pPad->getBoundingVolume()->getPosition() );
+			}
+		}
+
+		// ## BLOCKS ##
+		for(int i = 0; i < m_playFields[m_activePlayField]->getListSize();i++)
+		{
+			AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
+
+			if(bv->collide(m_pBall->getBoundingVolume()))
+			{
+				vec3 s = ((Ball*)m_pBall)->getSpeed();
+				vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), s);
+				((Ball*)m_pBall)->setSpeed( tempSpeed );
+				powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
+				m_playFields[m_activePlayField]->deleteBlock(i);
+				bv = NULL;
+				break;
+			}
+		}
+		// ## WALLS ##
+		for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
+		{
+			AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
+
+			if(  bv->collide(m_pBall->getBoundingVolume()))
+			{
+				vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+				tempSpeed.y = tempSpeed.y;
+				((Ball*)m_pBall)->setSpeed( tempSpeed );
+				break;
+			}
+		}
 	}
 	else
 	{
-		((Ball*)m_pBall)->setPos( *m_pPad->getBoundingVolume()->getPosition() + ((Pad*)m_pPad)->getSavedVector() );
+		((Ball*)m_pBall)->setInternalPosition( *m_pPad->getBoundingVolume()->getPosition() + ((Pad*)m_pPad)->getSavedVector(),pf->getOriginalPosition(),pf->getRightDir(), pf->getDownDir() );
 		((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
-	}
-	//Pad vs Ball
-	if(((Pad*)m_pPad)->collide(m_pBall->getBoundingVolume()))
-	{
-		if(!((Pad*)m_pPad)->getSticky())
-		{
-			vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
-			tempSpeed.y = -abs(tempSpeed.y);
-			((Ball*)m_pBall)->setSpeed( tempSpeed );
-		}
-		else
-		{
-			((Ball*)m_pBall)->setStuck(true);
-			((Pad*)m_pPad)->setSavedVector( *m_pBall->getPos() - *m_pPad->getBoundingVolume()->getPosition() );
-		}
 	}
 
 	pf = NULL;
-
-	// ## BLOCKS ##
-	for(int i = 0; i < m_playFields[m_activePlayField]->getListSize();i++)
-	{
-		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
-
-		if(bv->collide(m_pBall->getBoundingVolume()))
-		{
-			vec3 s = ((Ball*)m_pBall)->getSpeed();
-			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), s);
-			((Ball*)m_pBall)->setSpeed( tempSpeed );
-			powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
-			m_playFields[m_activePlayField]->deleteBlock(i);
-			bv = NULL;
-			break;
-		}
-	}
-	// ## WALLS ##
-	for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
-	{
-		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
-
-		if(  bv->collide(m_pBall->getBoundingVolume()))
-		{
-			vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
-			tempSpeed.y = tempSpeed.y;
-			((Ball*)m_pBall)->setSpeed( tempSpeed );
-			break;
-		}
-	}
 	//Pad vs Borders NEEDS FINE TUNING
 	for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders()-2; i++)
 	{
@@ -132,7 +133,9 @@ void Game::update(float p_screenWidth, float p_dt)
 			vec3 Pcenter = *m_pPad->getBoundingVolume()->getPosition();
 			Bcenter.y = Pcenter.y;
 
-			vec3 dir = normalize(Pcenter - Bcenter);
+			vec3 dir = Pcenter - Bcenter;
+			if(length(dir) > 0.0f)
+				dir = normalize(dir);
 
 			float x = dot(dir, m_playFields[m_activePlayField]->getRightDir());
 			x *= -1.f;
@@ -144,8 +147,6 @@ void Game::update(float p_screenWidth, float p_dt)
 			{
 				((Pad*)(m_pPad))->changeXCoordXAmount(x*2);
 			}
-
-
 			break;
 		}
 	}
@@ -197,30 +198,30 @@ void Game::keyEvent(unsigned short key)
 	if(key == 0x1B) //ESC
 		PostQuitMessage(0);
 
-	if(key == 0x52) // R
-	{
-		PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-		powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-		m_pPUObservable->broadcastRebirth(powerUp);
-		m_powerUps.push_back(powerUp);
-	}
-	if( key == 0x46) // F
-	{
-		PUBiggerPad* powerUp = new PUBiggerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-		powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-		m_pPUObservable->broadcastRebirth(powerUp);
-		m_powerUps.push_back(powerUp);
-	}
-	if(key == 0x4C) // L
-	{
-	}
+	//if(key == 0x52) // R
+	//{
+	//	//PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+	//	//powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
+	//	//m_pPUObservable->broadcastRebirth(powerUp);
+	//	//m_powerUps.push_back(powerUp);
+	//}
+	//if( key == 0x46) // F
+	//{
+	//	//PUBiggerPad* powerUp = new PUBiggerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+	//	//powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
+	//	//m_pPUObservable->broadcastRebirth(powerUp);
+	//	//m_powerUps.push_back(powerUp);
+	//}
+	//if(key == 0x4C) // L
+	//{
+	//}
 }
 
 void Game::leftMouseClick( vec2 p_mousePosition )
 {
 	((Ball*)m_pBall)->setStuck(false);
 	vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
-	tempSpeed.y = abs(tempSpeed.y);
+	tempSpeed.y = -abs(tempSpeed.y);
 	((Ball*)m_pBall)->setSpeed( tempSpeed );
 }
 

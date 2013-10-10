@@ -69,6 +69,16 @@ bool Ball::getStuck()
 	return m_stuck;
 }
 
+void Ball::setInternalPosition(vec3 p_position, vec3 p_origPos, vec3 p_right, vec3 p_down)
+{
+	vec2 t;
+	vec3 temp;
+	temp = p_position - p_origPos;
+	t.x = abs(dot(temp,p_right));
+	t.y = abs(dot(temp,p_down));
+	m_internPosition = t;
+}
+
 vec3 Ball::getRealPosition()
 {
 	return m_realPosition;

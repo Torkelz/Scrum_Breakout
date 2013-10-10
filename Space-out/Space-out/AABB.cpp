@@ -52,21 +52,22 @@ void AABB::calculateBounds()
 void AABB::updatePosition(mat4 p_scale, mat4 p_rotation,mat4 p_translate)
 {
 	mat4 scalate;
-	scalate =  p_scale * p_translate * p_rotation;
+	scalate = p_translate * p_rotation * p_scale;
 	
 	//## DIRECT3D DEBUG ##
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	m_translate.r[i].m128_f32[0] = scalate[i].x;
-	//	m_translate.r[i].m128_f32[1] = scalate[i].y;
-	//	m_translate.r[i].m128_f32[2] = scalate[i].z;
-	//	m_translate.r[i].m128_f32[3] = scalate[i].w;
-	//}
+	for (int i = 0; i < 4; i++)
+	{
+		m_translate.r[i].m128_f32[0] = scalate[i].x;
+		m_translate.r[i].m128_f32[1] = scalate[i].y;
+		m_translate.r[i].m128_f32[2] = scalate[i].z;
+		m_translate.r[i].m128_f32[3] = scalate[i].w;
+	}
 	//## DEBUG END ##
 
 	p_scale = transpose(p_scale);
+	p_rotation = transpose(p_rotation);
 	p_translate = transpose(p_translate);
-	scalate = p_scale * p_translate;
+	scalate = p_scale * p_rotation * p_translate;
 	
 	vec4 v = vec4(m_bottom, 1.0f) * scalate;
 	m_bounds[0].x = v.x;
@@ -294,113 +295,113 @@ void AABB::calculateAngle(bool p_x, bool p_border)
 }
 
 //## DIRECT3D DEBUG DRAW ##
-//void AABB::buildCubeIndices(int offset)
-//{
-//	// Cube Composition
-//	/*		  +----+  6    7	| Refered to as
-//			 /    /|			| indices of the
-//			+----+ |  4    5	| vertices below
-//	2	 3	|    | +			
-//			|    |/				
-//	0	 1	+----+								*/
-//
-//	// Right/Left
-//	for( int i = 0; i < 8; i++ )
-//	{
-//		m_indices.push_back( i + offset );
-//	}
-//	// Froward/Backward
-//	for( int i = 0; i < 4; i++ )
-//	{
-//		m_indices.push_back( i + offset );
-//		m_indices.push_back( i + offset + 4 );
-//	}
-//	// Up/Down
-//	for( int i = 0; i < 2; i++ )
-//	{
-//		m_indices.push_back( i + offset );
-//		m_indices.push_back( i + offset + 2 );
-//		m_indices.push_back( i + offset + 4 );
-//		m_indices.push_back( i + offset + 2 + 4 );
-//	}
-//}
-//void AABB::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext)
-//{
-//	m_pDevice = p_pDevice;
-//	m_pDeviceContext = p_pDeviceContext;
-//
-//	//m_sphere.initDraw(m_pDevice, m_pDeviceContext);
-//
-//	buildCubeIndices(0);
-//
-//	BufferInitDesc desc;
-//	desc.type				= VERTEX_BUFFER;
-//	desc.numElements		= 8;
-//	desc.elementSize		= sizeof( XMFLOAT3 );
-//	desc.usage				= BUFFER_DEFAULT;
-//	desc.initData			= m_bounds;
-//
-//	m_pBuffer = new Buffer();
-//	m_pBuffer->init(p_pDevice, p_pDeviceContext, desc);
-//
-//	BufferInitDesc cbDesc;	
-//
-//	cbDesc.elementSize = sizeof(CB);
-//	cbDesc.initData = NULL;
-//	cbDesc.numElements = 1;
-//	cbDesc.type = CONSTANT_BUFFER_VS;
-//	cbDesc.usage = BUFFER_DEFAULT;
-//	
-//	m_pCB = new Buffer();
-//	m_pCB->init(p_pDevice, p_pDeviceContext, cbDesc);
-//
-//	int						temp[24];
-//	for (UINT i = 0; i < 24; i++)
-//	{
-//		temp[i]				= m_indices.at(i);
-//	}
-//
-//	desc.type				= INDEX_BUFFER;
-//	desc.numElements		= 24;
-//	desc.elementSize		= sizeof(UINT);
-//	desc.usage				= BUFFER_DEFAULT;
-//	desc.initData			= &temp;
-//
-//	m_pIndexBuffer = new Buffer();
-//	m_pIndexBuffer->init(p_pDevice, p_pDeviceContext, desc);
-//
-//
-//
-//	D3D11_INPUT_ELEMENT_DESC inputDesc[] = 
-//	{
-//		{"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
-//	};
-//
-//	m_pShader = new Shader();
-//	m_pShader->init(p_pDevice, p_pDeviceContext, 1);
-//	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "VSInstmain","vs_5_0", VERTEX_SHADER , inputDesc);
-//	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "PSScene", "ps_5_0", PIXEL_SHADER, NULL);
-//}
-//
-//void AABB::draw(XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj)
-//{
-//	XMMATRIX WorldViewProj;
-//	WorldViewProj = XMMatrixMultiply(p_world, m_translate);
-//	WorldViewProj = XMMatrixMultiply(WorldViewProj, p_view );
-//	WorldViewProj = XMMatrixMultiply(WorldViewProj, p_proj );
-//
-//	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-//
-//	m_cb.color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-//	m_cb.WVP = XMMatrixTranspose(WorldViewProj);
-//	m_pCB->apply(0);
-//	m_pDeviceContext->UpdateSubresource(m_pCB->getBufferPointer(), 0, NULL, &m_cb, 0, 0);
-//	
-//	m_pIndexBuffer->apply(0);
-//	m_pBuffer->apply(0);
-//	m_pShader->setShaders();
-//
-//	m_pDeviceContext->DrawIndexed(24, 0, 0);
-//	
-//	//m_sphere.draw(p_world, p_view, p_proj);
-//}
+void AABB::buildCubeIndices(int offset)
+{
+	// Cube Composition
+	/*		  +----+  6    7	| Refered to as
+			 /    /|			| indices of the
+			+----+ |  4    5	| vertices below
+	2	 3	|    | +			
+			|    |/				
+	0	 1	+----+								*/
+
+	// Right/Left
+	for( int i = 0; i < 8; i++ )
+	{
+		m_indices.push_back( i + offset );
+	}
+	// Froward/Backward
+	for( int i = 0; i < 4; i++ )
+	{
+		m_indices.push_back( i + offset );
+		m_indices.push_back( i + offset + 4 );
+	}
+	// Up/Down
+	for( int i = 0; i < 2; i++ )
+	{
+		m_indices.push_back( i + offset );
+		m_indices.push_back( i + offset + 2 );
+		m_indices.push_back( i + offset + 4 );
+		m_indices.push_back( i + offset + 2 + 4 );
+	}
+}
+void AABB::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext)
+{
+	m_pDevice = p_pDevice;
+	m_pDeviceContext = p_pDeviceContext;
+
+	//m_sphere.initDraw(m_pDevice, m_pDeviceContext);
+
+	buildCubeIndices(0);
+
+	BufferInitDesc desc;
+	desc.type				= VERTEX_BUFFER;
+	desc.numElements		= 8;
+	desc.elementSize		= sizeof( XMFLOAT3 );
+	desc.usage				= BUFFER_DEFAULT;
+	desc.initData			= m_bounds;
+
+	m_pBuffer = new Buffer();
+	m_pBuffer->init(p_pDevice, p_pDeviceContext, desc);
+
+	BufferInitDesc cbDesc;	
+
+	cbDesc.elementSize = sizeof(CB);
+	cbDesc.initData = NULL;
+	cbDesc.numElements = 1;
+	cbDesc.type = CONSTANT_BUFFER_VS;
+	cbDesc.usage = BUFFER_DEFAULT;
+	
+	m_pCB = new Buffer();
+	m_pCB->init(p_pDevice, p_pDeviceContext, cbDesc);
+
+	int						temp[24];
+	for (UINT i = 0; i < 24; i++)
+	{
+		temp[i]				= m_indices.at(i);
+	}
+
+	desc.type				= INDEX_BUFFER;
+	desc.numElements		= 24;
+	desc.elementSize		= sizeof(UINT);
+	desc.usage				= BUFFER_DEFAULT;
+	desc.initData			= &temp;
+
+	m_pIndexBuffer = new Buffer();
+	m_pIndexBuffer->init(p_pDevice, p_pDeviceContext, desc);
+
+
+
+	D3D11_INPUT_ELEMENT_DESC inputDesc[] = 
+	{
+		{"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+	};
+
+	m_pShader = new Shader();
+	m_pShader->init(p_pDevice, p_pDeviceContext, 1);
+	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "VSInstmain","vs_5_0", VERTEX_SHADER , inputDesc);
+	m_pShader->compileAndCreateShaderFromFile(L"BoundingBox.fx", "PSScene", "ps_5_0", PIXEL_SHADER, NULL);
+}
+
+void AABB::draw(XMMATRIX& p_world, XMMATRIX& p_view, XMMATRIX& p_proj)
+{
+	XMMATRIX WorldViewProj;
+	WorldViewProj = XMMatrixMultiply(p_world, m_translate);
+	WorldViewProj = XMMatrixMultiply(WorldViewProj, p_view );
+	WorldViewProj = XMMatrixMultiply(WorldViewProj, p_proj );
+
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+	m_cb.color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_cb.WVP = XMMatrixTranspose(WorldViewProj);
+	m_pCB->apply(0);
+	m_pDeviceContext->UpdateSubresource(m_pCB->getBufferPointer(), 0, NULL, &m_cb, 0, 0);
+	
+	m_pIndexBuffer->apply(0);
+	m_pBuffer->apply(0);
+	m_pShader->setShaders();
+
+	m_pDeviceContext->DrawIndexed(24, 0, 0);
+	
+	//m_sphere.draw(p_world, p_view, p_proj);
+}
