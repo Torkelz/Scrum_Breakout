@@ -56,6 +56,8 @@ void Game::init(PUObserver* p_pPUObserver)
 	m_pPUObservable->addSubscriber(p_pPUObserver);
 
 	loadSounds();
+	m_soundManager.play(m_pSoundList.at(BACKGROUND), 0);
+	m_soundManager.setVolume(0.1f, 0);
 }
 
 void Game::update(float p_screenWidth, float p_dt)
@@ -137,6 +139,8 @@ void Game::update(float p_screenWidth, float p_dt)
 
 				if(bv->collide(m_pBall->getBoundingVolume()))
 				{
+					m_soundManager.play(m_pSoundList[COLLISION], 1);
+					m_soundManager.setVolume(0.5f, 1);
 					vec3 s = ((Ball*)m_pBall)->getSpeed();
 					vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), s);
 					((Ball*)m_pBall)->setSpeed( tempSpeed );
@@ -459,7 +463,8 @@ void Game::loadSounds()
 	m_pSoundList.resize(2);
 	m_soundManager.init();
 
-	 m_pSoundList.at(COLLISION) = m_soundManager.loadSound("Sounds/thunder.wav", false);
+	m_pSoundList.at(COLLISION) = m_soundManager.loadSound("Sounds/thunder.wav", false);
+	m_pSoundList.at(BACKGROUND) = m_soundManager.loadSound("Sounds/mainbackground.mp3", true);
 }
 
 

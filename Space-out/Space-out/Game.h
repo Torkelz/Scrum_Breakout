@@ -12,6 +12,7 @@
 #include "PowerUpInclude.h"
 #include "PUObservable.h"
 #include "FSound.h"
+#include "Camera.h"
 
 using namespace glm;
 
