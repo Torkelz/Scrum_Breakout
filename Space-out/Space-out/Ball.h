@@ -11,6 +11,8 @@ private:
 	vec3 m_realPosition;
 	vec2 m_internPosition;
 	bool m_stuck;
+	int  m_nrOfSpeedUps;
+	int  m_maxSpeedUps;
 public:
 	Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName); // when setting startposition only use x, y not z
 	~Ball();

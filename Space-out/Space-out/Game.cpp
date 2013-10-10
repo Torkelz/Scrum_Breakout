@@ -15,7 +15,7 @@ void Game::init(PUObserver* p_pPUObserver)
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
 
-	m_activePlayField = 3;
+	m_activePlayField = 2;
 	m_originWorld = vec3(0.f,0.f,0.f);
 
 	vec2 size = m_loadLevel.getFieldSize();
@@ -54,6 +54,20 @@ void Game::update(float p_screenWidth, float p_dt)
 	else
 		((Pad*)m_pPad)->setSticky(false);
 
+	if(m_padCounter > 0)
+	{
+		m_padCounter--;
+	}
+	else
+		m_padCrash = false;
+
+	if(m_wallCounter > 0)
+	{
+		m_wallCounter--;
+	}
+	else
+		m_wallCrash = false;
+
 	vec3 padPos = *m_pPad->getPos();
 	PlayField* pf = m_playFields[m_activePlayField];
 	vec3 t_pos = pf->getOriginalPosition();
@@ -61,8 +75,13 @@ void Game::update(float p_screenWidth, float p_dt)
 	t_pos += pf->getDownDir() * padPos.y;
 
 	mat4 padTranslation = translate(mat4(1.0f), t_pos);
-	
-	((Pad*)m_pPad)->update(padTranslation, pf->getRotationMatrix());
+	mat4 padRotation;
+	if(m_activePlayField == 0 || m_activePlayField == 2)
+		padRotation = m_playFields[0]->getRotationMatrix();
+	else
+		padRotation = m_playFields[3]->getRotationMatrix();
+
+	((Pad*)m_pPad)->update(padTranslation, padRotation);
 
 	if(!((Ball*)m_pBall)->getStuck())
 	{
@@ -70,13 +89,15 @@ void Game::update(float p_screenWidth, float p_dt)
 		((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 
 		//Pad vs Ball
-		if(((Pad*)m_pPad)->collide(m_pBall->getBoundingVolume()))
+		if(((Pad*)m_pPad)->collide(m_pBall->getBoundingVolume()) && !m_padCrash)
 		{
 			if(!((Pad*)m_pPad)->getSticky())
 			{
 				vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 				tempSpeed.y = -abs(tempSpeed.y);
 				((Ball*)m_pBall)->setSpeed( tempSpeed );
+				m_padCrash = true;
+				m_padCounter = 4;
 			}
 			else
 			{
@@ -106,11 +127,13 @@ void Game::update(float p_screenWidth, float p_dt)
 		{
 			AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
 
-			if(  bv->collide(m_pBall->getBoundingVolume()))
+			if(  bv->collide(m_pBall->getBoundingVolume()) && !m_wallCrash)
 			{
 				vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 				tempSpeed.y = tempSpeed.y;
 				((Ball*)m_pBall)->setSpeed( tempSpeed );
+				m_wallCrash = true;
+				m_wallCounter = 2;
 				break;
 			}
 		}
@@ -151,10 +174,16 @@ void Game::update(float p_screenWidth, float p_dt)
 		}
 	}
 
+	padPos = ((Pad*)m_pPad)->getRealPosition();
 	for(unsigned int i = 0; i < m_powerUps.size(); i++)
 	{
 		// Update position for power ups.
-		mat4 powTranslation = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, t_pos.z));
+		mat4 powTranslation;// = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, t_pos.z));
+		if (m_activePlayField == 0 || m_activePlayField == 2)
+			powTranslation = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, padPos.z)); // Translate powerup
+		else
+			powTranslation = translate(mat4(1.0f), vec3(padPos.x, m_powerUps.at(i)->getPos()->y, m_powerUps.at(i)->getPos()->z));
+
 		m_powerUps.at(i)->update(p_dt, powTranslation);
 		AABB* bv = (AABB*)(m_powerUps.at(i)->getBoundingVolume());
 
@@ -172,7 +201,6 @@ void Game::update(float p_screenWidth, float p_dt)
 			m_powerUps.erase(m_powerUps.begin() + i);
 		}
 	}
-
 	// ## COLLISION STUFF END ##
 }
 
@@ -280,7 +308,7 @@ void Game::powerUpCheck(int i)
 		break;
 	case STICKYPAD:
 		((Pad*)m_pPad)->setSticky(true);
-		m_counter = 30.0f;
+		m_counter = 10.0f;
 	default:
 		break;
 	}
@@ -295,13 +323,14 @@ void Game::powerUpSpawn(vec3 pos)
 		int r = rand() % 100;
 		if(r < 50)
 		{
-			r = random();
+			r = rand() % 5;
 			switch (r)
 			{
 			case FASTERBALL:
 				{
 					PUFasterBall* powerUp = new PUFasterBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
 					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
 					m_pPUObservable->broadcastRebirth(powerUp);
 					m_powerUps.push_back(powerUp);
 				}
@@ -310,6 +339,7 @@ void Game::powerUpSpawn(vec3 pos)
 				{
 					PUSlowerBall* powerUp = new PUSlowerBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
 					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
 					m_pPUObservable->broadcastRebirth(powerUp);
 					m_powerUps.push_back(powerUp);
 				}
@@ -318,6 +348,7 @@ void Game::powerUpSpawn(vec3 pos)
 				{
 					PUBiggerPad* powerUp = new PUBiggerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
 					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
 					m_pPUObservable->broadcastRebirth(powerUp);
 					m_powerUps.push_back(powerUp);
 				}
@@ -326,6 +357,7 @@ void Game::powerUpSpawn(vec3 pos)
 				{
 					PUSmallerPad* powerUp = new PUSmallerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
 					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
 					m_pPUObservable->broadcastRebirth(powerUp);
 					m_powerUps.push_back(powerUp);
 				}
@@ -334,6 +366,7 @@ void Game::powerUpSpawn(vec3 pos)
 				{
 					PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
 					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
 					m_pPUObservable->broadcastRebirth(powerUp);
 					m_powerUps.push_back(powerUp);
 				}

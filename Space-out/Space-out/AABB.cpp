@@ -370,8 +370,6 @@ void AABB::initDraw(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceConte
 	m_pIndexBuffer = new Buffer();
 	m_pIndexBuffer->init(p_pDevice, p_pDeviceContext, desc);
 
-
-
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] = 
 	{
 		{"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}

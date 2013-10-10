@@ -2,11 +2,13 @@
 
 Ball::Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName):Object(p_pPos, p_pColor, p_objectName)
 {
-	m_texturePath = new std::wstring(L"Picatures/sphere.png");
+	m_texturePath = new std::wstring(L"Picatures/BallTexture.png");
 	m_internPosition = vec2(*p_pPos);
 	
-	m_speed = vec3(5.0f, -10.0f, 0.0f);
+	m_speed = vec3(10.0f, -20.0f, 0.0f);
 	m_stuck = false;
+	m_maxSpeedUps = 4;
+	m_nrOfSpeedUps = 0;
 }
 
 Ball::~Ball(){}
@@ -51,12 +53,20 @@ vec3 Ball::getSpeed()
 
 void Ball::speedUp()
 {
-	m_speed *= 1.5f;
+	if(m_nrOfSpeedUps < m_maxSpeedUps)
+	{
+		m_speed *= 1.5f;
+		m_nrOfSpeedUps++;
+	}
 }
 
 void Ball::speedDown()
 {
-	m_speed *= 0.75f;
+	if(m_nrOfSpeedUps > -m_maxSpeedUps)
+	{
+		m_speed *= 0.5f;
+		m_nrOfSpeedUps--;
+	}
 }
 
 void Ball::setStuck(bool p_stuck)

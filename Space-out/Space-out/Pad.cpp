@@ -7,10 +7,12 @@ Pad::Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName) : Object(p_pPos
 	m_vertices.push_back(vec3(-5.0f, 1.0f, 0.0f));
 	m_vertices.push_back(vec3(5.0f, 1.0f, 0.0f));
 	m_boundingVolume = new AABB(m_vertices.at(3), m_vertices.at(0), vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	m_texturePath = new std::wstring(L"Picatures/sphere.png");
+	m_texturePath = new std::wstring(L"Picatures/PadTexture.png");
 	m_mouseOffset = 0.f;
 	m_scale = 1.0f;
 	m_sticky = false;
+	m_nrOfScales = 0;
+	m_maxScales = 3;
 }
 
 Pad::~Pad(){}
@@ -57,12 +59,20 @@ void Pad::changeXCoordXAmount(float p_x)
 
 void Pad::bigger()
 {
-	m_scale *= 1.25f;
+	if(m_nrOfScales < m_maxScales)
+	{
+		m_scale *= 1.25f;
+		m_nrOfScales++;
+	}
 }
 
 void Pad::smaller()
 {
-	m_scale *= 0.75;
+	if(m_nrOfScales > -m_maxScales)
+	{
+		m_scale *= 0.75;
+		m_nrOfScales--;
+	}
 }
 
 float Pad::getScale()

@@ -11,9 +11,11 @@ private:
 	vec2	m_mousePos;
 	float	m_mouseOffset;
 	vec3	m_realPosition;
-	float m_scale;
-	bool m_sticky;
-	vec3 m_savedVector;
+	float	m_scale;
+	bool	m_sticky;
+	vec3	m_savedVector;
+	int		m_nrOfScales;
+	int		m_maxScales;
 public:
 	Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName);
 	~Pad();

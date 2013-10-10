@@ -100,7 +100,7 @@ void Camera::setViewMatrix(vec3 p_pos)
 	m_cameraPos = p_pos;
 
 	m_pitch = 0;
-	m_yaw = 270.0f*(PI/180.0f);
+	m_yaw = 360.0f*(PI/180.0f);
 
 	mat4 R;
 	R[1].y = cos(m_pitch);

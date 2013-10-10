@@ -53,6 +53,10 @@ private:
 	unsigned int			m_activePlayField;
 	PlayField*				m_playFields[m_nrPlayFields];
 	float					m_counter;
+	int						m_padCounter;
+	int						m_wallCounter;
+	bool					m_padCrash;
+	bool					m_wallCrash;
 };
 
 #endif	GAME_H

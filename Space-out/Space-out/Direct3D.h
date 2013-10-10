@@ -117,10 +117,12 @@ private:
 	D3DTexture		 m_blockTexture;
 	Camera			 *m_camera;
 
-	Buffer			 m_buffer;
-	Buffer			 m_cBuffer;
-	Shader			 m_shader;
-	CBPad		m_cbPad;
+	//Pad
+	Buffer			m_buffer;
+	Buffer			m_cBuffer;
+	Shader			m_shader;
+	CBPad			m_cbPad;
+	D3DTexture		m_padTexture;
 
 	//Ball
 	Buffer		m_ballBuffer;
