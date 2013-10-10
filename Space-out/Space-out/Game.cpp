@@ -63,161 +63,164 @@ void Game::update(float p_screenWidth, float p_dt)
 		m_activePlayField = m_activePlayFieldNext;
 	}
 
-	if(m_counter > 0.0f)
+	if(!m_pCamera->isCinematic())
 	{
-		m_counter -= p_dt;
-	}
-	else
-		((Pad*)m_pPad)->setSticky(false);
-
-	if(m_padCounter > 0)
-	{
-		m_padCounter--;
-	}
-	else
-		m_padCrash = false;
-
-	if(m_wallCounter > 0)
-	{
-		m_wallCounter--;
-	}
-	else
-		m_wallCrash = false;
-
-	vec3 padPos = *m_pPad->getPos();
-	PlayField* pf = m_playFields[m_activePlayField];
-	vec3 t_pos = pf->getOriginalPosition();
-	t_pos -= pf->getRightDir() * padPos.x;
-	t_pos += pf->getDownDir() * padPos.y;
-
-	mat4 padTranslation = translate(mat4(1.0f), t_pos);
-	mat4 padRotation;
-	if(m_activePlayField == 0 || m_activePlayField == 2)
-		padRotation = m_playFields[0]->getRotationMatrix();
-	else
-		padRotation = m_playFields[3]->getRotationMatrix();
-
-	((Pad*)m_pPad)->update(padTranslation, padRotation);
-
-	if(!((Ball*)m_pBall)->getStuck())
-	{
-		((Ball*)m_pBall)->update(p_dt);
-		((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
-
-		//Pad vs Ball
-		if(((Pad*)m_pPad)->collide(m_pBall->getBoundingVolume()) && !m_padCrash)
+		if(m_counter > 0.0f)
 		{
-			if(!((Pad*)m_pPad)->getSticky())
+			m_counter -= p_dt;
+		}
+		else
+			((Pad*)m_pPad)->setSticky(false);
+
+		if(m_padCounter > 0)
+		{
+			m_padCounter--;
+		}
+		else
+			m_padCrash = false;
+
+		if(m_wallCounter > 0)
+		{
+			m_wallCounter--;
+		}
+		else
+			m_wallCrash = false;
+
+		vec3 padPos = *m_pPad->getPos();
+		PlayField* pf = m_playFields[m_activePlayField];
+		vec3 t_pos = pf->getOriginalPosition();
+		t_pos -= pf->getRightDir() * padPos.x;
+		t_pos += pf->getDownDir() * padPos.y;
+
+		mat4 padTranslation = translate(mat4(1.0f), t_pos);
+		mat4 padRotation;
+		if(m_activePlayField == 0 || m_activePlayField == 2)
+			padRotation = m_playFields[0]->getRotationMatrix();
+		else
+			padRotation = m_playFields[3]->getRotationMatrix();
+
+		((Pad*)m_pPad)->update(padTranslation, padRotation);
+
+		if(!((Ball*)m_pBall)->getStuck())
+		{
+			((Ball*)m_pBall)->update(p_dt);
+			((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
+
+			//Pad vs Ball
+			if(((Pad*)m_pPad)->collide(m_pBall->getBoundingVolume()) && !m_padCrash)
 			{
-				vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
-				tempSpeed.y = -abs(tempSpeed.y);
-				((Ball*)m_pBall)->setSpeed( tempSpeed );
-				m_padCrash = true;
-				m_padCounter = 4;
+				if(!((Pad*)m_pPad)->getSticky())
+				{
+					vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+					tempSpeed.y = -abs(tempSpeed.y);
+					((Ball*)m_pBall)->setSpeed( tempSpeed );
+					m_padCrash = true;
+					m_padCounter = 4;
+				}
+				else
+				{
+					((Ball*)m_pBall)->setStuck(true);
+					((Pad*)m_pPad)->setSavedVector( ((Ball*)m_pBall)->getRealPosition()- *m_pPad->getBoundingVolume()->getPosition() );
+				}
 			}
-			else
+
+			// ## BLOCKS ##
+			for(int i = 0; i < m_playFields[m_activePlayField]->getListSize();i++)
 			{
-				((Ball*)m_pBall)->setStuck(true);
-				((Pad*)m_pPad)->setSavedVector( ((Ball*)m_pBall)->getRealPosition()- *m_pPad->getBoundingVolume()->getPosition() );
+				AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
+
+				if(bv->collide(m_pBall->getBoundingVolume()))
+				{
+					vec3 s = ((Ball*)m_pBall)->getSpeed();
+					vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), s);
+					((Ball*)m_pBall)->setSpeed( tempSpeed );
+					powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
+					m_playFields[m_activePlayField]->deleteBlock(i);
+					bv = NULL;
+					break;
+				}
+			}
+			// ## WALLS ##
+			for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
+			{
+				AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
+
+				if(  bv->collide(m_pBall->getBoundingVolume()) && !m_wallCrash)
+				{
+					vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+					tempSpeed.y = tempSpeed.y;
+					((Ball*)m_pBall)->setSpeed( tempSpeed );
+					m_wallCrash = true;
+					m_wallCounter = 2;
+					break;
+				}
 			}
 		}
-
-		// ## BLOCKS ##
-		for(int i = 0; i < m_playFields[m_activePlayField]->getListSize();i++)
+		else
 		{
-			AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
-
-			if(bv->collide(m_pBall->getBoundingVolume()))
-			{
-				vec3 s = ((Ball*)m_pBall)->getSpeed();
-				vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), s);
-				((Ball*)m_pBall)->setSpeed( tempSpeed );
-				powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
-				m_playFields[m_activePlayField]->deleteBlock(i);
-				bv = NULL;
-				break;
-			}
+			((Ball*)m_pBall)->setInternalPosition( *m_pPad->getBoundingVolume()->getPosition() + ((Pad*)m_pPad)->getSavedVector(),pf->getOriginalPosition(),pf->getRightDir(), pf->getDownDir() );
+			((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 		}
-		// ## WALLS ##
-		for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
+
+		pf = NULL;
+		//Pad vs Borders NEEDS FINE TUNING
+		for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders()-2; i++)
 		{
 			AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
 
-			if(  bv->collide(m_pBall->getBoundingVolume()) && !m_wallCrash)
+			if(  bv->collide(m_pPad->getBoundingVolume()))
 			{
-				vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
-				tempSpeed.y = tempSpeed.y;
-				((Ball*)m_pBall)->setSpeed( tempSpeed );
-				m_wallCrash = true;
-				m_wallCounter = 2;
+				vec3 Bcenter = *bv->getPosition();
+				vec3 Pcenter = *m_pPad->getBoundingVolume()->getPosition();
+				Bcenter.y = Pcenter.y;
+
+				vec3 dir = Pcenter - Bcenter;
+				if(length(dir) > 0.0f)
+					dir = normalize(dir);
+
+				float x = dot(dir, m_playFields[m_activePlayField]->getRightDir());
+				x *= -1.f;
+				if(i == 0) //Hit Left side
+				{
+					((Pad*)(m_pPad))->changeXCoordXAmount(x*2); // NEEDS FINE TUNING
+				}
+				else //Hit Right side
+				{
+					((Pad*)(m_pPad))->changeXCoordXAmount(x*2);
+				}
 				break;
 			}
 		}
-	}
-	else
-	{
-		((Ball*)m_pBall)->setInternalPosition( *m_pPad->getBoundingVolume()->getPosition() + ((Pad*)m_pPad)->getSavedVector(),pf->getOriginalPosition(),pf->getRightDir(), pf->getDownDir() );
-		((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
-	}
 
-	pf = NULL;
-	//Pad vs Borders NEEDS FINE TUNING
-	for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders()-2; i++)
-	{
-		AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
-
-		if(  bv->collide(m_pPad->getBoundingVolume()))
+		padPos = ((Pad*)m_pPad)->getRealPosition();
+		for(unsigned int i = 0; i < m_powerUps.size(); i++)
 		{
-			vec3 Bcenter = *bv->getPosition();
-			vec3 Pcenter = *m_pPad->getBoundingVolume()->getPosition();
-			Bcenter.y = Pcenter.y;
+			// Update position for power ups.
+			mat4 powTranslation;// = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, t_pos.z));
+			if (m_activePlayField == 0 || m_activePlayField == 2)
+				powTranslation = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, padPos.z)); // Translate powerup
+			else
+				powTranslation = translate(mat4(1.0f), vec3(padPos.x, m_powerUps.at(i)->getPos()->y, m_powerUps.at(i)->getPos()->z));
 
-			vec3 dir = Pcenter - Bcenter;
-			if(length(dir) > 0.0f)
-				dir = normalize(dir);
+			m_powerUps.at(i)->update(p_dt, powTranslation);
+			AABB* bv = (AABB*)(m_powerUps.at(i)->getBoundingVolume());
 
-			float x = dot(dir, m_playFields[m_activePlayField]->getRightDir());
-			x *= -1.f;
-			if(i == 0) //Hit Left side
+			if( bv->collide(m_pPad->getBoundingVolume()) )
 			{
-				((Pad*)(m_pPad))->changeXCoordXAmount(x*2); // NEEDS FINE TUNING
+				//Power Up catch.
+				powerUpCheck(m_powerUps.at(i)->getType());
+				m_pPUObservable->broadcastDeath(i);
+				m_powerUps.erase(m_powerUps.begin() + i);
 			}
-			else //Hit Right side
+			if( bv->collide(m_playFields[m_activePlayField]->getCollisionBorder(3)))
 			{
-				((Pad*)(m_pPad))->changeXCoordXAmount(x*2);
+				//Power Up missed.
+				m_pPUObservable->broadcastDeath(i);
+				m_powerUps.erase(m_powerUps.begin() + i);
 			}
-			break;
 		}
+		// ## COLLISION STUFF END ##
 	}
-
-	padPos = ((Pad*)m_pPad)->getRealPosition();
-	for(unsigned int i = 0; i < m_powerUps.size(); i++)
-	{
-		// Update position for power ups.
-		mat4 powTranslation;// = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, t_pos.z));
-		if (m_activePlayField == 0 || m_activePlayField == 2)
-			powTranslation = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, padPos.z)); // Translate powerup
-		else
-			powTranslation = translate(mat4(1.0f), vec3(padPos.x, m_powerUps.at(i)->getPos()->y, m_powerUps.at(i)->getPos()->z));
-
-		m_powerUps.at(i)->update(p_dt, powTranslation);
-		AABB* bv = (AABB*)(m_powerUps.at(i)->getBoundingVolume());
-
-		if( bv->collide(m_pPad->getBoundingVolume()) )
-		{
-			//Power Up catch.
-			powerUpCheck(m_powerUps.at(i)->getType());
-			m_pPUObservable->broadcastDeath(i);
-			m_powerUps.erase(m_powerUps.begin() + i);
-		}
-		if( bv->collide(m_playFields[m_activePlayField]->getCollisionBorder(3)))
-		{
-			//Power Up missed.
-			m_pPUObservable->broadcastDeath(i);
-			m_powerUps.erase(m_powerUps.begin() + i);
-		}
-	}
-	// ## COLLISION STUFF END ##
 }
 
 void Game::keyEvent(unsigned short key)
@@ -239,7 +242,7 @@ void Game::keyEvent(unsigned short key)
 	{
 		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f));
 	}
-	if(key == 0x51) // Q
+	if(key == 0x45) // E
 	{
 		if(!m_pCamera->isCinematic())
 		{
@@ -255,7 +258,7 @@ void Game::keyEvent(unsigned short key)
 			m_pCamera->startCinematic();
 		}
 	}
-	if(key == 0x45) // E
+	if(key == 0x51) // Q
 	{
 		if(!m_pCamera->isCinematic())
 		{

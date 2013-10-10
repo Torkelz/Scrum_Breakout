@@ -159,7 +159,7 @@ vec3 PlayField::calculateCameraCenterPos()
 	vec3 pos;
 
 	pos = m_positionOriginal + (m_planeVectorX * m_size.x * 0.5f) + (m_planeVectorY * m_size.y * 0.5f);
-	pos = pos + m_orto * 250.0f;
+	pos = pos + m_orto * 200.0f;
 
 	return pos;
 }
