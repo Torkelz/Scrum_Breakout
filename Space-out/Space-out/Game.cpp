@@ -15,6 +15,8 @@ void Game::init(PUObserver* p_pPUObserver)
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
 
+	m_newVolume = 0.5f;
+
 	m_activePlayField = 0;
 	m_activePlayFieldNext = m_activePlayField;
 
@@ -52,10 +54,14 @@ void Game::init(PUObserver* p_pPUObserver)
 	m_loadLevel.~LevelGenerator();
 	m_pPUObservable = new PUObservable();
 	m_pPUObservable->addSubscriber(p_pPUObserver);
+
+	loadSounds();
 }
 
 void Game::update(float p_screenWidth, float p_dt)
 {
+	m_soundManager.update();
+
 	m_pCamera->updateCameraPos(p_dt);
 
 	if(m_pCamera->timeToChange())
@@ -447,3 +453,16 @@ int Game::random()
 	else 
 		return STICKYPAD;
 }
+
+void Game::loadSounds()
+{
+	m_pSoundList.resize(2);
+	m_soundManager.init();
+
+	 m_pSoundList.at(COLLISION) = m_soundManager.loadSound("Sounds/thunder.wav", false);
+}
+
+
+
+
+

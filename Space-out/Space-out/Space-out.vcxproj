@@ -41,7 +41,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\glm;C:\git\Scrum_Breakout\Space-out\cppUnit;C:\Users\BTH\Documents\GitHub\Scrum_Breakout\Space-out\glm;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\glm;C:\git\Scrum_Breakout\Space-out\cppUnit;C:\Users\BTH\Documents\GitHub\Scrum_Breakout\Space-out\glm;$(SolutionDir)\FMOD\FmodInc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\FMOD\FmodLib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -57,7 +58,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>D3D11.lib;D3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D3D11.lib;D3dcompiler.lib;FMODEX_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -107,6 +108,7 @@
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="Pad.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="FSound.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="WICTextureLoader.cpp" />
     <ClCompile Include="WinHID.cpp" />
@@ -125,6 +127,7 @@
     <ClInclude Include="D3DTexture.h" />
     <ClInclude Include="d3dUtil.h" />
     <ClInclude Include="Direct3D.h" />
+    <ClInclude Include="FSound.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="LevelGenerator.h" />
     <ClInclude Include="Object.h" />
