@@ -83,8 +83,6 @@ void PlayField::init(vector<ABlock*> p_blockList, vec2 p_nrBlocks, bool p_x)
 
 void PlayField::transBorders(bool p_x)
 {
-	vec3 orto;		// planevecX * planeVecY pekar mot mot center
-	orto			= cross( m_planeVectorX, m_planeVectorY );
 	mat4 trans;
 	
 	//## Left ##
@@ -152,6 +150,18 @@ void PlayField::deleteBlock(unsigned int p_id)
 {
 	m_blockList.erase(m_blockList.begin() + p_id);
 	setUpdateBuffer(true);
+}
+
+vec3 PlayField::calculateCameraCenterPos()
+{
+	m_orto			= cross( m_planeVectorX, m_planeVectorY );
+
+	vec3 pos;
+
+	pos = m_positionOriginal + (m_planeVectorX * m_size.x * 0.5f) + (m_planeVectorY * m_size.y * 0.5f);
+	pos = pos + m_orto * 250.0f;
+
+	return pos;
 }
 
 
