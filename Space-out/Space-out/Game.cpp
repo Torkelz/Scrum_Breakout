@@ -15,7 +15,9 @@ void Game::init(PUObserver* p_pPUObserver)
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
 
-	m_activePlayField = 3;
+	m_activePlayField = 0;
+	m_activePlayFieldNext = m_activePlayField;
+
 	m_originWorld = vec3(0.f,0.f,0.f);
 
 	vec2 size = m_loadLevel.getFieldSize();
@@ -40,6 +42,13 @@ void Game::init(PUObserver* p_pPUObserver)
 	PlayField* pf = m_playFields[m_activePlayField];
 	((Ball*)m_pBall)->init(pf->getOriginalPosition(), pf->getRightDir(), pf->getDownDir());
 
+	m_pCamera = new Camera();
+	m_pCamera->init(pf->calculateCameraCenterPos());
+	m_pCamera->setViewMatrix();
+	m_pCamera->createProjectionMatrix(PI*0.25f,(float)CLIENTWIDTH/CLIENTHEIGHT, 1.0f, 500.0f);
+	m_pCamera->setYaw(m_activePlayField);
+	
+
 	m_loadLevel.~LevelGenerator();
 	m_pPUObservable = new PUObservable();
 	m_pPUObservable->addSubscriber(p_pPUObserver);
@@ -47,6 +56,13 @@ void Game::init(PUObserver* p_pPUObserver)
 
 void Game::update(float p_screenWidth, float p_dt)
 {
+	m_pCamera->updateCameraPos(p_dt);
+
+	if(m_pCamera->timeToChange())
+	{
+		m_activePlayField = m_activePlayFieldNext;
+	}
+
 	if(m_counter > 0.0f)
 	{
 		m_counter -= p_dt;
@@ -194,6 +210,38 @@ void Game::keyEvent(unsigned short key)
 	{
 		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f));
 	}
+	if(key == 0x51) // Q
+	{
+		if(!m_pCamera->isCinematic())
+		{
+			m_activePlayFieldNext--;
+			if(m_activePlayFieldNext < 0)
+				m_activePlayFieldNext = m_nrPlayFields - 1;
+
+			m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
+									m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
+									m_originWorld,
+									3);
+			m_pCamera->setYaw(m_activePlayFieldNext);
+			m_pCamera->startCinematic();
+		}
+	}
+	if(key == 0x45) // E
+	{
+		if(!m_pCamera->isCinematic())
+		{
+			m_activePlayFieldNext++;
+			if(m_activePlayFieldNext >= m_nrPlayFields)
+				m_activePlayFieldNext = 0;
+
+			m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
+									m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
+									m_originWorld,
+									3);
+			m_pCamera->setYaw(m_activePlayFieldNext);
+			m_pCamera->startCinematic();
+		}
+	}
 	if(key == 0x1B) //ESC
 		PostQuitMessage(0);
 
@@ -259,6 +307,11 @@ PlayField* Game::getActiveField()
 unsigned int Game::getActiveFieldNr()
 {
 	return m_activePlayField;
+}
+
+Camera*	Game::getCamera()
+{
+	return m_pCamera;
 }
 
 void Game::powerUpCheck(int i)

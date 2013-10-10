@@ -1,7 +1,11 @@
 #include "Camera.h"
 
 
-Camera::Camera(vec3 initPos)
+Camera::Camera(){}
+
+Camera::~Camera(){}
+
+void Camera::init(vec3 initPos)
 {
 	m_cameraPos	= initPos;
 	m_velocity	= vec3( 0.0f, 0.0f, 0.0f );
@@ -19,15 +23,16 @@ Camera::Camera(vec3 initPos)
 	
 	m_MAXpitch	= PI/2.0f;
 	m_MINpitch	= -PI/2.0f;
-}
 
-Camera::~Camera(){}
+	m_lifeTime = 0;
+	m_isCinematic = false;
+}
 
 void Camera::createProjectionMatrix( float p_FOV, float p_aspect,
 									float p_nearPlane, float p_farPlane )
 {
 	m_FOV		= p_FOV;
-	m_aspect		= p_aspect;
+	m_aspect	= p_aspect;
 	m_nearPlane	= p_nearPlane;
 	m_farPlane	= p_farPlane;
 
@@ -51,57 +56,9 @@ void Camera::updateViewMatrix()
 	m_lookAt = vec3(0.0f,0.0f,1.0f);
 	m_right = vec3(1.0f,0.0f,0.0f);
 
-	mat4 R;
+	//m_yaw = 270.0f*(PI/180.0f);
 
-	rotate(R, m_pitch, m_right);
-	vec4 temp;
-
-	temp = vec4(m_up, 0.0f) * R;
-	m_up = temp.xyz();
-
-	temp = vec4(m_lookAt, 0.0f) * R;
-	m_lookAt = temp.xyz();
-
-
-	rotate(R, m_yaw, vec3(0.0f, 1.0f, 0.0f));
-
-
-	temp = vec4(m_up, 0.0f) * R;
-	m_up = temp.xyz();
-
-	temp = vec4(m_right, 0.0f) * R;
-	m_right = temp.xyz();
-
-	temp = vec4(m_lookAt, 0.0f) * R;
-	m_lookAt = temp.xyz();
-
-
-	// Update view matrix.
-	m_view[0].x = m_right.x; m_view[0].y = m_up.x; m_view[0].z = m_lookAt.x;
-	m_view[1].x = m_right.y; m_view[1].y = m_up.y; m_view[1].z = m_lookAt.y;
-	m_view[2].x = m_right.z; m_view[2].y = m_up.z; m_view[2].z = m_lookAt.z;
-	 
-	m_view[3].x = - dot(m_cameraPos, m_right );
-	m_view[3].y = - dot(m_cameraPos, m_up );
-	m_view[3].z = - dot(m_cameraPos, m_lookAt );
-	 
-	m_view[0].w = 0.0f;
-	m_view[1].w = 0.0f;
-	m_view[2].w = 0.0f;
-	m_view[3].w = 1.0f;
-}
-
-void Camera::setViewMatrix(vec3 p_pos)
-{
-	m_up = vec3(0.0f,1.0f,0.0f);
-	m_lookAt = vec3(0.0f,0.0f,1.0f);
-	m_right = vec3(1.0f,0.0f,0.0f);
-
-	m_cameraPos = p_pos;
-
-	m_pitch = 0;
-	m_yaw = 180.0f*(PI/180.0f);
-
+	//setYaw(3);
 	mat4 R;
 	R[1].y = cos(m_pitch);
 	R[1].z = sin(m_pitch);
@@ -121,6 +78,63 @@ void Camera::setViewMatrix(vec3 p_pos)
 	R[0].z = -sin(m_yaw);
 	R[2].x = sin(m_yaw);
 	R[2].z = cos(m_yaw);
+	
+
+	temp = vec4(m_up, 0.0f) * R;
+	m_up = temp.xyz();
+
+	temp = vec4(m_right, 0.0f) * R;
+	m_right = temp.xyz();
+	
+	temp = vec4(m_lookAt, 0.0f) * R;
+	m_lookAt = temp.xyz();
+
+
+	// Update view matrix.
+	m_view[0].x = m_right.x; m_view[0].y = m_up.x; m_view[0].z = m_lookAt.x;
+	m_view[1].x = m_right.y; m_view[1].y = m_up.y; m_view[1].z = m_lookAt.y;
+	m_view[2].x = m_right.z; m_view[2].y = m_up.z; m_view[2].z = m_lookAt.z;
+	 
+	m_view[3].x = - dot(m_cameraPos, m_right );
+	m_view[3].y = - dot(m_cameraPos, m_up );
+	m_view[3].z = - dot(m_cameraPos, m_lookAt );
+	 
+	m_view[0].w = 0.0f;
+	m_view[1].w = 0.0f;
+	m_view[2].w = 0.0f;
+	m_view[3].w = 1.0f;
+}
+
+void Camera::setViewMatrix()
+{
+	m_up = vec3(0.0f,1.0f,0.0f);
+	m_lookAt = vec3(0.0f,0.0f,1.0f);
+	m_right = vec3(1.0f,0.0f,0.0f);
+	
+	m_pitch = 0;
+
+	m_yawStart = 180.0f*(PI/180.0f);
+	m_yaw = m_yawStart;
+	m_yawNext = m_yawStart;
+	mat4 R;
+	R[1].y = cos(m_pitch);
+	R[1].z = sin(m_pitch);
+	R[2].y = -sin(m_pitch);
+	R[2].z = cos(m_pitch);
+	
+	vec4 temp;
+	temp = vec4(m_up, 0.0f) * R;
+	m_up = temp.xyz();
+	
+	temp = vec4(m_lookAt, 0.0f) * R;
+	m_lookAt = temp.xyz();
+	
+
+	R = mat4(1.0f);
+	R[0].x = cos(m_yawStart);
+	R[0].z = -sin(m_yawStart);
+	R[2].x = sin(m_yawStart);
+	R[2].z = cos(m_yawStart);
 	
 
 	temp = vec4(m_up, 0.0f) * R;
@@ -162,10 +176,10 @@ void Camera::strafe( float p_f )
 	m_velocity += m_right * p_f;
 }
 
-void Camera::updateCameraPos()
+void Camera::updateCameraPos(float p_dt)
 {
 	// Move camera.
-	m_cameraPos += m_velocity;
+	/*m_cameraPos += m_velocity;
 	if(m_cameraPos.x < - 100)
 		m_cameraPos.x  = -100;
 	else if(m_cameraPos.x > 340)
@@ -176,9 +190,26 @@ void Camera::updateCameraPos()
 	else if(m_cameraPos.z > 200)
 		m_cameraPos.z  = 200;
 
-	m_velocity = vec3( 0.0f, 0.0f, 0.0f );
+	m_velocity = vec3( 0.0f, 0.0f, 0.0f );*/
 
-	m_lookAtPos = m_cameraPos + m_lookAt;
+	if(m_isCinematic)
+	{
+		m_lifeTime += p_dt;
+
+		if((unsigned int)m_lifeTime > m_cinematicPos.size() - 2)
+			resetCinematic();
+		else
+		{
+			updateViewMatrix();
+			interpolateYaw(m_lifeTime);
+			flyCinematic(m_lifeTime);
+		}
+	}
+	else
+	{
+		m_lifeTime = 0;
+	}
+	//m_lookAtPos = m_cameraPos + m_lookAt;
 }
 
 void Camera::setY( float p_f )
@@ -209,6 +240,91 @@ void Camera::updatePitch( float p_d )
 		m_pitch = m_MINpitch;
 }
 
+bool Camera::isCinematic()
+{
+	return m_isCinematic;
+}
+
+void Camera::startCinematic()
+{
+	m_isCinematic = true;
+}
+
+bool Camera::timeToChange()
+{
+	//if((m_lifeTime / m_cinematicPos.size() - 2) > 0.5f)
+	//	return true;
+
+	return (m_lifeTime / m_cinematicPos.size() - 2) > 0.5f ? true : false;
+}
+
+void Camera::buildPath(vec3 p_start, vec3 p_stop, vec3 p_originWorld, int p_nrPoints)
+{
+	m_cinematicPos.push_back(p_start);
+	
+	vec3 dirStart = normalize(p_start - p_originWorld);
+	vec3 dirStop = normalize(p_stop - p_originWorld);
+	vec3 zoomOut = (p_start - p_originWorld) + dirStart * 30.f;
+
+	vec3 checkAngle = cross(dirStart, dirStop);
+
+	float angle = 90.f;//(PI/180.0f);
+
+	if(checkAngle.y < 0) // Test if its right, rotating right direction
+		angle *= -1;
+
+	mat4 rot = rotate(mat4(1.0f), angle/p_nrPoints, m_up);
+
+	vec4 tempZoomOut;
+
+	tempZoomOut = vec4(zoomOut, 0.0f);
+
+	for(int i = 0; i < p_nrPoints; i++)
+	{
+		tempZoomOut = rot * tempZoomOut;
+
+		m_cinematicPos.push_back(p_originWorld + tempZoomOut.xyz());
+	}
+	
+	m_cinematicPos.push_back(p_stop);
+}
+
+void Camera::flyCinematic(float p_lifeTime)
+{
+	float proc = p_lifeTime - (int)p_lifeTime;
+
+	vec3 p0, p4;
+
+	if((unsigned int)p_lifeTime == 0)
+		p0 = m_cinematicPos.at((unsigned int)p_lifeTime);
+	else
+		p0 = m_cinematicPos.at((unsigned int)p_lifeTime - 1);
+
+
+	if((unsigned int)p_lifeTime + 2 > m_cinematicPos.size() - 1)
+		p4 = m_cinematicPos.at((unsigned int)p_lifeTime + 1);
+	else
+		p4 = m_cinematicPos.at((unsigned int)p_lifeTime + 2);
+
+	m_cameraPos = catmullRom(	p0, 
+								m_cinematicPos.at((unsigned int)p_lifeTime), 
+								m_cinematicPos.at((unsigned int)p_lifeTime + 1), 
+								p4,
+								proc);
+}
+
+void Camera::interpolateYaw(float p_lifeTime)
+{
+	float pc = (p_lifeTime / (m_cinematicPos.size() - 1));
+	m_yaw = m_yawStart + ((m_yawNext - m_yawStart) * pc);
+}
+
+void Camera::resetCinematic()
+{
+	m_cinematicPos.clear();
+	m_isCinematic = false;
+}
+
 float Camera::cotan( float p_d )
 {
 	return 1 / tan(p_d);
@@ -232,6 +348,34 @@ vec3 Camera::getPosition()
 vec3 Camera::getLookAt()
 {
 	return m_lookAt;
+}
+
+void Camera::setYaw(int p_activePlayField)
+{
+	m_yawStart = m_yaw;
+
+	switch (p_activePlayField)
+	{
+	case 0:
+		m_yawNext = 180.0f;
+		break;
+
+	case 1:
+		m_yawNext = 90.0f;
+		break;
+
+	case 2:
+		m_yawNext = 360.0f;
+		break;
+
+	case 3:
+		m_yawNext = 270.0f;
+		break;
+	default:
+		break;
+	}
+
+	m_yawNext *= (PI/180.0f);
 }
 
 void Camera::setPosition(float p_x, float p_y, float p_z)

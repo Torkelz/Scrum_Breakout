@@ -115,7 +115,7 @@ private:
 	int				 m_blockBufferSizeL;
 	int				 m_blockBufferSizeR;
 	D3DTexture		 m_blockTexture;
-	Camera			 *m_camera;
+	Camera*			 m_pCamera;
 
 	Buffer			 m_buffer;
 	Buffer			 m_cBuffer;

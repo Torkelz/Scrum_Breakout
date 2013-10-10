@@ -23,6 +23,9 @@ public:
 	mat4		getRotationMatrix();
 	ABlock*		getBlock(unsigned int p_id);
 	void		deleteBlock(unsigned int p_id);
+
+	vec3		calculateCameraCenterPos();
+
 	bool		getUpdateBuffer();
 	void		setUpdateBuffer(bool p_bool);
 	BoundingVolume* getCollisionBorder(unsigned int p_id);
@@ -44,6 +47,10 @@ private:
 	vec3			m_planeVectorY;
 	bool			m_updateBuffer;
 	vec3			m_borderOffset;
+
+	// spline stuffies
+	
+	vec3 m_orto;		// planevecX * planeVecY pekar mot mot center
 };
 
 #endif

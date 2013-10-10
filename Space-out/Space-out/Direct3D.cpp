@@ -49,6 +49,7 @@ void Direct3D::initApp()
 	m_game = Game();
 	m_game.init(m_pPUObserver);
 
+	m_pCamera = m_game.getCamera();
 
 	//Set up world view proj
 	//m_camPosition = XMVectorSet( 0.0f, 0.0f, 250.f, 0.0f );
@@ -59,12 +60,12 @@ void Direct3D::initApp()
 	//m_camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
 	//m_camProjection = XMMatrixPerspectiveFovLH( PI*0.25f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
 
-	m_camera = new Camera(vec3(0.0f, 0.0f, 250.0f));
-	m_camera->setViewMatrix(vec3(0.0f, 0.0f, 250.0f));
-	m_camera->createProjectionMatrix(PI*0.25f,(float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
-	m_camView = mat4ToXMMatrix(m_camera->getViewMatrix());
-	m_camProjection = mat4ToXMMatrix(m_camera->getProjectionMatrix());
-	m_camPosition = vec3ToXMVector(m_camera->getPosition());
+	//m_pCamera = new Camera(vec3(0.0f, 0.0f, 250.0f));
+	//m_pCamera->setViewMatrix(vec3(0.0f, 0.0f, 250.0f));
+	//m_pCamera->createProjectionMatrix(PI*0.25f,(float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
+	m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
+	m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
+	m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
 	m_world = XMMatrixIdentity();
 	
 	RECT r;
@@ -107,8 +108,8 @@ void Direct3D::initApp()
 	m_shader.compileAndCreateShaderFromFile(L"VertexShader.fx", "main","vs_5_0", VERTEX_SHADER , desc);
 	m_shader.compileAndCreateShaderFromFile(L"PixelShader.fx", "main", "ps_5_0", PIXEL_SHADER, NULL);
 	
-	m_WVP	= m_world * m_camView * m_camProjection;
-	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
+	//m_WVP	= m_world * m_camView * m_camProjection;
+	//m_cbPad.WVP = XMMatrixTranspose(m_WVP);
 	BufferInitDesc cbbd;	
 
 	cbbd.elementSize = sizeof(CBPad);
@@ -300,10 +301,10 @@ void Direct3D::updateScene(float p_dt)
 {
 	D3DApp::updateScene(p_dt);
 	m_game.update(m_ScreenViewport.Width, p_dt);
-	m_camView = mat4ToXMMatrix(m_camera->getViewMatrix());
-	m_camProjection = mat4ToXMMatrix(m_camera->getProjectionMatrix());
-	m_camPosition = vec3ToXMVector(m_camera->getPosition());
-	m_camera->updateCameraPos();
+
+	m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
+	m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
+	m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
 	
 	//Update Active block buffer
 	unsigned int active = m_game.getActiveFieldNr();

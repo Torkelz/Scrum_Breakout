@@ -1,6 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 
+#define CLIENTWIDTH		800
+#define CLIENTHEIGHT	600
+
 #include <glm.hpp>
 #include <gtc\matrix_transform.hpp>
 #include <vector>
@@ -8,6 +11,7 @@
 #include "PlayField.h"
 #include "PowerUpInclude.h"
 #include "PUObservable.h"
+#include "Camera.h"
 
 using namespace glm;
 
@@ -34,6 +38,8 @@ public:
 	PlayField*				getField(int p_id);
 	PlayField*				getActiveField();
 	unsigned int			getActiveFieldNr();
+
+	Camera*					getCamera();
 private:
 	void					powerUpSpawn(vec3 pos);
 	int					    random();
@@ -47,10 +53,12 @@ private:
 	vector<vector<ABlock*>>*m_pBlocks;
 	LevelGenerator			m_loadLevel;
 	vector<PowerUp*>		m_powerUps;
+	Camera*					m_pCamera;
 
 	static const unsigned int	m_nrPlayFields = 4;
 	vec3					m_originWorld;
 	unsigned int			m_activePlayField;
+	int			m_activePlayFieldNext;
 	PlayField*				m_playFields[m_nrPlayFields];
 	float					m_counter;
 };
