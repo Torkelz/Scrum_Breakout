@@ -22,7 +22,7 @@ struct cBlockBuffer
 	float sizeZ;
 };
 
-const vec3 g_bvSize(3.2f, 3.7f, 1.0f);
+const vec3 g_bvSize(3.2f, 3.7f, 3.0f);
 
 class ABlock : public Object
 {

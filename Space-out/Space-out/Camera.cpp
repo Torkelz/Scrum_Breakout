@@ -191,6 +191,10 @@ void Camera::updateCameraPos(float p_dt)
 		m_cameraPos.z  = 200;
 
 	m_velocity = vec3( 0.0f, 0.0f, 0.0f );*/
+	if(m_yaw < 0.0f)
+		m_yaw += (2*PI);
+	if(m_yaw > 2*PI)
+		m_yaw -= 2*PI; 
 
 	if(m_isCinematic)
 	{
