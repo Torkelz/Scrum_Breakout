@@ -53,7 +53,7 @@ ID3D11Texture2D* D3DTexture::createTextureResource(DXGI_FORMAT p_dxFormat, UINT 
 
 	if(FAILED(m_pDevice->CreateTexture2D( &desc, p_pInitData ? &data : NULL, &pTexture )))
 	{
-		int i = 0;
+		MessageBox(0, "LOADING TEXTURE FAILED!!!!!!!!!", "ERROR", MB_OK);
 	}
 
 	return pTexture;
@@ -65,7 +65,6 @@ void D3DTexture::createTexture(std::wstring* p_pTextureFilename, char* p_pDebugN
 	const wchar_t* temp = p_pTextureFilename->c_str();
 	if(SUCCEEDED(CreateWICTextureFromFile(m_pDevice, m_pDeviceContext, temp, (ID3D11Resource**)m_pResource, &m_pResourceView, NULL)))
 	{
-		int lol = 0;
 		//m_pResourceView = createTextureSRV(m_pResource);
 		
 		/*if(p_pDebugName)
