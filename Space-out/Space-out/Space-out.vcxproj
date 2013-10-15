@@ -68,7 +68,9 @@
     </Link>
     <CustomBuildStep>
       <Command>COPY /Y $(SolutionDir)fmodex.dll $(SolutionDir)\Debug </Command>
-      <Outputs>Copy relevant files to Debug</Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>Copying relevant files to Debug</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

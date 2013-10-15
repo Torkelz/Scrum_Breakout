@@ -357,7 +357,7 @@ void Direct3D::drawScene()
 
 	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
 	
-	//// Bounding Volume DEBUGGING DRAW
+	// Bounding Volume DEBUGGING DRAW
 	//BoundingVolume* t_v;
 	//t_v = m_game.getBall()->getBoundingVolume();
 	//Sphere t_sphere = *((Sphere*)t_v);
@@ -371,7 +371,7 @@ void Direct3D::drawScene()
 	//	AABB t_bb = *((AABB*)t_v);
 	//	t_bb.draw(m_world, m_camView, m_camProjection);
 	//}
-	//// END DEBUGGING DRAW
+	// END DEBUGGING DRAW
 	
 	//## PAD DRAW START ##
 	XMMATRIX translatePadMatrix;
