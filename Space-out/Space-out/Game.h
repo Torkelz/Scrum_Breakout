@@ -76,7 +76,7 @@ public:
 	Camera*					getCamera();
 	void					setScreenBorders(vec4 p_screenBorder);
 private:
-	Difficulties			m_diff;
+	SInitDataDifficulties	m_sDiffData;
 	SPlayer					m_player;
 
 	void					loadSounds();
