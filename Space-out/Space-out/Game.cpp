@@ -401,7 +401,7 @@ void Game::powerUpSpawn(vec3 pos)
 {
 	if(m_powerUps.size() < 10)
 	{
-		int chance = 20;
+		int chance = 25;
 		int r = rand() % 100;
 		// chance for powerups
 		if(r < chance * m_sDiffData.dropRate)
@@ -409,9 +409,9 @@ void Game::powerUpSpawn(vec3 pos)
 			r = rand() % 3;
 			switch (r)
 			{
-			case SLOWERBALL:
+			case FASTERBALL:
 				{
-					PUSlowerBall* powerUp = new PUSlowerBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+					PUFasterBall* powerUp = new PUFasterBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
 					powerUp->setPos(pos);
 					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
 					m_pPUObservable->broadcastRebirth(powerUp);
@@ -444,9 +444,9 @@ void Game::powerUpSpawn(vec3 pos)
 			r = rand() % 2;
 			switch(r)
 			{
-			case FASTERBALL:
+			case SLOWERBALL:
 				{
-					PUFasterBall* powerUp = new PUFasterBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+					PUSlowerBall* powerUp = new PUSlowerBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
 					powerUp->setPos(pos);
 					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
 					m_pPUObservable->broadcastRebirth(powerUp);
