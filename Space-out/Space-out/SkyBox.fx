@@ -21,7 +21,7 @@ struct PSSceneIn
 //-----------------------------------------------------------------------------------------
 cbuffer cbEveryFrame
 {
-	matrix	g_mWorldViewProjection;
+	float4x4	g_mWorldViewProjection;
 };
 
 //-----------------------------------------------------------------------------------------
@@ -70,22 +70,23 @@ float4 PSScene(PSSceneIn input) : SV_Target
 {	
 	//return gCubeMap.Sample(linearSampler, input.texC);
 	return m_texture.Sample(m_textureSampler, input.texC);
+	return float4(1,0,0,1);
 }
 
 //-----------------------------------------------------------------------------------------
 // Technique: RenderTextured  
 //-----------------------------------------------------------------------------------------
-technique10 RenderSky 
-{
-    pass p0
-    {
-		// Set VS, GS, and PS
-        SetVertexShader( CompileShader( vs_5_0, VSScene() ) );
-        SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PSScene() ) );
-	    
-	    SetRasterizerState( NoCulling );
-		SetBlendState(NoBlend, float4(0.0f,0.0f,0.0f,0.0f), 0xFFFFFFFF);
-	    SetDepthStencilState( EnableDepth, 0 );
-    }  
-}
+//technique10 RenderSky 
+//{
+//    pass p0
+//    {
+//		// Set VS, GS, and PS
+//        SetVertexShader( CompileShader( vs_5_0, VSScene() ) );
+//        SetGeometryShader( NULL );
+//        SetPixelShader( CompileShader( ps_5_0, PSScene() ) );
+//	    
+//	    SetRasterizerState( NoCulling );
+//		SetBlendState(NoBlend, float4(0.0f,0.0f,0.0f,0.0f), 0xFFFFFFFF);
+//	    SetDepthStencilState( EnableDepth, 0 );
+//    }  
+//}

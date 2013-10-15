@@ -304,7 +304,7 @@ void Direct3D::initApp()
 	//Vertices
 	BufferInitDesc skyVBufferDesc;
 	skyVBufferDesc.elementSize		= sizeof(SkyBox::SkyVertex);
-	skyVBufferDesc.initData			= &m_skyBox->getVertices();
+	skyVBufferDesc.initData			= m_skyBox->getVertices().data();
 	skyVBufferDesc.numElements		= m_skyBox->getVertices().size();
 	skyVBufferDesc.type				= VERTEX_BUFFER;
 	skyVBufferDesc.usage			= BUFFER_DEFAULT;
@@ -313,14 +313,14 @@ void Direct3D::initApp()
 	//Indices
 	BufferInitDesc skyIBufferDesc;
 	skyIBufferDesc.elementSize		= sizeof(SkyBox::SkyVertex);
-	skyIBufferDesc.initData			= &m_skyBox->getIndices();
+	skyIBufferDesc.initData			= m_skyBox->getIndices().data();
 	skyIBufferDesc.numElements		= m_skyBox->getIndices().size();
 	skyIBufferDesc.type				= INDEX_BUFFER;
 	skyIBufferDesc.usage			= BUFFER_DEFAULT;
 	m_skyBoxIbuffer = new Buffer();
 	m_skyBoxIbuffer->init(m_pDevice, m_pDeviceContext, skyIBufferDesc);
 	//Texture
-	m_skyTexture = D3DTexture(m_pDevice, m_pDeviceContext);
+	//m_skyTexture = D3DTexture(m_pDevice, m_pDeviceContext);
 	//m_skyTexture.createTexture(new std::wstring(L"Picatures/grassenvmap1024.dds"), 0, D3D11_RESOURCE_MISC_TEXTURECUBE);
 	DirectX::TexMetadata info;
 	std::unique_ptr<DirectX::ScratchImage> image ( new DirectX::ScratchImage );
@@ -334,6 +334,37 @@ void Direct3D::initApp()
 	m_skyBoxShader.init(m_pDevice, m_pDeviceContext, 1);
 	m_skyBoxShader.compileAndCreateShaderFromFile(L"SkyBox.fx", "VSScene", "vs_5_0", VERTEX_SHADER, blockInputdesc);
 	m_skyBoxShader.compileAndCreateShaderFromFile(L"SkyBox.fx", "PSScene", "ps_5_0", PIXEL_SHADER, NULL);
+
+	D3D11_SAMPLER_DESC sdsky;
+	ZeroMemory(&sdsky, sizeof(sdsky));
+	sdsky.Filter				= D3D11_FILTER_ANISOTROPIC;
+	sdsky.AddressU				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sdsky.AddressV				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sdsky.AddressW				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sdsky.ComparisonFunc		= D3D11_COMPARISON_NEVER;
+	sdsky.MinLOD				= 0;
+	sdsky.MaxLOD				= D3D11_FLOAT32_MAX;
+
+	m_pSkySampler = nullptr;
+	hr = m_pDevice->CreateSamplerState( &sdsky, &m_pSkySampler );
+
+	D3D11_RASTERIZER_DESC rssky;
+	ZeroMemory(&rssky, sizeof(rssky));
+	rssky.AntialiasedLineEnable =  false;//DEFAULT
+	rssky.CullMode				=  D3D11_CULL_NONE;
+	rssky.DepthBias				=  0;		//DEFAULT
+	rssky.DepthBiasClamp		=  0.0f;	//DEFAULT
+	rssky.DepthClipEnable		=  true;	//DEFAULT
+	rssky.FillMode				=  D3D11_FILL_SOLID;
+	rssky.FrontCounterClockwise	=  false;	//DEFAULT
+	rssky.MultisampleEnable		=  false;	//DEFAULT
+	rssky.ScissorEnable			=  false;	//DEFAULT
+	rssky.SlopeScaledDepthBias	=  0.0f;	//DEFAULT
+
+
+
+	hr = m_pDevice->CreateRasterizerState(&rssky,&m_pRasterState);
+
 	//SKYBOX END
 }
 
@@ -399,6 +430,7 @@ void Direct3D::drawScene()
 	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
 
 	
+
 	//// Bounding Volume DEBUGGING DRAW
 	//BoundingVolume* t_v;
 	//t_v = m_game.getBall()->getBoundingVolume();
@@ -511,10 +543,33 @@ void Direct3D::drawScene()
 
 	m_pDeviceContext->Draw(1, 0);
 	//## BALL DRAW END ##
+	// SKYBOX DRAW
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	XMMATRIX transSky;
+	vec3 camppos = m_game.getCamera()->getPosition();
+	transSky = XMMatrixTranslation(camppos.x,camppos.y,camppos.z);
 
-	m_pDeviceContext->PS
+	m_cbPad.WVP = XMMatrixTranspose( transSky * m_camView * m_camProjection);
+	//m_cbPad.WVP = transSky * m_camView * m_camProjection;
+	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+	m_cBuffer.apply(0);
 
-	m_pSwapChain->Present(0, 0);
+	
+	
+	m_skyBoxVbuffer->apply();
+	m_skyBoxIbuffer->apply();
+
+	m_skyBoxShader.setShaders();
+	m_skyBoxShader.setBlendState(NULL);
+	m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
+	m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
+	//m_pDeviceContext->RSSetState(m_pRasterState);
+	
+	m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
+
+	//SKYBOX DRAW END
+	
+	m_pSwapChain->Present(1, 0);
 }
 
 LRESULT Direct3D::msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)

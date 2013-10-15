@@ -141,6 +141,8 @@ private:
 	Shader		m_skyBoxShader;
 	D3DTexture	m_skyTexture;
 	ID3D11ShaderResourceView* m_skysrv;
+	ID3D11SamplerState* m_pSkySampler;
+	ID3D11RasterizerState* m_pRasterState;
 
 	//TEST
 	ID3D11Buffer*    mVB;
