@@ -76,20 +76,11 @@ public:
 	Camera*					getCamera();
 	void					setScreenBorders(vec4 p_screenBorder);
 private:
-	SInitDataDifficulties	m_sDiffData;
-	SPlayer					m_player;
-
 	void					loadSounds();
-	FSound					m_soundManager;
-	float					m_newVolume;
-
-	vector<FMOD::Sound*>	m_pSoundList;
-	
-
-
 	void					powerUpSpawn(vec3 pos);
 	int					    random();
 	void					powerUpCheck(int i);
+	void					resetBall(PlayField* pf);
 
 	Observer*				m_pObserver;
 	// ## POWER UP OBSERVABLE ##
@@ -104,7 +95,7 @@ private:
 	static const unsigned int	m_nrPlayFields = 4;
 	vec3					m_originWorld;
 	unsigned int			m_activePlayField;
-	int			m_activePlayFieldNext;
+	int						m_activePlayFieldNext;
 	PlayField*				m_playFields[m_nrPlayFields];
 	float					m_counter;
 	int						m_padCounter;
@@ -113,6 +104,13 @@ private:
 	bool					m_wallCrash;
 
 	vec4					m_screenBorders;
+	
+	FSound					m_soundManager;
+	float					m_newVolume;
+	vector<FMOD::Sound*>	m_pSoundList;
+
+	SInitDataDifficulties	m_sDiffData;
+	SPlayer					m_player;
 };
 
 #endif	GAME_H
