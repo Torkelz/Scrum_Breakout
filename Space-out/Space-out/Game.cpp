@@ -9,7 +9,6 @@ Game::~Game(){}
 
 void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 {
-	
 	Difficulties diff = Difficulties();
 	diff.setInitValues(p_diff);
 	m_sDiffData = diff.getDifficultyValues();
@@ -50,6 +49,7 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 	//Set ball bounding box
 	PlayField* pf = m_playFields[m_activePlayField];
 	((Ball*)m_pBall)->init(pf->getOriginalPosition(), pf->getRightDir(), pf->getDownDir());
+	resetBall(pf);
 
 	m_pCamera = new Camera();
 	m_pCamera->init(pf->calculateCameraCenterPos());
@@ -170,6 +170,11 @@ void Game::update(float p_screenWidth, float p_dt)
 
 				if(  bv->collide(m_pBall->getBoundingVolume()) && !m_wallCrash)
 				{
+					if (i == 3)
+					{
+						resetBall(pf);
+						m_sDiffData.lives--;
+					}
 					vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 					tempSpeed.y = tempSpeed.y;
 					((Ball*)m_pBall)->setSpeed( tempSpeed );
@@ -185,7 +190,6 @@ void Game::update(float p_screenWidth, float p_dt)
 			((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 		}
 
-		pf = NULL;
 		//Pad vs Borders NEEDS FINE TUNING
 		for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders()-2; i++)
 		{
@@ -243,6 +247,29 @@ void Game::update(float p_screenWidth, float p_dt)
 			}
 		}
 		// ## COLLISION STUFF END ##
+
+		if(pf->getListSize() <= 0) // If playfield is empty move the ball to the pad.
+		{
+			resetBall(pf);
+		}
+
+		pf = NULL;
+
+		// TEST LIVES
+		if (m_sDiffData.lives <= 0)
+		{
+			PostQuitMessage(0);
+		}
+
+		int nrOfRemainingBlocks = 0;
+		for (int pl = 0; pl < 4; pl++)
+		{
+			nrOfRemainingBlocks += m_playFields[pl]->getListSize();
+		}
+		if(nrOfRemainingBlocks <= 0)
+		{
+			PostQuitMessage(1);
+		}
 	}
 
 	// SOUND IS OFF HERE REMOVE WHEN NEEDING ZE SOUNDS
@@ -303,13 +330,13 @@ void Game::keyEvent(unsigned short key)
 	if(key == 0x1B) //ESC
 		PostQuitMessage(0);
 
-	//if(key == 0x52) // R
-	//{
-	//	//PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-	//	//powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-	//	//m_pPUObservable->broadcastRebirth(powerUp);
-	//	//m_powerUps.push_back(powerUp);
-	//}
+	if(key == 0x52) // R
+	{
+		PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+		powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
+		m_pPUObservable->broadcastRebirth(powerUp);
+		m_powerUps.push_back(powerUp);
+	}
 	//if( key == 0x46) // F
 	//{
 	//	//PUBiggerPad* powerUp = new PUBiggerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
@@ -502,4 +529,15 @@ void Game::loadSounds()
 void Game::setScreenBorders(vec4 p_screenBorders)
 {
 	m_screenBorders = p_screenBorders;
+}
+
+void Game::resetBall(PlayField* pf)
+{
+	((Ball*)m_pBall)->setStuck(true);
+	((Pad*)m_pPad)->setSavedVector(vec3(0.0f, 4.0f, 0.0f) * ((Pad*)m_pPad)->getScale());
+
+	((Ball*)m_pBall)->setInternalPosition( *m_pPad->getBoundingVolume()->getPosition() + 
+		((Pad*)m_pPad)->getSavedVector(),
+		pf->getOriginalPosition(), pf->getRightDir(), pf->getDownDir() );
+	((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 }

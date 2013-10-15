@@ -20,23 +20,21 @@ public:
 	Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, float p_size);
 	~Pad();
 
-	void update(mat4 p_translate, mat4 p_rotation);
-	bool collide(BoundingVolume* p_pVolume);
+	void	update(mat4 p_translate, mat4 p_rotation);
+	bool	collide(BoundingVolume* p_pVolume);
+	vec2	getMousePos();
+	void	setMouseOffset(float p_x);
+	void	changeXCoordXAmount(float p_x);
 
-	vec2 getMousePos();
-
-	void setMouseOffset(float p_x);
-	void changeXCoordXAmount(float p_x);
-
-	vec3 getRealPosition();
-	void setPos(vec2 p_pos);
-	void bigger();
-	void smaller();
-	float getScale();
-	bool getSticky();
-	void setSticky(bool p_sticky);
-	vec3 getSavedVector();
-	void setSavedVector(vec3 p_savedVector);
+	vec3	getRealPosition();
+	void	setPos(vec2 p_pos);
+	void	bigger();
+	void	smaller();
+	float	getScale();
+	bool	getSticky();
+	void	setSticky(bool p_sticky);
+	vec3	getSavedVector();
+	void	setSavedVector(vec3 p_savedVector);
 };
 
 #endif
