@@ -13,7 +13,7 @@ void Difficulties::setInitValues(int p_difficulty)
 	switch (p_difficulty)
 	{
 	case 0: // EASY Difficulty
-		m_sData = SInitDataDifficulties(10.f, vec3(10.f, -20.0f, 0.0f), 10, 0.75f, 0.7f);
+		m_sData = SInitDataDifficulties(10.f, vec3(10.f, -20.0f, 0.0f), 10, 0.75f, 0.8f);
 		break;
 
 	case 1: // NORMAL Difficulty

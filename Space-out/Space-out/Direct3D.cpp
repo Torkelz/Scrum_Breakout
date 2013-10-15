@@ -47,7 +47,7 @@ void Direct3D::initApp()
 	m_cBlockBuffer		= Buffer();
 	m_pPUObserver		= new PUObserver(this);
 	m_game = Game();
-	m_game.init(m_pPUObserver, HARD);
+	m_game.init(m_pPUObserver, EASY);
 
 	m_pCamera = m_game.getCamera();
 
