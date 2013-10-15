@@ -75,7 +75,7 @@ public:
 
 	Camera*					getCamera();
 private:
-	Difficulties			m_diff;
+	SInitDataDifficulties	m_sDiffData;
 	SPlayer					m_player;
 
 	void					loadSounds();

@@ -9,10 +9,10 @@ Game::~Game(){}
 
 void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 {
-	m_diff = Difficulties();
-	m_diff.setInitValues(p_diff);
-	SInitDataDifficulties m_sDiffData;
-	m_sDiffData = m_diff.getDifficultyValues();
+	
+	Difficulties diff = Difficulties();
+	diff.setInitValues(p_diff);
+	m_sDiffData = diff.getDifficultyValues();
 
 	m_player = SPlayer(m_sDiffData.lives, m_sDiffData.multiplier);
 
@@ -64,8 +64,6 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 	loadSounds();
 	m_soundManager.play(m_pSoundList.at(BACKGROUND), 0);
 	m_soundManager.setVolume(0.1f, 0);
-
-	m_diff.~Difficulties();
 }
 
 void Game::update(float p_screenWidth, float p_dt)
@@ -403,21 +401,14 @@ void Game::powerUpSpawn(vec3 pos)
 {
 	if(m_powerUps.size() < 10)
 	{
+		int chance = 20;
 		int r = rand() % 100;
-		if(r < 50)
+		// chance for powerups
+		if(r < chance * m_sDiffData.dropRate)
 		{
-			r = rand() % 5;
+			r = rand() % 3;
 			switch (r)
 			{
-			case FASTERBALL:
-				{
-					PUFasterBall* powerUp = new PUFasterBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-					powerUp->setPos(pos);
-					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
-					m_pPUObservable->broadcastRebirth(powerUp);
-					m_powerUps.push_back(powerUp);
-				}
-				break;
 			case SLOWERBALL:
 				{
 					PUSlowerBall* powerUp = new PUSlowerBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
@@ -436,6 +427,32 @@ void Game::powerUpSpawn(vec3 pos)
 					m_powerUps.push_back(powerUp);
 				}
 				break;
+			case STICKYPAD:
+				{
+					PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
+					m_pPUObservable->broadcastRebirth(powerUp);
+					m_powerUps.push_back(powerUp);
+				}
+			default:
+				break;
+			}
+		} // Drop chance for powerdowns!
+		else if(r < chance)
+		{
+			r = rand() % 2;
+			switch(r)
+			{
+			case FASTERBALL:
+				{
+					PUFasterBall* powerUp = new PUFasterBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
+					m_pPUObservable->broadcastRebirth(powerUp);
+					m_powerUps.push_back(powerUp);
+				}
+				break;
 			case SMALLERPAD:
 				{
 					PUSmallerPad* powerUp = new PUSmallerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
@@ -445,14 +462,7 @@ void Game::powerUpSpawn(vec3 pos)
 					m_powerUps.push_back(powerUp);
 				}
 				break;
-			case STICKYPAD:
-				{
-					PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-					powerUp->setPos(pos);
-					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
-					m_pPUObservable->broadcastRebirth(powerUp);
-					m_powerUps.push_back(powerUp);
-				}
+
 			default:
 				break;
 			}
