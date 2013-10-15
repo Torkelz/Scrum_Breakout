@@ -13,27 +13,26 @@ Keyboard::~Keyboard()
 unsigned short Keyboard::KeyDown(unsigned short p_key)
 {
 	unsigned short ushort;
-//http://www.grandmaster.nu/blog/?page_id=609
 
 	switch(p_key)
 	{
-	case GLFW_KEY_W:
+	case GLFW_KEY_A:
 		ushort = 0x41;
 		break;
-	case GLFW_KEY_A:
+	case GLFW_KEY_D:
 		ushort = 0x44;
 		break;
-	case GLFW_KEY_S:
-		ushort = 0x57;
+	case GLFW_KEY_SPACE:
+		ushort = 0x20;
 		break;
-	case GLFW_KEY_D:
-		ushort = 0x53;
+	case GLFW_KEY_LEFT:
+		ushort = 2190;
+		break;
+	case GLFW_KEY_RIGHT:
+		ushort = 2192;
 		break;
 	case GLFW_KEY_ESCAPE:
-		ushort = 0x1B;
-		break;
-	case GLFW_KEY_LEFT_CONTROL:
-
+		ushort = 0x1b;
 		break;
 
 	case GLFW_KEY_UNKNOWN:

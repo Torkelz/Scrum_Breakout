@@ -5,7 +5,6 @@
 #include "GLUtil.h"
 #include "HIDObservable.h"
 #include "LinKeyboard.h"
-#include "LinMouse.h"
 #include <SDL/SDL.h>
 
 #define KEY_RELEASE 0
@@ -19,7 +18,6 @@ private:
 	GLFWwindow* m_pHwnd;
 
 	HIDObservable*	m_pObservable;
-	Mouse*			m_pMouse;
 	Keyboard*		m_pKeyboard;
 
 public:
@@ -28,7 +26,7 @@ public:
 	SDL_Event event;
 	bool initDevices();
 
-	void update(int p_action, int p_key);
+	void update(int p_key);
 
 	HIDObservable*	getObservable();
 };

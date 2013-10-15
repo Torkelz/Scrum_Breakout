@@ -10,8 +10,7 @@
 #include <stdlib.h>
 
 using namespace glm;
-
-
+static int keyValueStatic;
 
 class OpenGL : public GLApp{
 	public:
@@ -21,9 +20,10 @@ class OpenGL : public GLApp{
 	void 			initApp();
 	void 			updateScene(float p_dt);
 	void 			drawScene();
-	//static void 	messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods);
-	int m_action;
-	int m_key;
+	void			generatingKeyValue();
+	void			copyMousePos();
+	static void 	messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods);
+
 private:
 	void			updateFPSCounter();
 
@@ -36,6 +36,7 @@ private:
 	Shader			m_triShader;
 	HID*			m_pHID;
 	Game*			m_pGame;
+	int 			m_keyValue;
 
 
 };

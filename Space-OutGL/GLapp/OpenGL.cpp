@@ -91,12 +91,15 @@ void OpenGL::initApp()
 
 	m_pHID = new HID(m_hMainWnd);
 
+	glfwSetCursorPos(m_hMainWnd, 1024/2, 768/2);
+
 	m_pHID->getObservable()->addSubscriber(m_pGame->getObserver());
 }
 
 void OpenGL::updateScene(float p_dt)
 {
 	GLApp::updateScene(p_dt);
+	generatingKeyValue();
 	int width, height;
 	glfwGetFramebufferSize(m_hMainWnd, &width, &height);
 	m_ratio = width / (float) height;
@@ -179,18 +182,21 @@ void OpenGL::drawScene()
 
 }
 
-void  messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods)
+void  OpenGL::messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods)
 {
-	m_action = p_action;
-	m_key = p_key;
-	if(p_key == GLFW_KEY_ESCAPE && p_action == GLFW_PRESS)
-		{glfwSetWindowShouldClose(p_pMainWnd, GL_TRUE);}
+	if(p_action == GLFW_PRESS){
+		keyValueStatic = p_key;
+
+	}
+	else
+		keyValueStatic = 0x00;
 }
 
- messageCallback(int p_key, int p_action)
-{
-
-}
+//void OpenGL::mousePosCallback(GLFWwindow* p_pMainWnd, double p_mouse_x, double p_mouse_y)
+//{
+//	mouseStatic_x = p_mouse_x;
+//	mouseStatic_y = p_mouse_y;
+//}
 
 void OpenGL::updateFPSCounter()
 {
@@ -210,4 +216,33 @@ void OpenGL::updateFPSCounter()
 	     frame_count = 0;
 	 }
 	 frame_count++;
+}
+
+void OpenGL::generatingKeyValue()
+{
+	switch(keyValueStatic)
+	{
+	case GLFW_KEY_A:
+		m_keyValue = GLFW_KEY_A;
+		break;
+	case GLFW_KEY_D:
+		m_keyValue = GLFW_KEY_D;
+		break;
+	case GLFW_KEY_SPACE:
+		m_keyValue = GLFW_KEY_SPACE;
+		break;
+	case GLFW_KEY_LEFT:
+		m_keyValue = GLFW_KEY_LEFT;
+		break;
+	case GLFW_KEY_RIGHT:
+		m_keyValue = GLFW_KEY_RIGHT;
+		break;
+	case GLFW_KEY_ESCAPE:
+		m_keyValue = GLFW_KEY_ESCAPE;
+		break;
+	default:
+		m_keyValue = 0x00;
+		break;
+	}
+	m_pHID->update(m_keyValue);
 }

@@ -105,8 +105,11 @@ void Game::keyEvent(unsigned short key)
 //	{
 //		((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f));
 //	}
-//	if(key == 0x1B) //ESC
-//		PostQuitMessage(0);
+	if(key == 0x1B) //ESC
+	{
+		int i;
+		i =0;
+	}
 //
 //	//if(key == 0x52) // R
 //	//{
