@@ -19,6 +19,7 @@
     <FxCompile Include="VertexShader.fx">
       <Filter>D3D\HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="SkyBox.fx" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameTimer.cpp" />
@@ -101,6 +102,7 @@
     <ClCompile Include="PUStickyPad.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FSound.cpp" />
+    <ClCompile Include="SkyBox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -187,6 +189,7 @@
     <ClInclude Include="PUStickyPad.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FSound.h" />
+    <ClInclude Include="SkyBox.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">
