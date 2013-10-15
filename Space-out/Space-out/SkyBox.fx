@@ -1,6 +1,6 @@
-TextureCube gCubeMap;
+//TextureCube gCubeMap;
 
-TextureCube m_texture : register ( t0 );
+Texture2D m_texture : register ( t0 );
 SamplerState m_textureSampler : register ( s0 );
 
 //-----------------------------------------------------------------------------------------
@@ -19,34 +19,16 @@ struct PSSceneIn
 //-----------------------------------------------------------------------------------------
 // Constant Buffers (where we store variables by frequency of update)
 //-----------------------------------------------------------------------------------------
-cbuffer cbEveryFrame
+//cbuffer cbEveryFrame : register(b0)
+//{
+//	float4x4	g_mWorldViewProjection;
+//};
+cbuffer	cb
 {
-	float4x4	g_mWorldViewProjection;
-};
-
-//-----------------------------------------------------------------------------------------
-// State Structures
-//-----------------------------------------------------------------------------------------
-DepthStencilState EnableDepth
-{
-    DepthEnable = TRUE;
-    DepthWriteMask = ALL;
-};
-BlendState NoBlend
-{
-	BlendEnable[0] = FALSE;
-};
-RasterizerState NoCulling
-{
-	FillMode = SOLID;//WIREFRAME;
-	CullMode = NONE;
-};
-
-SamplerState linearSampler
-{
-	Filter = ANISOTROPIC;
-	AddressU = Wrap;
-	AddressV = Wrap;
+	float4		eyePosW;
+	float4x4	viewProj;
+	float4x4	translation;
+	float2		size;
 };
 //-----------------------------------------------------------------------------------------
 // VertexShader: VSScene
@@ -56,7 +38,7 @@ PSSceneIn VSScene(VSSceneIn input)
 	PSSceneIn output = (PSSceneIn)0;
 	
 	// transform the point into view space
-	output.Pos = mul( float4(input.posL,1.0), g_mWorldViewProjection );
+	output.Pos = mul( float4(input.posL,1.0), mul(translation,viewProj) );
 
 
 	output.texC = input.posL;
@@ -69,7 +51,7 @@ PSSceneIn VSScene(VSSceneIn input)
 float4 PSScene(PSSceneIn input) : SV_Target
 {	
 	//return gCubeMap.Sample(linearSampler, input.texC);
-	return m_texture.Sample(m_textureSampler, input.texC);
+	//return m_texture.Sample(m_textureSampler, input.texC);
 	return float4(1,0,0,1);
 }
 
@@ -90,3 +72,27 @@ float4 PSScene(PSSceneIn input) : SV_Target
 //	    SetDepthStencilState( EnableDepth, 0 );
 //    }  
 //}
+//-----------------------------------------------------------------------------------------
+// State Structures
+//-----------------------------------------------------------------------------------------
+//DepthStencilState EnableDepth
+//{
+//    DepthEnable = TRUE;
+//    DepthWriteMask = ALL;
+//};
+//BlendState NoBlend
+//{
+//	BlendEnable[0] = FALSE;
+//};
+//RasterizerState NoCulling
+//{
+//	FillMode = SOLID;//WIREFRAME;
+//	CullMode = NONE;
+//};
+//
+//SamplerState linearSampler
+//{
+//	Filter = ANISOTROPIC;
+//	AddressU = Wrap;
+//	AddressV = Wrap;
+//};

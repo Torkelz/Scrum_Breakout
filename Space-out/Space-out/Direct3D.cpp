@@ -303,8 +303,8 @@ void Direct3D::initApp()
 	m_skyBox->init(500.0f);
 	//Vertices
 	BufferInitDesc skyVBufferDesc;
-	skyVBufferDesc.elementSize		= sizeof(SkyBox::SkyVertex);
-	skyVBufferDesc.initData			= m_skyBox->getVertices().data();
+	skyVBufferDesc.elementSize		= sizeof(vec3);
+	skyVBufferDesc.initData			= &m_skyBox->getVertices();
 	skyVBufferDesc.numElements		= m_skyBox->getVertices().size();
 	skyVBufferDesc.type				= VERTEX_BUFFER;
 	skyVBufferDesc.usage			= BUFFER_DEFAULT;
@@ -312,8 +312,8 @@ void Direct3D::initApp()
 	m_skyBoxVbuffer->init(m_pDevice, m_pDeviceContext, skyVBufferDesc);
 	//Indices
 	BufferInitDesc skyIBufferDesc;
-	skyIBufferDesc.elementSize		= sizeof(SkyBox::SkyVertex);
-	skyIBufferDesc.initData			= m_skyBox->getIndices().data();
+	skyIBufferDesc.elementSize		= sizeof(unsigned int);
+	skyIBufferDesc.initData			= &m_skyBox->getIndices();
 	skyIBufferDesc.numElements		= m_skyBox->getIndices().size();
 	skyIBufferDesc.type				= INDEX_BUFFER;
 	skyIBufferDesc.usage			= BUFFER_DEFAULT;
@@ -544,15 +544,31 @@ void Direct3D::drawScene()
 	m_pDeviceContext->Draw(1, 0);
 	//## BALL DRAW END ##
 	// SKYBOX DRAW
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	XMMATRIX transSky;
-	vec3 camppos = m_game.getCamera()->getPosition();
-	transSky = XMMatrixTranslation(camppos.x,camppos.y,camppos.z);
 
-	m_cbPad.WVP = XMMatrixTranspose( transSky * m_camView * m_camProjection);
+	//Clear old stuff
+
+	/*m_pDeviceContext->IASetVertexBuffers(0, 0, 0, 0, 0 );
+	m_pDeviceContext->IASetIndexBuffer(NULL, DXGI_FORMAT_R32_UINT, 0);
+	m_pDeviceContext->VSSetConstantBuffers(0, 0,NULL);
+	m_pDeviceContext->GSSetConstantBuffers(0, 0,NULL);
+	m_pDeviceContext->PSSetConstantBuffers(0, 0,NULL);
+	m_pDeviceContext->VSSetConstantBuffers(0, 0,NULL);
+	m_pDeviceContext->GSSetConstantBuffers(0, 0,NULL);
+	m_pDeviceContext->PSSetConstantBuffers(0, 0,NULL);*/
+
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//XMMATRIX transSky;
+	vec3 camppos = m_game.getCamera()->getPosition();
+	//transSky = XMMatrixTranslation(camppos.x,camppos.y,camppos.z);
+
+	//m_cbPad.WVP = XMMatrixTranspose( transSky * m_camView * m_camProjection);
 	//m_cbPad.WVP = transSky * m_camView * m_camProjection;
-	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
-	m_cBuffer.apply(0);
+	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
+	m_constantBallBuffer.apply(0);
+
+	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+	/*m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+	m_cBuffer.apply(0);*/
 
 	
 	
@@ -563,7 +579,7 @@ void Direct3D::drawScene()
 	m_skyBoxShader.setBlendState(NULL);
 	m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
 	m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
-	//m_pDeviceContext->RSSetState(m_pRasterState);
+	m_pDeviceContext->RSSetState(m_pRasterState);
 	
 	m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
 

@@ -23,10 +23,10 @@ public:
 	//ID3D10ShaderResourceView* getSkySRV();
 	vector<vec3> getVertices();
 	vector<unsigned int> getIndices();
-	struct SkyVertex
+	/*struct SkyVertex
 	{
 		vec3 pos;
-	};
+	};*/
 private:
 	
 	void BuildGeoSphere( unsigned int p_NumSubDivisions, float p_Radius);

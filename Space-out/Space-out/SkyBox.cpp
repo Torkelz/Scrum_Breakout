@@ -23,10 +23,10 @@ bool SkyBox::init(float p_Radius)
 
 	BuildGeoSphere( 2, p_Radius);
 
-	vector<SkyVertex> initSkym_vertices(m_vertices.size());
+	vector<vec3> initSkym_vertices(m_vertices.size());
 	for(unsigned int i = 0; i < m_vertices.size(); i++)
 	{
-		initSkym_vertices[i].pos = 0.5f * m_vertices[i];
+		initSkym_vertices[i] = 0.5f * m_vertices[i];
 	}
 
 	////Create Vertex Buffer Description
