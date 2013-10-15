@@ -50,6 +50,7 @@ public:
 	unsigned int			getActiveFieldNr();
 
 	Camera*					getCamera();
+	void					setScreenBorders(vec4 p_screenBorder);
 private:
 	void					loadSounds();
 	FSound					m_soundManager;
@@ -83,6 +84,8 @@ private:
 	int						m_wallCounter;
 	bool					m_padCrash;
 	bool					m_wallCrash;
+
+	vec4					m_screenBorders;
 };
 
 #endif	GAME_H

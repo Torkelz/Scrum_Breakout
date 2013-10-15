@@ -318,6 +318,10 @@ void Game::rightMouseClick( vec2 p_mousePosition ){}
 
 void Game::mouseMove( vec2 p_mousePosition )
 {
+	if(p_mousePosition.x >= m_screenBorders.x &&
+		p_mousePosition.x <= m_screenBorders.y &&
+		p_mousePosition.y >= m_screenBorders.z &&
+		p_mousePosition.y <= m_screenBorders.w)
 	((Pad*)m_pPad)->setPos( vec2(-p_mousePosition.x, p_mousePosition.y) );
 }
 
@@ -467,7 +471,7 @@ void Game::loadSounds()
 	m_pSoundList.at(BACKGROUND) = m_soundManager.loadSound("Sounds/mainbackground.mp3", true);
 }
 
-
-
-
-
+void Game::setScreenBorders(vec4 p_screenBorders)
+{
+	m_screenBorders = p_screenBorders;
+}

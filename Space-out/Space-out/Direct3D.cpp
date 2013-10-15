@@ -74,6 +74,8 @@ void Direct3D::initApp()
 	playFieldScreen.x = (m_game.getActiveField()->getScreenPosition(XMMatrixTomat4(&(m_camView*m_camProjection))).x + 1)/2 * r.right;
 	((Pad*)(m_game.getPad()))->setMouseOffset(m_game.getActiveField()->getSize().x / r.right);
 
+	m_game.setScreenBorders(vec4(r.top,r.right,r.left,r.bottom));
+
 	// ## PAD ##
 	UINT32 const nrVertices = 4;
 	Vertex data[nrVertices];

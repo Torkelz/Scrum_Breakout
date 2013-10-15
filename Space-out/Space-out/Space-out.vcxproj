@@ -43,11 +43,15 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)\glm;C:\git\Scrum_Breakout\Space-out\cppUnit;C:\Users\BTH\Documents\GitHub\Scrum_Breakout\Space-out\glm;$(SolutionDir)\FMOD\FmodInc;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\FMOD\FmodLib;$(LibraryPath)</LibraryPath>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)\glm;C:\git\Scrum_Breakout\Space-out\cppUnit;C:\Users\BTH\Documents\GitHub\Scrum_Breakout\Space-out\glm;$(SolutionDir)\FMOD\FmodInc;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\FMOD\FmodLib;$(LibraryPath)</LibraryPath>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -62,6 +66,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>D3D11.lib;D3dcompiler.lib;FMODEX_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>COPY /Y $(SolutionDir)fmodex.dll $(SolutionDir)\Debug </Command>
+      <Outputs>Copy relevant files to Debug</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -80,6 +88,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;FMODEX_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>COPY /Y $(SolutionDir)fmodex.dll $(SolutionDir)\Release</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>Copying relevant files to Release</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ABlock.cpp" />
