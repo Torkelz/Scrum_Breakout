@@ -28,6 +28,13 @@ enum SOUNDS
 	DEATH
 };
 
+struct Borders
+{
+	vec3	pos;
+	float	offset;
+};
+
+
 class Game
 {
 public:

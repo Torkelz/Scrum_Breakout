@@ -9,6 +9,13 @@ inline int RoundDoneRight(float x) { if(x >= 0){ return (int)(x+0.5f); }else{ re
 
 using namespace std;
 
+struct Borders
+{
+	vec3	pos;
+	float	offset;
+};
+
+
 class PlayField
 {
 public:

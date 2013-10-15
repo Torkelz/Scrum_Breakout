@@ -475,3 +475,21 @@ void Game::setScreenBorders(vec4 p_screenBorders)
 {
 	m_screenBorders = p_screenBorders;
 }
+
+bool PlayField::addBorders()
+{
+	//get playfield orgpos... 
+	//pos for 3 borders... 
+	//top, bot, left side... 
+	//add them to the vector of borders... 
+	//all done return 1... 
+	//else return 0
+
+	for(int i = 0; i > 3; i++)
+	{
+		m_positionOriginal
+	}
+
+
+	return 1;
+}
