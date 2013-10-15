@@ -15,15 +15,11 @@ HID::~HID()
 
 	m_pKeyboard->~Keyboard();
 	m_pKeyboard = NULL;
-	SDL_Quit();
 
 }
 
 bool HID::initDevices()
 {
-	SDL_Init(SDL_INIT_EVERYTHING);
-	SDL_SetVideoMode(640, 480, 32, SDL_NOFRAME);
-	return true;
 }
 
 void HID::update(int p_key)

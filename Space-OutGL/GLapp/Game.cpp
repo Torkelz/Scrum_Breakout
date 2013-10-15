@@ -1,5 +1,5 @@
 #include "Header/Game.h"
-#include "Header/Observer.h"
+
 //#include "Pad.h"
 //#include "Ball.h"
 //#include "Block.h"
@@ -13,6 +13,15 @@ Game::~Game(){}
 void Game::init()
 {
 	m_pObserver = new Observer(this);
+
+	FIBITMAP* bitmap = FreeImage_Load(FreeImage_GetFileType("../c.jpeg",0),"../c.jpeg");
+
+	FIBITMAP *pImage = FreeImage_ConvertTo32Bits(bitmap);
+	int width = FreeImage_GetWidth(pImage);
+	int height = FreeImage_GetHeight(pImage);
+	glGenTextures(1,&cat);
+	glBindTexture(GL_TEXTURE_2D, cat);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, (void*)FreeImage_GetBits(pImage));
 
 //	m_pPad		= new Pad(&vec3(0.0f, 0.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad");
 //	m_pBall		= new Ball(&vec3(0.0f, 0.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Ball");

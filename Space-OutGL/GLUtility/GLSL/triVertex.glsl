@@ -5,8 +5,6 @@ layout(location = 1) in vec3 in_color;
 out vec4 outputColor;
 out mat4 oProj;
 
-//uniform mat4 gWorld;
-
 uniform ColorBlock
 {
 	vec4 pos;

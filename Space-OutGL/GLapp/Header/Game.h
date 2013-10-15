@@ -7,9 +7,12 @@
 //#include "PlayField.h"
 
 #include <glm/glm.hpp>
+#include "Observer.h"
+#include "GLUtil.h"
+#include "FreeImage.h"
 
 using namespace glm;
-
+static GLuint	cat;
 class Observer;
 class Object;
 
@@ -28,12 +31,7 @@ public:
 	void					keyEvent( unsigned short p_key );
 	Observer*				getObserver();
 
-//	Object*					getPad();
-//	vector<ABlock*>*		getBlocks(int p_list);
-//	Object*					getBall();
-//	PlayField*				getField(int p_id);
-//	PlayField*				getActiveField();
-//	unsigned int			getActiveFieldNr();
+
 private:
 	Observer*				m_pObserver;
 
