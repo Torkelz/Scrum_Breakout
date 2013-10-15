@@ -101,6 +101,7 @@
     <ClCompile Include="PUStickyPad.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FSound.cpp" />
+    <ClCompile Include="Difficulties.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -187,6 +188,7 @@
     <ClInclude Include="PUStickyPad.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FSound.h" />
+    <ClInclude Include="Difficulties.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

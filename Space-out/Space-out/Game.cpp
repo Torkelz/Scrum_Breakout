@@ -7,11 +7,18 @@
 Game::Game(){}
 Game::~Game(){}
 
-void Game::init(PUObserver* p_pPUObserver)
+void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 {
+	m_diff = Difficulties();
+	m_diff.setInitValues(p_diff);
+	SInitDataDifficulties m_sDiffData;
+	m_sDiffData = m_diff.getDifficultyValues();
+
+	m_player = SPlayer(m_sDiffData.lives, m_sDiffData.multiplier);
+
 	m_pObserver = new Observer(this);
-	m_pPad		= new Pad(&vec3(0.0f, 125.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad");
-	m_pBall		= new Ball(&vec3(50.0f, 100.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Ball");
+	m_pPad		= new Pad(&vec3(0.0f, 125.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad", m_sDiffData.padStartSize);
+	m_pBall		= new Ball(&vec3(50.0f, 100.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Ball", m_sDiffData.ballStartSpeed);
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
 
@@ -49,7 +56,6 @@ void Game::init(PUObserver* p_pPUObserver)
 	m_pCamera->setViewMatrix();
 	m_pCamera->createProjectionMatrix(PI*0.25f,(float)CLIENTWIDTH/CLIENTHEIGHT, 1.0f, 500.0f);
 	m_pCamera->setYaw(m_activePlayField);
-	
 
 	m_loadLevel.~LevelGenerator();
 	m_pPUObservable = new PUObservable();
@@ -58,6 +64,8 @@ void Game::init(PUObserver* p_pPUObserver)
 	loadSounds();
 	m_soundManager.play(m_pSoundList.at(BACKGROUND), 0);
 	m_soundManager.setVolume(0.1f, 0);
+
+	m_diff.~Difficulties();
 }
 
 void Game::update(float p_screenWidth, float p_dt)

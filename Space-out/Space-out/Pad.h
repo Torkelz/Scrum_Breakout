@@ -17,7 +17,7 @@ private:
 	int		m_nrOfScales;
 	int		m_maxScales;
 public:
-	Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName);
+	Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, float p_size);
 	~Pad();
 
 	void update(mat4 p_translate, mat4 p_rotation);
