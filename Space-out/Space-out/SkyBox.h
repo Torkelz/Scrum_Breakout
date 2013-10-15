@@ -1,38 +1,48 @@
 #ifndef SKYBOX__H
 #define SKYBOX__H
 
-#include "stdafx.h"
-#include "Buffer.h"
-#include "Shader.h"
+//#include "stdafx.h"
+//#include "Buffer.h"
+//#include "Shader.h"
+#include <glm.hpp>
+#include <vector>
+
+using namespace glm;
+using namespace std;
 
 class SkyBox
 {
 public:
-	SkyBox(ID3D10Device* pDevice);
+	SkyBox();//ID3D10Device* pDevice);
 	~SkyBox();
 
-	HRESULT init(float pRadius);
-	void prepareToRender(D3DXMATRIX& pWorld, D3DXVECTOR3 pEyePos);//, D3DXMATRIX& pView, D3DXMATRIX& pProjection);
-	void render();
+	bool init(float p_Radius);
+	//void prepareToRender(D3DXMATRIX& pWorld, D3DXVECTOR3 pEyePos);//, D3DXMATRIX& pView, D3DXMATRIX& pProjection);
+	//void render();
 
-	ID3D10ShaderResourceView* getSkySRV();
-
-private:
+	//ID3D10ShaderResourceView* getSkySRV();
+	vector<vec3> getVertices();
+	vector<unsigned int> getIndices();
 	struct SkyVertex
 	{
-		D3DXVECTOR3 pos;
+		vec3 pos;
 	};
-	void BuildGeoSphere( UINT pNumSubDivisions, float pRadius,  vector<D3DXVECTOR3>& pVertices, vector<DWORD>& pIndices);
-	void Subdivide(vector<D3DXVECTOR3>& pVertices, vector<DWORD>& pIndices);
+private:
+	
+	void BuildGeoSphere( unsigned int p_NumSubDivisions, float p_Radius);
+	void Subdivide();
 
-	ID3D10Device* mDevice;
+	//ID3D10Device* mDevice;
 
-	Buffer* mVertexBuffer;
-	Buffer* mIndexBuffer;
-	Shader* mShader;
+	//Buffer* mVertexBuffer;
+	//Buffer* mIndexBuffer;
+	//Shader* mShader;
 
-	ID3D10ShaderResourceView* mRV;
+	//ID3D10ShaderResourceView* mRV;
 
-	UINT mNumIndices;
+	vector<vec3> m_vertices;
+	vector<unsigned int> m_initIndices;
+
+	unsigned int m_NumIndices;
 };
 #endif;

@@ -4,6 +4,10 @@
 #include "Ball.h"
 #include "Pad.h"
 
+#include "DirectXTex.h"
+#include <memory>
+
+
 int WINAPI WinMain(HINSTANCE p_hInstance, HINSTANCE p_prevInstance,
 				   PSTR p_cmdLine, int p_showCmd)
 {
@@ -122,7 +126,7 @@ void Direct3D::initApp()
 	
 	m_cBuffer.init(m_pDevice, m_pDeviceContext, cbbd);
 	m_padTexture = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_padTexture.createTexture(m_game.getPad()->getTexturePath(), 0);
+	m_padTexture.createTexture(m_game.getPad()->getTexturePath(), 0, 0);
 
 	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
 	m_cBuffer.apply(0);
@@ -164,7 +168,7 @@ void Direct3D::initApp()
 	
 	m_cBlockBuffer.init(m_pDevice, m_pDeviceContext, cBlockBufferDesc);
 	m_blockTexture = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_blockTexture.createTexture(m_game.getActiveField()->getBlock(0)->getTexturePath(),  0);
+	m_blockTexture.createTexture(m_game.getActiveField()->getBlock(0)->getTexturePath(),  0, 0);
 
 	//## BLOCK END ##
 	//## BALL START ##
@@ -182,7 +186,7 @@ void Direct3D::initApp()
 
 	m_ballBuffer.init(m_pDevice, m_pDeviceContext, bufferDesc);
 	m_ballTexture = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_ballTexture.createTexture(m_game.getBall()->getTexturePath(), 0);
+	m_ballTexture.createTexture(m_game.getBall()->getTexturePath(), 0, 0);
 	
 	CBBall cbBall;
 
@@ -267,15 +271,15 @@ void Direct3D::initApp()
 	m_powerShader.compileAndCreateShaderFromFile(L"PixelShader.fx", "main", "ps_5_0", PIXEL_SHADER, NULL);
 
 	m_powerTextures[FASTERBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_powerTextures[FASTERBALL].createTexture(new std::wstring(L"Picatures/fastAndFurious7.png"), 0);
+	m_powerTextures[FASTERBALL].createTexture(new std::wstring(L"Picatures/fastAndFurious7.png"), 0, 0);
 	m_powerTextures[SLOWERBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_powerTextures[SLOWERBALL].createTexture(new std::wstring(L"Picatures/slow.png"), 0);
+	m_powerTextures[SLOWERBALL].createTexture(new std::wstring(L"Picatures/slow.png"), 0, 0);
 	m_powerTextures[BIGGERPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_powerTextures[BIGGERPAD].createTexture(new std::wstring(L"Picatures/biggerPad.png"), 0);
+	m_powerTextures[BIGGERPAD].createTexture(new std::wstring(L"Picatures/biggerPad.png"), 0, 0);
 	m_powerTextures[SMALLERPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_powerTextures[SMALLERPAD].createTexture(new std::wstring(L"Picatures/smallerPad.png"), 0);
+	m_powerTextures[SMALLERPAD].createTexture(new std::wstring(L"Picatures/smallerPad.png"), 0, 0);
 	m_powerTextures[STICKYPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_powerTextures[STICKYPAD].createTexture(m_game.getBall()->getTexturePath(), 0);
+	m_powerTextures[STICKYPAD].createTexture(m_game.getBall()->getTexturePath(), 0, 0);
 
 	D3D11_BLEND_DESC bd;
 	bd.AlphaToCoverageEnable = false;
@@ -294,6 +298,43 @@ void Direct3D::initApp()
 
 	hr = m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
 	//POWER UP END!
+	//SKYBOX START
+	m_skyBox = new SkyBox();
+	m_skyBox->init(500.0f);
+	//Vertices
+	BufferInitDesc skyVBufferDesc;
+	skyVBufferDesc.elementSize		= sizeof(SkyBox::SkyVertex);
+	skyVBufferDesc.initData			= &m_skyBox->getVertices();
+	skyVBufferDesc.numElements		= m_skyBox->getVertices().size();
+	skyVBufferDesc.type				= VERTEX_BUFFER;
+	skyVBufferDesc.usage			= BUFFER_DEFAULT;
+	m_skyBoxVbuffer = new Buffer();
+	m_skyBoxVbuffer->init(m_pDevice, m_pDeviceContext, skyVBufferDesc);
+	//Indices
+	BufferInitDesc skyIBufferDesc;
+	skyIBufferDesc.elementSize		= sizeof(SkyBox::SkyVertex);
+	skyIBufferDesc.initData			= &m_skyBox->getIndices();
+	skyIBufferDesc.numElements		= m_skyBox->getIndices().size();
+	skyIBufferDesc.type				= INDEX_BUFFER;
+	skyIBufferDesc.usage			= BUFFER_DEFAULT;
+	m_skyBoxIbuffer = new Buffer();
+	m_skyBoxIbuffer->init(m_pDevice, m_pDeviceContext, skyIBufferDesc);
+	//Texture
+	m_skyTexture = D3DTexture(m_pDevice, m_pDeviceContext);
+	//m_skyTexture.createTexture(new std::wstring(L"Picatures/grassenvmap1024.dds"), 0, D3D11_RESOURCE_MISC_TEXTURECUBE);
+	DirectX::TexMetadata info;
+	std::unique_ptr<DirectX::ScratchImage> image ( new DirectX::ScratchImage );
+	hr = DirectX::LoadFromDDSFile( L"Picatures/grassenvmap1024.dds", DDS_FLAGS_NONE, &info, *image );
+
+	image->InitializeCubeFromImages( image->GetImages(),image->GetImageCount());
+
+	DirectX::CreateShaderResourceView(m_pDevice, image->GetImages(),image->GetImageCount(),image->GetMetadata(), &m_skysrv);
+
+	m_skyBoxShader = Shader();
+	m_skyBoxShader.init(m_pDevice, m_pDeviceContext, 1);
+	m_skyBoxShader.compileAndCreateShaderFromFile(L"SkyBox.fx", "VSScene", "vs_5_0", VERTEX_SHADER, blockInputdesc);
+	m_skyBoxShader.compileAndCreateShaderFromFile(L"SkyBox.fx", "PSScene", "ps_5_0", PIXEL_SHADER, NULL);
+	//SKYBOX END
 }
 
 void Direct3D::onResize()
@@ -356,6 +397,7 @@ void Direct3D::drawScene()
 	cBlockBuffer cBlockBufferStruct;
 
 	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
+
 	
 	//// Bounding Volume DEBUGGING DRAW
 	//BoundingVolume* t_v;
@@ -469,6 +511,8 @@ void Direct3D::drawScene()
 
 	m_pDeviceContext->Draw(1, 0);
 	//## BALL DRAW END ##
+
+	m_pDeviceContext->PS
 
 	m_pSwapChain->Present(0, 0);
 }

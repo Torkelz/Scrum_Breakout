@@ -1,11 +1,14 @@
 TextureCube gCubeMap;
 
+TextureCube m_texture : register ( t0 );
+SamplerState m_textureSampler : register ( s0 );
+
 //-----------------------------------------------------------------------------------------
 // Input and Output Structures
 //-----------------------------------------------------------------------------------------
 struct VSSceneIn
 {
-	float3 posL : POS;
+	float3 posL : POSITION;
 };
 
 struct PSSceneIn
@@ -65,7 +68,8 @@ PSSceneIn VSScene(VSSceneIn input)
 //-----------------------------------------------------------------------------------------
 float4 PSScene(PSSceneIn input) : SV_Target
 {	
-	return gCubeMap.Sample(linearSampler, input.texC);
+	//return gCubeMap.Sample(linearSampler, input.texC);
+	return m_texture.Sample(m_textureSampler, input.texC);
 }
 
 //-----------------------------------------------------------------------------------------
@@ -76,9 +80,9 @@ technique10 RenderSky
     pass p0
     {
 		// Set VS, GS, and PS
-        SetVertexShader( CompileShader( vs_4_0, VSScene() ) );
+        SetVertexShader( CompileShader( vs_5_0, VSScene() ) );
         SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_4_0, PSScene() ) );
+        SetPixelShader( CompileShader( ps_5_0, PSScene() ) );
 	    
 	    SetRasterizerState( NoCulling );
 		SetBlendState(NoBlend, float4(0.0f,0.0f,0.0f,0.0f), 0xFFFFFFFF);
