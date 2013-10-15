@@ -107,6 +107,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="D3DTexture.cpp" />
+    <ClCompile Include="Difficulties.cpp" />
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="LevelGenerator.cpp" />
     <ClCompile Include="Object.cpp" />
@@ -144,6 +145,7 @@
     <ClInclude Include="d3dApp.h" />
     <ClInclude Include="D3DTexture.h" />
     <ClInclude Include="d3dUtil.h" />
+    <ClInclude Include="Difficulties.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="FSound.h" />
     <ClInclude Include="Game.h" />

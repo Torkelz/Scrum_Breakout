@@ -13,11 +13,19 @@
 #include "PUObservable.h"
 #include "FSound.h"
 #include "Camera.h"
+#include "Difficulties.h"
 
 using namespace glm;
 
 class Observer;
 class Object;
+
+enum DIFFICULTIES
+{
+	EASY,
+	NORMAL,
+	HARD
+};
 
 enum SOUNDS
 {
@@ -28,13 +36,29 @@ enum SOUNDS
 	DEATH
 };
 
+struct SPlayer
+{
+	unsigned short lives;
+	unsigned int highscore;
+	float multipler;
+
+	SPlayer(){}
+
+	SPlayer(unsigned short p_lives, float p_mul)
+	{
+		lives = p_lives;
+		highscore = 0;
+		multipler = p_mul;
+	}
+};
+
 class Game
 {
 public:
 	Game();
 	~Game();
 
-	void					init(PUObserver* p_pPUObserver);
+	void					init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff);
 
 	void					update(float p_screenWidth, float p_dt);
 	void					leftMouseClick( vec2 p_mousePosition );
@@ -52,6 +76,9 @@ public:
 	Camera*					getCamera();
 	void					setScreenBorders(vec4 p_screenBorder);
 private:
+	Difficulties			m_diff;
+	SPlayer					m_player;
+
 	void					loadSounds();
 	FSound					m_soundManager;
 	float					m_newVolume;

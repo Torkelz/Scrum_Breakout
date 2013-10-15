@@ -369,7 +369,7 @@ void Camera::setYaw(int p_activePlayField)
 		break;
 
 	case 2:
-		m_yawNext = 360.0f;
+		m_yawNext = 0.0f;
 		break;
 
 	case 3:
