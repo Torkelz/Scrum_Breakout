@@ -120,6 +120,7 @@ void Game::update(float p_screenWidth, float p_dt)
 				if(!((Pad*)m_pPad)->getSticky())
 				{
 					vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+					
 					tempSpeed.y = -abs(tempSpeed.y);
 					((Ball*)m_pBall)->setSpeed( tempSpeed );
 					m_padCrash = true;
@@ -161,7 +162,7 @@ void Game::update(float p_screenWidth, float p_dt)
 					tempSpeed.y = tempSpeed.y;
 					((Ball*)m_pBall)->setSpeed( tempSpeed );
 					m_wallCrash = true;
-					m_wallCounter = 2;
+					m_wallCounter = 6;
 					break;
 				}
 			}
@@ -238,19 +239,19 @@ void Game::keyEvent(unsigned short key)
 	float Rotation = 0;
 	if(key == 0x41) // A
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(-50.0f, 0.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(-50.0f, 0.0f, 0.0f) * 3.0f);
 	}
 	if(key == 0x44) // D
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(50.0f, 0.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(50.0f, 0.0f, 0.0f) * 3.0f);
 	}
 	if(key == 0x57) // W
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f) * 3.0f);
 	}
 	if(key == 0x53) // S
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f) * 3.0f);
 	}
 	if(key == 0x45) // E
 	{
