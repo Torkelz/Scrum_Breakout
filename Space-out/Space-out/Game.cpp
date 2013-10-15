@@ -69,6 +69,12 @@ void Game::update(float p_screenWidth, float p_dt)
 	if(m_pCamera->timeToChange())
 	{
 		m_activePlayField = m_activePlayFieldNext;
+		int tempPowerUpSize = m_powerUps.size() - 1;
+		for(int i = tempPowerUpSize; i >= 0; i--)
+		{
+			m_pPUObservable->broadcastDeath(i);
+			m_powerUps.erase(m_powerUps.begin() + i);
+		}
 	}
 
 	if(!m_pCamera->isCinematic())
@@ -232,6 +238,9 @@ void Game::update(float p_screenWidth, float p_dt)
 		}
 		// ## COLLISION STUFF END ##
 	}
+
+	// SOUND IS OFF HERE REMOVE WHEN NEEDING ZE SOUNDS
+	m_soundManager.setPauseAll(true);
 }
 
 void Game::keyEvent(unsigned short key)

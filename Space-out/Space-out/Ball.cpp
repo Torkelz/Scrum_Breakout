@@ -55,7 +55,7 @@ void Ball::speedUp()
 {
 	if(m_nrOfSpeedUps < m_maxSpeedUps)
 	{
-		m_speed *= 1.5f;
+		m_speed *= 1.25f;
 		m_nrOfSpeedUps++;
 	}
 }
@@ -64,7 +64,7 @@ void Ball::speedDown()
 {
 	if(m_nrOfSpeedUps > -m_maxSpeedUps)
 	{
-		m_speed *= 0.5f;
+		m_speed *= 0.75f;
 		m_nrOfSpeedUps--;
 	}
 }
