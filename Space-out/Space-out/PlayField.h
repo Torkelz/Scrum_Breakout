@@ -23,7 +23,8 @@ public:
 	mat4		getRotationMatrix();
 	ABlock*		getBlock(unsigned int p_id);
 	void		deleteBlock(unsigned int p_id);
-
+	
+	//The offset in y axis is done because the camera is shifted down ( pitch )
 	vec3		calculateCameraCenterPos();
 
 	bool		getUpdateBuffer();
