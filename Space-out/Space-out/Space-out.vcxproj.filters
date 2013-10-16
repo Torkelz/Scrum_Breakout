@@ -19,6 +19,9 @@
     <FxCompile Include="VertexShader.fx">
       <Filter>D3D\HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="Font.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameTimer.cpp" />
@@ -102,6 +105,9 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FSound.cpp" />
     <ClCompile Include="Difficulties.cpp" />
+    <ClCompile Include="AdvancedText.cpp" />
+    <ClCompile Include="D3DTextDevice.cpp" />
+    <ClCompile Include="D3DFont.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -189,6 +195,9 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FSound.h" />
     <ClInclude Include="Difficulties.h" />
+    <ClInclude Include="AdvancedText.h" />
+    <ClInclude Include="D3DTextDevice.h" />
+    <ClInclude Include="D3DFont.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

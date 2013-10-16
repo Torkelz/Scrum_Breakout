@@ -4,66 +4,50 @@
 #include <d2d1.h>
 #include <dwrite.h>
 
+#ifndef HINST_THISCOMPONENT
+EXTERN_C IMAGE_DOS_HEADER __ImageBase;
+#define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
+#endif
+
 class AdvancedText
 {
-public:
+public: // ## FUNCTIONS ##
 	AdvancedText();
     ~AdvancedText();
 
-    HRESULT Initialize(HWND hwndParent);
-
+    HRESULT Initialize(HWND hwndParent, IDXGISurface* p_RT);
     HWND GetHwnd() { return hwnd_; }
+	
+    static LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+    HRESULT DrawD2DContent();
+    HRESULT DrawText();
 
-private:
-    HRESULT CreateDeviceIndependentResources(
-        );
+private: // ## FUNCTIONS ##
+    HRESULT CreateDeviceIndependentResources();
+    void DiscardDeviceIndependentResources();
+    HRESULT CreateDeviceResources(IDXGISurface* p_RT);
+    void DiscardDeviceResources();
 
-    void DiscardDeviceIndependentResources(
-        );
+    void OnResize( UINT width, UINT height );
 
-    HRESULT CreateDeviceResources(
-        );
-
-    void DiscardDeviceResources(
-        );
-
-    HRESULT DrawD2DContent(
-        );
-
-    HRESULT DrawText(
-        );
-
-    void OnResize(
-        UINT width,
-        UINT height
-        );
-
-    static LRESULT CALLBACK WndProc(
-        HWND hWnd,
-        UINT message,
-        WPARAM wParam,
-        LPARAM lParam
-        );
-
-private:
+private: // ## VARIABLES ##
     HWND hwnd_;
 
     // how much to scale a design that assumes 96-DPI pixels
-    float dpiScaleX_;
-    float dpiScaleY_;
+    float					dpiX;
+    float					dpiY;
 
     // Direct2D
-
-    ID2D1Factory* pD2DFactory_;
-    ID2D1HwndRenderTarget* pRT_;
-    ID2D1SolidColorBrush* pBlackBrush_;
+    ID2D1Factory*			pD2DFactory_;
+	ID2D1HwndRenderTarget*	pRT_;
+    //ID2D1RenderTarget*		pRT_;
+    ID2D1SolidColorBrush*	pBlackBrush_;
 
     // DirectWrite
+    IDWriteFactory*			pDWriteFactory_;
+    IDWriteTextFormat*		pTextFormat_;
 
-    IDWriteFactory* pDWriteFactory_;
-    IDWriteTextFormat* pTextFormat_;
-
-    const wchar_t* wszText_;
-    UINT32 cTextLength_;
+    const wchar_t*			wszText_;
+    UINT32					cTextLength_;
 };
 

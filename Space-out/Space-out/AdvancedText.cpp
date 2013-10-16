@@ -21,85 +21,58 @@ AdvancedText::~AdvancedText()
     //SafeRelease(&pTextFormat_);
 }
 
-HRESULT AdvancedText::Initialize(HWND hwndParent)
+HRESULT AdvancedText::Initialize(HWND hwndParent, IDXGISurface* p_RT)
 {
-    WNDCLASSEX wcex;
-
-    //get the dpi information
-    HDC screen = GetDC(0);
-    dpiScaleX_ = GetDeviceCaps(screen, LOGPIXELSX) / 96.0f;
-    dpiScaleY_ = GetDeviceCaps(screen, LOGPIXELSY) / 96.0f;
-    ReleaseDC(0, screen);
+    //WNDCLASSEX wcex;
     
     HRESULT hr = S_OK;
 
-    ATOM atom;
+	hwnd_ = hwndParent;
 
-    // Register window class.
-    wcex.cbSize        = sizeof(WNDCLASSEX);
-    wcex.style         = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc   = AdvancedText::WndProc;
-    wcex.cbClsExtra    = 0;
-    wcex.cbWndExtra    = sizeof(LONG_PTR);
+    //ATOM atom;
+
+    //// Register window class.
+    //wcex.cbSize        = sizeof(WNDCLASSEX);
+    //wcex.style         = CS_HREDRAW | CS_VREDRAW;
+    //wcex.lpfnWndProc   = AdvancedText::WndProc;
+    //wcex.cbClsExtra    = 0;
+    //wcex.cbWndExtra    = sizeof(LONG_PTR);
     //wcex.hInstance     = HINST_THISCOMPONENT;
-    wcex.hbrBackground = NULL;
-    wcex.lpszMenuName  = NULL;
-    wcex.hIcon         = LoadIcon(
-                            NULL,
-                            IDI_APPLICATION);
-    wcex.hCursor       = LoadCursor(
-                            NULL,
-                            IDC_ARROW);
-    wcex.lpszClassName = TEXT("D2DSimpleText");
-    wcex.hIconSm       = LoadIcon(
-                            NULL,
-                            IDI_APPLICATION
-                            );
+    //wcex.hbrBackground = NULL;
+    //wcex.lpszMenuName  = NULL;
+    //wcex.hIcon         = LoadIcon( NULL, IDI_APPLICATION );
+    //wcex.hCursor       = LoadCursor( NULL, IDC_ARROW );
+    //wcex.lpszClassName = TEXT("D2DSimpleText");
+    //wcex.hIconSm       = LoadIcon( NULL, IDI_APPLICATION );
 
-    atom = RegisterClassEx(
-        &wcex
-        );
+    //atom = RegisterClassEx( &wcex );
 
-    hr = atom ? S_OK : E_FAIL;
+    //hr = atom ? S_OK : E_FAIL;
 
     // Create window.
-    hwnd_ = CreateWindow(
-        TEXT("D2DSimpleText"),
-        TEXT(""),
-        WS_CHILD,
-        0,
-        0,
-        static_cast<int>(640.0f / dpiScaleX_),
-        static_cast<int>(480.0f / dpiScaleY_),
-        hwndParent,
-        NULL,
-        HINST_THISCOMPONENT,
-        this
-        );
+  //  hwnd_ = CreateWindow( TEXT("D2DSimpleText"), TEXT(""), WS_CHILD, 0, 0, 
+		//static_cast<int>(640.0f / dpiScaleX_), static_cast<int>(480.0f / dpiScaleY_),
+  //      hwndParent, NULL, HINST_THISCOMPONENT, this );
    
-    if (SUCCEEDED(hr))
-    {
-        hr = hwnd_ ? S_OK : E_FAIL;
-    }
+    //if (SUCCEEDED(hr))
+    //{
+    //    hr = hwnd_ ? S_OK : E_FAIL;
+    //}
     
     if (SUCCEEDED(hr))
     {
-        hr = CreateDeviceIndependentResources(
-            );
+        hr = CreateDeviceIndependentResources();
     }
 
+	if (SUCCEEDED(hr))
+	{
+		hr = CreateDeviceResources(p_RT);
+	}
 
     if (SUCCEEDED(hr))
     {
-        ShowWindow(
-            hwnd_,
-            SW_SHOWNORMAL
-            );
-
-
-        UpdateWindow(
-            hwnd_
-            );
+        ShowWindow( hwnd_, SW_SHOWNORMAL );
+        UpdateWindow( hwnd_ );
     }
 
     if (SUCCEEDED(hr))
@@ -126,9 +99,8 @@ HRESULT AdvancedText::Initialize(HWND hwndParent)
 HRESULT AdvancedText::CreateDeviceIndependentResources()
 {
     HRESULT hr;
-
+	
     // Create Direct2D factory.
-
     hr = D2D1CreateFactory(
         D2D1_FACTORY_TYPE_SINGLE_THREADED,
         &pD2DFactory_
@@ -136,7 +108,6 @@ HRESULT AdvancedText::CreateDeviceIndependentResources()
 
 
     // Create a shared DirectWrite factory.
-
     if (SUCCEEDED(hr))
     {
         hr = DWriteCreateFactory(
@@ -148,14 +119,12 @@ HRESULT AdvancedText::CreateDeviceIndependentResources()
 
 
     // The string to display.
-
     wszText_ = L"Hello World using  DirectWrite!";
     cTextLength_ = (UINT32) wcslen(wszText_);
 
 
     // Create a text format using Gabriola with a font size of 72.
     // This sets the default font, weight, stretch, style, and locale.
-
     if (SUCCEEDED(hr))
     {
         hr = pDWriteFactory_->CreateTextFormat(
@@ -169,8 +138,6 @@ HRESULT AdvancedText::CreateDeviceIndependentResources()
             &pTextFormat_
             );
     }
-
-
 
     // Center align (horizontally) the text.
     if (SUCCEEDED(hr))
@@ -198,10 +165,9 @@ HRESULT AdvancedText::CreateDeviceIndependentResources()
 *                                                                 *
 ******************************************************************/
 
-HRESULT AdvancedText::CreateDeviceResources()
+HRESULT AdvancedText::CreateDeviceResources(IDXGISurface* p_RT)
 {
     HRESULT hr = S_OK;
-
 
     RECT rc;
     GetClientRect(hwnd_, &rc);
@@ -211,15 +177,20 @@ HRESULT AdvancedText::CreateDeviceResources()
     if (!pRT_)
     {
         // Create a Direct2D render target.
-        hr = pD2DFactory_->CreateHwndRenderTarget(
-                D2D1::RenderTargetProperties(),
-                D2D1::HwndRenderTargetProperties(
-                    hwnd_,
-                    size
-                    ),
-                &pRT_
-                );
-
+        hr = pD2DFactory_->CreateHwndRenderTarget( D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(hwnd_,size), &pRT_);
+		//get the dpi information
+		/*HDC screen = GetDC(0);
+		dpiX = GetDeviceCaps(screen, LOGPIXELSX) / 96.0f;
+		dpiY = GetDeviceCaps(screen, LOGPIXELSY) / 96.0f;
+		ReleaseDC(0, screen);
+		D2D1_RENDER_TARGET_PROPERTIES props =
+			D2D1::RenderTargetProperties(
+			D2D1_RENDER_TARGET_TYPE_DEFAULT,
+			D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED),
+			dpiX,
+			dpiY );
+		ID2D1RenderTarget* tt = 0;
+		hr = pD2DFactory_->CreateDxgiSurfaceRenderTarget( p_RT, &props, &tt);*/
         // Create a black brush.
         if (SUCCEEDED(hr))
         {
@@ -271,10 +242,10 @@ HRESULT AdvancedText::DrawText()
     // Create a D2D rect that is the same size as the window.
 
     D2D1_RECT_F layoutRect = D2D1::RectF(
-        static_cast<FLOAT>(rc.left) / dpiScaleX_,
-        static_cast<FLOAT>(rc.top) / dpiScaleY_,
-        static_cast<FLOAT>(rc.right - rc.left) / dpiScaleX_,
-        static_cast<FLOAT>(rc.bottom - rc.top) / dpiScaleY_
+        static_cast<FLOAT>(rc.left) / dpiX,
+        static_cast<FLOAT>(rc.top) / dpiY,
+        static_cast<FLOAT>(rc.right - rc.left) / dpiX,
+        static_cast<FLOAT>(rc.bottom - rc.top) / dpiY
         );
 
 
@@ -309,15 +280,15 @@ HRESULT AdvancedText::DrawD2DContent()
 {
     HRESULT hr;
 
+	hr = S_OK;
 
-    hr = CreateDeviceResources();
+
+    //hr = CreateDeviceResources();
 
     if (SUCCEEDED(hr))
     {
         pRT_->BeginDraw();
-
         pRT_->SetTransform(D2D1::IdentityMatrix());
-
         pRT_->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
         // Call the DrawText method of this class.
@@ -325,14 +296,13 @@ HRESULT AdvancedText::DrawD2DContent()
 
         if (SUCCEEDED(hr))
         {
-            hr = pRT_->EndDraw(
-                );
+            hr = pRT_->EndDraw();
         }
     }
 
     if (FAILED(hr))
     {
-        DiscardDeviceResources();
+        //DiscardDeviceResources();
     }
 
 
@@ -356,7 +326,7 @@ void AdvancedText::OnResize(UINT width, UINT height)
         D2D1_SIZE_U size;
         size.width = width;
         size.height = height;
-        pRT_->Resize(size);
+        //pRT_->Resize(size);
     }
 }
 
@@ -404,10 +374,7 @@ LRESULT CALLBACK AdvancedText::WndProc(HWND hwnd, UINT message, WPARAM wParam, L
                 PAINTSTRUCT ps;
                 BeginPaint(hwnd, &ps);
                 pAdvancedText->DrawD2DContent();
-                EndPaint(
-                    hwnd,
-                    &ps
-                    );
+                EndPaint( hwnd, &ps );
             }
             return 0;
 

@@ -295,7 +295,8 @@ void Direct3D::initApp()
 	hr = m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
 	//POWER UP END!
 
-	// SPRITE TEST
+	// TEXT TEST
+	//m_pTextDevice->DrawD2DContent();
 }
 
 void Direct3D::onResize()
@@ -355,6 +356,7 @@ void Direct3D::updateScene(float p_dt)
 void Direct3D::drawScene()
 {
 	D3DApp::drawScene();
+
 	cBlockBuffer cBlockBufferStruct;
 
 	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
@@ -472,12 +474,18 @@ void Direct3D::drawScene()
 	m_pDeviceContext->Draw(1, 0);
 	//## BALL DRAW END ##
 
+	//PAINTSTRUCT ps;
+	//BeginPaint(m_hMainWnd, &ps);
+	//m_pTextDevice->DrawD2DContent();
+    //EndPaint( m_hMainWnd, &ps );
+
 	m_pSwapChain->Present(0, 0);
 }
 
 LRESULT Direct3D::msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
 {
 	m_HID.update(p_msg, p_lParam);
+	//m_pTextDevice->WndProc(m_hMainWnd, p_msg, p_wParam, p_lParam);
 
 	return D3DApp::msgProc(p_msg, p_wParam, p_lParam);;
 }

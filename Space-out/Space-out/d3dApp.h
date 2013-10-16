@@ -63,6 +63,9 @@ protected:
 	bool						m_Enable4xMsaa;
 
 	//DEBUG REMOVE
-	std::wstring					m_winTitle;
+	std::wstring				m_winTitle;
+
+	// TEXT TEST
+	//AdvancedText*				m_pTextDevice;
 };
 #endif // D3DAPP_H
