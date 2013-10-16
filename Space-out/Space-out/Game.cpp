@@ -487,29 +487,33 @@ void Game::addBorders()
 	//add them to the vector of borders... 
 
 
-	for(int i = 0; i < (m_nrPlayFields * 3); i+3)
+	for(int i = 0; i < (m_nrPlayFields * 3);)
 	{
 		int playfeildnr = i/3;
 
-		vec3 lol = m_playFields[playfeildnr]->getOriginalPosition();
-
-		//ONLY WORKS FOR THE FRONT SIDE!!!
-		//NEEDS TO USE THE PLAYFIELDS VECTORS TO CORRECT THE BORDERS!
+		//vec3 lol = m_playFields[playfeildnr]->getOriginalPosition();
+		vec3 rightDir = m_playFields[playfeildnr]->getRightDir();
+		vec3 downDir = m_playFields[playfeildnr]->getDownDir();
+		vec3 crossDir = cross(rightDir, downDir);
+		vec3 dirs = rightDir + downDir + crossDir;
+		float offset = 5.0f;
 
 
 		//##TOP##
 		m_borderList.push_back(Borders(vec3(m_playFields[playfeildnr]->getOriginalPosition().x + (m_playFields[playfeildnr]->getSize().x * 0.5f), 
-									m_playFields[playfeildnr]->getOriginalPosition().y, 
-									m_playFields[playfeildnr]->getOriginalPosition().z)));
+									m_playFields[playfeildnr]->getOriginalPosition().y - offset, 
+									m_playFields[playfeildnr]->getOriginalPosition().z) * dirs));
 
 		//##LEFT##
-		m_borderList.push_back(Borders(vec3(m_playFields[playfeildnr]->getOriginalPosition().x, 
+		m_borderList.push_back(Borders(vec3(m_playFields[playfeildnr]->getOriginalPosition().x - offset, 
 									m_playFields[playfeildnr]->getOriginalPosition().y + (m_playFields[playfeildnr]->getSize().y * 0.5f), 
-									m_playFields[playfeildnr]->getOriginalPosition().z)));
+									m_playFields[playfeildnr]->getOriginalPosition().z) * dirs));
 
 		//##BOT##
 		m_borderList.push_back(Borders(vec3(m_playFields[playfeildnr]->getOriginalPosition().x + (m_playFields[playfeildnr]->getSize().x * 0.5f), 
-									m_playFields[playfeildnr]->getOriginalPosition().y + (m_playFields[playfeildnr]->getSize().y), 
-									m_playFields[playfeildnr]->getOriginalPosition().z)));
+									m_playFields[playfeildnr]->getOriginalPosition().y + (m_playFields[playfeildnr]->getSize().y + offset), 
+									m_playFields[playfeildnr]->getOriginalPosition().z) * dirs));
+
+		 i += 3;
 	}
 }
