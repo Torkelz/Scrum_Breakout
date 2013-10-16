@@ -63,7 +63,7 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 
 	loadSounds();
 	m_soundManager.play(m_pSoundList.at(BACKGROUND), 0);
-	m_soundManager.setVolume(0.1f, 0);
+	m_soundManager.setVolume(0.0f, 0);
 }
 
 void Game::update(float p_screenWidth, float p_dt)
