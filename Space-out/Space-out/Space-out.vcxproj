@@ -68,7 +68,7 @@
       <AdditionalDependencies>D3D11.lib;D3dcompiler.lib;FMODEX_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>COPY /Y $(SolutionDir)fmodex.dll $(SolutionDir)\Debug </Command>
+      <Command>COPY /Y "$(SolutionDir)fmodex.dll" "$(SolutionDir)Debug" </Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>Copying relevant files to Debug</Outputs>
