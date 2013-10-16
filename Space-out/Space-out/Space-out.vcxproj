@@ -41,7 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\glm;C:\git\Scrum_Breakout\Space-out\cppUnit;C:\Users\BTH\Documents\GitHub\Scrum_Breakout\Space-out\glm;$(SolutionDir)\FMOD\FmodInc;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\DirectXTK\inc;$(SolutionDir)\glm;C:\git\Scrum_Breakout\Space-out\cppUnit;C:\Users\BTH\Documents\GitHub\Scrum_Breakout\Space-out\glm;$(SolutionDir)\FMOD\FmodInc;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\FMOD\FmodLib;$(LibraryPath)</LibraryPath>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
     <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
@@ -210,6 +210,11 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DirectXTK\DirectXTK_Desktop_2012.vcxproj">
+      <Project>{e0b52ae7-e160-4d32-bf3f-910b785e5a8e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

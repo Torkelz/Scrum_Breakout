@@ -294,6 +294,8 @@ void Direct3D::initApp()
 
 	hr = m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
 	//POWER UP END!
+
+	// SPRITE TEST
 }
 
 void Direct3D::onResize()

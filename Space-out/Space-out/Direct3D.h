@@ -143,6 +143,7 @@ private:
 	Shader			 m_powerShader;
 	ID3D11BlendState* m_pPowerBlend;
 	// DEBUGGING DRAW
-	
+
+	// SPRITE TEST
 };
 #endif
