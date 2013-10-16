@@ -249,7 +249,28 @@ vector<unsigned int> SkyBox::getIndices()
 {
 	return m_initIndices;
 }
-
+vec3* SkyBox::getVertexData()
+{
+  vec3* temp = NULL;
+  unsigned int size = m_vertices.size();
+  temp				= new vec3[size];
+  for(unsigned int i = 0; i < size; i++)
+  {
+	  temp[i] = m_vertices.at(i);
+  }
+  return temp;
+}
+unsigned int* SkyBox::getIndicesData()
+{
+  unsigned int* temp = NULL;
+  unsigned int size = m_initIndices.size();
+  temp				= new unsigned int[size];
+  for(unsigned int i = 0; i < size; i++)
+  {
+	  temp[i] = m_initIndices.at(i);
+  }
+  return temp;
+}
 //ID3D10ShaderResourceView* SkyBox::getSkySRV()
 //{
 //	return mRV;

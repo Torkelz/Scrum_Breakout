@@ -1,6 +1,6 @@
 //TextureCube gCubeMap;
 
-Texture2D m_texture : register ( t0 );
+TextureCube m_texture : register ( t0 );
 SamplerState m_textureSampler : register ( s0 );
 
 //-----------------------------------------------------------------------------------------
@@ -51,8 +51,8 @@ PSSceneIn VSScene(VSSceneIn input)
 float4 PSScene(PSSceneIn input) : SV_Target
 {	
 	//return gCubeMap.Sample(linearSampler, input.texC);
-	//return m_texture.Sample(m_textureSampler, input.texC);
-	return float4(1,0,0,1);
+	return m_texture.Sample(m_textureSampler, input.texC);
+	//return float4(1,0,0,1);
 }
 
 //-----------------------------------------------------------------------------------------

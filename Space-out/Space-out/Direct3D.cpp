@@ -4,7 +4,8 @@
 #include "Ball.h"
 #include "Pad.h"
 
-#include "DirectXTex.h"
+#include "..\DirectXTK\Inc\DDSTextureLoader.h"
+
 #include <memory>
 
 
@@ -300,11 +301,12 @@ void Direct3D::initApp()
 	//POWER UP END!
 	//SKYBOX START
 	m_skyBox = new SkyBox();
-	m_skyBox->init(500.0f);
+	m_skyBox->init( m_game.getCamera()->getFarPlane()-10.0f);
 	//Vertices
 	BufferInitDesc skyVBufferDesc;
 	skyVBufferDesc.elementSize		= sizeof(vec3);
-	skyVBufferDesc.initData			= &m_skyBox->getVertices();
+	//skyVBufferDesc.initData		= &m_skyBox->getVertices();
+	skyVBufferDesc.initData			= m_skyBox->getVertexData();
 	skyVBufferDesc.numElements		= m_skyBox->getVertices().size();
 	skyVBufferDesc.type				= VERTEX_BUFFER;
 	skyVBufferDesc.usage			= BUFFER_DEFAULT;
@@ -313,22 +315,30 @@ void Direct3D::initApp()
 	//Indices
 	BufferInitDesc skyIBufferDesc;
 	skyIBufferDesc.elementSize		= sizeof(unsigned int);
-	skyIBufferDesc.initData			= &m_skyBox->getIndices();
+	//skyIBufferDesc.initData		= &m_skyBox->getIndices();
+	skyIBufferDesc.initData			= m_skyBox->getIndicesData();
 	skyIBufferDesc.numElements		= m_skyBox->getIndices().size();
 	skyIBufferDesc.type				= INDEX_BUFFER;
 	skyIBufferDesc.usage			= BUFFER_DEFAULT;
 	m_skyBoxIbuffer = new Buffer();
 	m_skyBoxIbuffer->init(m_pDevice, m_pDeviceContext, skyIBufferDesc);
 	//Texture
-	//m_skyTexture = D3DTexture(m_pDevice, m_pDeviceContext);
-	//m_skyTexture.createTexture(new std::wstring(L"Picatures/grassenvmap1024.dds"), 0, D3D11_RESOURCE_MISC_TEXTURECUBE);
-	DirectX::TexMetadata info;
-	std::unique_ptr<DirectX::ScratchImage> image ( new DirectX::ScratchImage );
-	hr = DirectX::LoadFromDDSFile( L"Picatures/grassenvmap1024.dds", DDS_FLAGS_NONE, &info, *image );
+	ID3D11Texture2D* tex = 0;
+	ID3D11Resource* tt = 0;
+	
+	hr = DirectX::CreateDDSTextureFromFile(m_pDevice, L"Picatures/grassenvmap1024.dds",&tt, nullptr );
+	//ID3D11Resource to ID3D11Texture2D
+	tt->QueryInterface(&tex);
+	D3D11_TEXTURE2D_DESC td;
+	tex->GetDesc(&td);
 
-	image->InitializeCubeFromImages( image->GetImages(),image->GetImageCount());
+	D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+	viewDesc.Format = td.Format;
+	viewDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURECUBE;
+	viewDesc.TextureCube.MipLevels = td.MipLevels;
+	viewDesc.TextureCube.MostDetailedMip = 0;
 
-	DirectX::CreateShaderResourceView(m_pDevice, image->GetImages(),image->GetImageCount(),image->GetMetadata(), &m_skysrv);
+	hr = m_pDevice->CreateShaderResourceView(tex, &viewDesc, &m_skysrv);
 
 	m_skyBoxShader = Shader();
 	m_skyBoxShader.init(m_pDevice, m_pDeviceContext, 1);
@@ -545,32 +555,14 @@ void Direct3D::drawScene()
 	//## BALL DRAW END ##
 	// SKYBOX DRAW
 
-	//Clear old stuff
-
-	/*m_pDeviceContext->IASetVertexBuffers(0, 0, 0, 0, 0 );
-	m_pDeviceContext->IASetIndexBuffer(NULL, DXGI_FORMAT_R32_UINT, 0);
-	m_pDeviceContext->VSSetConstantBuffers(0, 0,NULL);
-	m_pDeviceContext->GSSetConstantBuffers(0, 0,NULL);
-	m_pDeviceContext->PSSetConstantBuffers(0, 0,NULL);
-	m_pDeviceContext->VSSetConstantBuffers(0, 0,NULL);
-	m_pDeviceContext->GSSetConstantBuffers(0, 0,NULL);
-	m_pDeviceContext->PSSetConstantBuffers(0, 0,NULL);*/
-
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//XMMATRIX transSky;
-	vec3 camppos = m_game.getCamera()->getPosition();
-	//transSky = XMMatrixTranslation(camppos.x,camppos.y,camppos.z);
 
-	//m_cbPad.WVP = XMMatrixTranspose( transSky * m_camView * m_camProjection);
-	//m_cbPad.WVP = transSky * m_camView * m_camProjection;
+	vec3 camppos = m_game.getCamera()->getPosition();
+
 	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
 	m_constantBallBuffer.apply(0);
 
 	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
-	/*m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
-	m_cBuffer.apply(0);*/
-
-	
 	
 	m_skyBoxVbuffer->apply();
 	m_skyBoxIbuffer->apply();

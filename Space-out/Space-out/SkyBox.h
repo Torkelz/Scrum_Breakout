@@ -23,6 +23,10 @@ public:
 	//ID3D10ShaderResourceView* getSkySRV();
 	vector<vec3> getVertices();
 	vector<unsigned int> getIndices();
+	vec3* getVertexData();
+
+	unsigned int* getIndicesData();
+
 	/*struct SkyVertex
 	{
 		vec3 pos;
