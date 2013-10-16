@@ -7,7 +7,7 @@ Pad::Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, float p_size) :
 	m_vertices.push_back(vec3(-5.0f, 1.0f, 0.0f));
 	m_vertices.push_back(vec3(5.0f, 1.0f, 0.0f));
 
-	for(int i = 0; i < m_vertices.size(); i++)
+	for(unsigned int i = 0; i < m_vertices.size(); i++)
 		m_vertices.at(i).x *= p_size;
 
 	m_boundingVolume = new AABB(m_vertices.at(3), m_vertices.at(0), vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -74,7 +74,7 @@ void Pad::smaller()
 {
 	if(m_nrOfScales > -m_maxScales)
 	{
-		m_scale *= 0.85;
+		m_scale *= 0.85f;
 		m_nrOfScales--;
 	}
 }

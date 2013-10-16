@@ -13,7 +13,7 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 	diff.setInitValues(p_diff);
 	m_sDiffData = diff.getDifficultyValues();
 
-	m_player = SPlayer(m_sDiffData.lives, m_sDiffData.multiplier);
+	m_player = SPlayer((short)m_sDiffData.lives, m_sDiffData.multiplier);
 
 	m_pObserver = new Observer(this);
 	m_pPad		= new Pad(&vec3(0.0f, 125.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad", m_sDiffData.padStartSize);
@@ -63,7 +63,7 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 
 	loadSounds();
 	m_soundManager.play(m_pSoundList.at(BACKGROUND), 0);
-	m_soundManager.setVolume(0.1f, 0);
+	m_soundManager.setVolume(0.0f, 0);
 }
 
 void Game::update(float p_screenWidth, float p_dt)
@@ -278,7 +278,6 @@ void Game::update(float p_screenWidth, float p_dt)
 
 void Game::keyEvent(unsigned short key)
 {
-	float Rotation = 0;
 	if(key == 0x41) // A
 	{
 		((Ball*)m_pBall)->setSpeed(vec3(-50.0f, 0.0f, 0.0f) * 3.0f);

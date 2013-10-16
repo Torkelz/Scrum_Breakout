@@ -4,6 +4,11 @@
 #include "Ball.h"
 #include "Pad.h"
 
+#include "..\DirectXTK\Inc\DDSTextureLoader.h"
+
+#include <memory>
+
+
 int WINAPI WinMain(HINSTANCE p_hInstance, HINSTANCE p_prevInstance,
 				   PSTR p_cmdLine, int p_showCmd)
 {
@@ -290,11 +295,89 @@ void Direct3D::initApp()
 	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	m_pDevice->CreateBlendState(&bd, &m_pPowerBlend);
 	m_powerShader.setBlendState(m_pPowerBlend);
+	
 	m_pBallSampler = nullptr;
 
 	hr = m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
 	//POWER UP END!
+	
+	//SKYBOX START
+#pragma region SKYBOX
+	m_skyBox = new SkyBox();
+	m_skyBox->init( m_game.getCamera()->getFarPlane()-10.0f);
+	//Vertices
+	BufferInitDesc skyVBufferDesc;
+	skyVBufferDesc.elementSize		= sizeof(vec3);
+	skyVBufferDesc.initData			= m_skyBox->getVertexData();
+	skyVBufferDesc.numElements		= m_skyBox->getVertices().size();
+	skyVBufferDesc.type				= VERTEX_BUFFER;
+	skyVBufferDesc.usage			= BUFFER_DEFAULT;
+	m_skyBoxVbuffer = new Buffer();
+	m_skyBoxVbuffer->init(m_pDevice, m_pDeviceContext, skyVBufferDesc);
+	//Indices
+	BufferInitDesc skyIBufferDesc;
+	skyIBufferDesc.elementSize		= sizeof(unsigned int);
+	skyIBufferDesc.initData			= m_skyBox->getIndicesData();
+	skyIBufferDesc.numElements		= m_skyBox->getIndices().size();
+	skyIBufferDesc.type				= INDEX_BUFFER;
+	skyIBufferDesc.usage			= BUFFER_DEFAULT;
+	m_skyBoxIbuffer = new Buffer();
+	m_skyBoxIbuffer->init(m_pDevice, m_pDeviceContext, skyIBufferDesc);
+	//Texture
+	ID3D11Texture2D* tex = 0;
+	ID3D11Resource* tt = 0;
+	
+	hr = DirectX::CreateDDSTextureFromFile(m_pDevice, L"Picatures/TT.dds",&tt, nullptr );
+	//ID3D11Resource to ID3D11Texture2D
+	tt->QueryInterface(&tex);
+	D3D11_TEXTURE2D_DESC td;
+	tex->GetDesc(&td);
 
+	D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+	viewDesc.Format = td.Format;
+	viewDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURECUBE;
+	viewDesc.TextureCube.MipLevels = td.MipLevels;
+	viewDesc.TextureCube.MostDetailedMip = 0;
+
+	hr = m_pDevice->CreateShaderResourceView(tex, &viewDesc, &m_skysrv);
+
+	m_skyBoxShader = Shader();
+	m_skyBoxShader.init(m_pDevice, m_pDeviceContext, 1);
+	m_skyBoxShader.compileAndCreateShaderFromFile(L"SkyBox.fx", "VSScene", "vs_5_0", VERTEX_SHADER, blockInputdesc);
+	m_skyBoxShader.compileAndCreateShaderFromFile(L"SkyBox.fx", "PSScene", "ps_5_0", PIXEL_SHADER, NULL);
+
+	D3D11_SAMPLER_DESC sdsky;
+	ZeroMemory(&sdsky, sizeof(sdsky));
+	sdsky.Filter				= D3D11_FILTER_ANISOTROPIC;
+	sdsky.AddressU				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sdsky.AddressV				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sdsky.AddressW				= D3D11_TEXTURE_ADDRESS_WRAP;
+	sdsky.ComparisonFunc		= D3D11_COMPARISON_NEVER;
+	sdsky.MinLOD				= 0;
+	sdsky.MaxLOD				= D3D11_FLOAT32_MAX;
+
+	m_pSkySampler = nullptr;
+	hr = m_pDevice->CreateSamplerState( &sdsky, &m_pSkySampler );
+
+	D3D11_RASTERIZER_DESC rssky;
+	ZeroMemory(&rssky, sizeof(rssky));
+	rssky.AntialiasedLineEnable =  false;//DEFAULT
+	rssky.CullMode				=  D3D11_CULL_NONE;
+	rssky.DepthBias				=  0;		//DEFAULT
+	rssky.DepthBiasClamp		=  0.0f;	//DEFAULT
+	rssky.DepthClipEnable		=  true;	//DEFAULT
+	rssky.FillMode				=  D3D11_FILL_SOLID;
+	rssky.FrontCounterClockwise	=  false;	//DEFAULT
+	rssky.MultisampleEnable		=  false;	//DEFAULT
+	rssky.ScissorEnable			=  false;	//DEFAULT
+	rssky.SlopeScaledDepthBias	=  0.0f;	//DEFAULT
+
+
+
+	hr = m_pDevice->CreateRasterizerState(&rssky,&m_pRasterState);
+#pragma endregion Initializations of skybox variables
+	//SKYBOX END
+	
 	// TEXT TEST
 	m_pTextDevice = new D3DTextDevice();
 	m_pTextDevice->Initialize(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600, &m_camView);
@@ -362,7 +445,7 @@ void Direct3D::drawScene()
 	cBlockBuffer cBlockBufferStruct;
 
 	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
-	
+
 	// Bounding Volume DEBUGGING DRAW
 	//BoundingVolume* t_v;
 	//t_v = m_game.getBall()->getBoundingVolume();
@@ -475,12 +558,35 @@ void Direct3D::drawScene()
 
 	m_pDeviceContext->Draw(1, 0);
 	//## BALL DRAW END ##
+	// SKYBOX DRAW
 
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	vec3 camppos = m_game.getCamera()->getPosition();
+
+	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
+	m_constantBallBuffer.apply(0);
+
+	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+	
+	m_skyBoxVbuffer->apply();
+	m_skyBoxIbuffer->apply();
+
+	m_skyBoxShader.setShaders();
+	m_skyBoxShader.setBlendState(NULL);
+	m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
+	m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
+	m_pDeviceContext->RSSetState(m_pRasterState);
+	
+	m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
+
+	//SKYBOX DRAW END
+	
 	//PAINTSTRUCT ps;
 	//BeginPaint(m_hMainWnd, &ps);
 	//m_pTextDevice->DrawD2DContent();
     //EndPaint( m_hMainWnd, &ps );
-
+	
 	m_pSwapChain->Present(0, 0);
 }
 
