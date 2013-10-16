@@ -326,7 +326,7 @@ void Direct3D::initApp()
 	ID3D11Texture2D* tex = 0;
 	ID3D11Resource* tt = 0;
 	
-	hr = DirectX::CreateDDSTextureFromFile(m_pDevice, L"Picatures/TT.dds",&tt, nullptr );
+	hr = DirectX::CreateDDSTextureFromFile(m_pDevice, L"Picatures/DD.dds",&tt, nullptr );
 	//ID3D11Resource to ID3D11Texture2D
 	tt->QueryInterface(&tex);
 	D3D11_TEXTURE2D_DESC td;
