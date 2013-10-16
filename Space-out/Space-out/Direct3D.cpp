@@ -586,6 +586,8 @@ void Direct3D::drawScene()
 	//BeginPaint(m_hMainWnd, &ps);
 	//m_pTextDevice->DrawD2DContent();
     //EndPaint( m_hMainWnd, &ps );
+
+	m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &XMMatrixIdentity(), m_pBallSampler, m_pRasterState);
 	
 	m_pSwapChain->Present(0, 0);
 }

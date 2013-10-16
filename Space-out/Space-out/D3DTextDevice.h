@@ -21,19 +21,26 @@ private:
 	    XMFLOAT2 texture;
 	};
 
+	struct FontCB
+	{
+		XMMATRIX worldMatrix;
+		XMMATRIX viewMatrix;
+		XMMATRIX projectionMatrix; 
+	};
+
 public:
 	D3DTextDevice();
 	~D3DTextDevice();
 
 	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, HWND hwnd, int screenWidth, int screenHeight, XMMATRIX* baseViewMatrix);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, XMMATRIX*, XMMATRIX*);
+	bool Render(ID3D11DeviceContext*, XMMATRIX*, XMMATRIX*, ID3D11SamplerState*, ID3D11RasterizerState*);
 
 private:
 	bool InitializeSentence(SentenceType**, int, ID3D11Device*);
 	bool UpdateSentence(SentenceType*, char*, int, int, float, float, float, ID3D11DeviceContext*);
 	void ReleaseSentence(SentenceType**);
-	bool RenderSentence(ID3D11DeviceContext*, SentenceType*, XMMATRIX*, XMMATRIX*);
+	bool RenderSentence(ID3D11DeviceContext*, SentenceType*, XMMATRIX*, XMMATRIX*, ID3D11SamplerState*, ID3D11RasterizerState*);
 
 private:
 	D3DFont*		m_Font;
@@ -42,4 +49,5 @@ private:
 	XMMATRIX		m_baseViewMatrix;
 	SentenceType*	m_sentence1;
 	SentenceType*	m_sentence2;
+	FontCB			m_cb;
 };

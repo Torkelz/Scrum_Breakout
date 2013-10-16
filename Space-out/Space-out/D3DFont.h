@@ -39,6 +39,7 @@ private:
 	void ReleaseTexture();
 
 private:
-	FontType* m_Font;
-	D3DTexture* m_Texture;
+	FontType*					m_Font;
+	ID3D11ShaderResourceView*	m_srv;
+	//D3DTexture* m_Texture;
 };

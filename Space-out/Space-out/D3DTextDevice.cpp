@@ -107,19 +107,19 @@ void D3DTextDevice::Shutdown()
 	return;
 }
 
-bool D3DTextDevice::Render(ID3D11DeviceContext* deviceContext, XMMATRIX* worldMatrix, XMMATRIX* orthoMatrix)
+bool D3DTextDevice::Render(ID3D11DeviceContext* deviceContext, XMMATRIX* worldMatrix, XMMATRIX* orthoMatrix, ID3D11SamplerState* pSS, ID3D11RasterizerState* pRS)
 {
 	bool result;
 
 	// Draw the first sentence.
-	result = RenderSentence(deviceContext, m_sentence1, worldMatrix, orthoMatrix);
+	result = RenderSentence(deviceContext, m_sentence1, worldMatrix, orthoMatrix, pSS, pRS);
 	if(!result)
 	{
 		return false;
 	}
 
 	// Draw the second sentence.
-	result = RenderSentence(deviceContext, m_sentence2, worldMatrix, orthoMatrix);
+	result = RenderSentence(deviceContext, m_sentence2, worldMatrix, orthoMatrix, pSS, pRS);
 	if(!result)
 	{
 		return false;
@@ -324,12 +324,11 @@ void D3DTextDevice::ReleaseSentence(SentenceType** sentence)
 
 
 bool D3DTextDevice::RenderSentence(ID3D11DeviceContext* deviceContext, SentenceType* sentence, XMMATRIX* worldMatrix, 
-							   XMMATRIX* orthoMatrix)
+							   XMMATRIX* orthoMatrix, ID3D11SamplerState* pSS, ID3D11RasterizerState* pRS)
 {
 	unsigned int stride, offset;
 	XMFLOAT4 pixelColor;
 	bool result;
-
 
 	// Set vertex buffer stride and offset.
     stride = sizeof(VertexType); 
@@ -348,12 +347,23 @@ bool D3DTextDevice::RenderSentence(ID3D11DeviceContext* deviceContext, SentenceT
 	pixelColor = XMFLOAT4(sentence->red, sentence->green, sentence->blue, 1.0f);
 
 	// Render the text using the font shader.
+
+	m_cb.worldMatrix		= XMMatrixIdentity();
+	m_cb.projectionMatrix	= XMMatrixIdentity();
+	m_cb.viewMatrix			= XMMatrixIdentity();
+
+	m_FontShader->setShaders();
+	m_FontShader->setBlendState(NULL);
+	m_FontShader->setResource(PIXEL_SHADER, 0, 1, m_Font->GetTexture());
+	m_FontShader->setSamplerState(PIXEL_SHADER, 0, 1, pSS);
+	//m_pDeviceContext->RSSetState(m_pRasterState);
+
 	//result = m_FontShader->Render(deviceContext, sentence->indexCount, worldMatrix, m_baseViewMatrix, orthoMatrix, m_Font->GetTexture(), 
 								  //pixelColor);
-	if(!result)
-	{
-		false;
-	}
+	//if(!result)
+	//{
+	//	false;
+	//}
 
 	return true;
 }

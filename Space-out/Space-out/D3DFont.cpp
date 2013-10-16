@@ -1,9 +1,11 @@
 #include "D3DFont.h"
 
+#include "..\DirectXTK\Inc\DDSTextureLoader.h"
+
 D3DFont::D3DFont()
 {
 	m_Font = 0;
-	m_Texture = 0;
+	m_srv = 0;
 }
 
 D3DFont::~D3DFont(){}
@@ -97,22 +99,40 @@ bool D3DFont::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceConte
 {
 	bool result;
 
-	// Create the texture object.
-	m_Texture = new D3DTexture(device, deviceContext);
-	if(!m_Texture)
-	{
-		return false;
-	}
+	//// Create the texture object.
+	//m_Texture = new D3DTexture(device, deviceContext);
+	//if(!m_Texture)
+	//{
+	//	return false;
+	//}
 
-	// Initialize the texture object.
-	//result = m_Texture->Initialize(device, filename);
-	m_Texture->createTexture(filename, NULL);
+	//// Initialize the texture object.
+	////result = m_Texture->Initialize(device, filename);
+	//m_Texture->createTexture(filename, NULL);
+	
+	//Texture
+	ID3D11Texture2D* tex = 0;
+	ID3D11Resource* tt = 0;
+	
+	DirectX::CreateDDSTextureFromFile(device, L"Picatures/TT.dds",&tt, nullptr );
+	//ID3D11Resource to ID3D11Texture2D
+	tt->QueryInterface(&tex);
+	D3D11_TEXTURE2D_DESC td;
+	tex->GetDesc(&td);
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+	viewDesc.Format						= td.Format;
+    viewDesc.ViewDimension              = D3D11_SRV_DIMENSION_TEXTURE2D;
+    viewDesc.Texture2D.MipLevels        = td.MipLevels;
+
+	device->CreateShaderResourceView(tex, &viewDesc, &m_srv);
+
 	return true;
 }
 
 ID3D11ShaderResourceView* D3DFont::GetTexture()
 {
-	return m_Texture->getResourceView();
+	return m_srv;
 }
 
 
