@@ -47,7 +47,7 @@ void Direct3D::initApp()
 	m_cBlockBuffer		= Buffer();
 	m_pPUObserver		= new PUObserver(this);
 	m_game = Game();
-	m_game.init(m_pPUObserver, EASY);
+	m_game.init(m_pPUObserver, NORMAL);
 
 	m_pCamera = m_game.getCamera();
 
@@ -296,6 +296,8 @@ void Direct3D::initApp()
 	//POWER UP END!
 
 	// TEXT TEST
+	m_pTextDevice = new D3DTextDevice();
+	m_pTextDevice->Initialize(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600, &m_camView);
 	//m_pTextDevice->DrawD2DContent();
 }
 

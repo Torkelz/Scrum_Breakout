@@ -17,6 +17,8 @@
 #include "PUObserver.h"
 #include "Camera.h"
 
+#include "D3DTextDevice.h"
+
 class Object;
 
 using namespace DirectX;
@@ -143,5 +145,9 @@ private:
 	Shader			 m_powerShader;
 	ID3D11BlendState* m_pPowerBlend;
 	// DEBUGGING DRAW
+
+	// TEXT TEST
+	D3DTextDevice*	 m_pTextDevice;
+
 };
 #endif

@@ -107,11 +107,6 @@ bool D3DFont::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceConte
 	// Initialize the texture object.
 	//result = m_Texture->Initialize(device, filename);
 	m_Texture->createTexture(filename, NULL);
-	if(!result)
-	{
-		return false;
-	}
-
 	return true;
 }
 
