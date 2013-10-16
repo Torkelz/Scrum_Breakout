@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;Space-OutGL/GLapp/D3DTexture.cpp&apos; to &apos;GLTexture.cpp&apos;" description="Rename resource &apos;D3DTexture.cpp&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="GLapp/D3DTexture.cpp" name="GLTexture.cpp" stamp="1381905596600" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;Space-OutGL/GLapp/Header/D3DTexture.h&apos; to &apos;GLTexture.h&apos;" description="Rename resource &apos;D3DTexture.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="GLapp/Header/D3DTexture.h" name="GLTexture.h" stamp="1381905615063" updateReferences="true"/>
+</session>

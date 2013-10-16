@@ -26,8 +26,12 @@ int main(void)
 
 OpenGL::OpenGL() : GLApp()
 {
+	m_keyValue = 0x00;
+	m_pHID = 0;
 	m_ratio = 0;
 	m_rotation = 0;
+	m_pTexTest = NULL;
+	m_pTexture = 0;
 }
 
 OpenGL::~OpenGL()
@@ -43,7 +47,7 @@ void OpenGL::initApp()
 
 	col[0].pos = vec4(0.0f, 0.0f, 0.f,1.0f); //Uniform performs a padding on the buffer that can make
 	col[0].col = vec4(0.f, 1.f, 0.f,0);        //the result look really odd. Always use vec4 or mat4x4;
-
+	m_pTexTest->createTexture((char*)("/home/bthp0000/Desktop/GitHub/Git/Space-OutGL/GLapp/cat.tiff"), m_pTexture);
 	scale = 0;
 //	BufferInputDesc* desc = new BufferInputDesc[2];
 //	desc[0].size = 3;
@@ -86,14 +90,15 @@ void OpenGL::initApp()
 	// Bind the bindingPoint to the right buffer.
 	m_uniBuffer.bindBufferBase(bindingPoint);
 
-	m_pGame = new Game();
-	m_pGame->init();
+	//m_pGame = new Game();
+	//m_pGame->init();
 
 	m_pHID = new HID(m_hMainWnd);
 
-	glfwSetCursorPos(m_hMainWnd, 1024/2, 768/2);
-
-	m_pHID->getObservable()->addSubscriber(m_pGame->getObserver());
+//	glfwSetCursorPos(m_hMainWnd, 1024/2, 768/2);
+//	GLint texUnitLoc = glGetUniformLocation(m_triShader.getProgram(),(char*)("textest"));
+	m_pTexTest->bindTextureResource(m_triShader.getProgram(), (char*)("texUnit"), m_pTexture);
+	//m_pHID->getObservable()->addSubscriber(m_pGame->getObserver());
 }
 
 void OpenGL::updateScene(float p_dt)

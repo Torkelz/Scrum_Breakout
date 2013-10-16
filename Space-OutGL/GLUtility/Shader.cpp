@@ -123,7 +123,7 @@ void Shader::uniformBlockBinding(GLuint p_bindingPoint, const char* p_pUniformNa
 
 //void shader::uniformMatrix4fv();
 
-GLint Shader::getProgram()
+GLuint Shader::getProgram()
 {
 	return m_program;
 }

@@ -4,6 +4,7 @@
 #include "GLApp.h"
 #include "LinHid.h"
 #include "Game.h"
+#include "GLTexture.h"
 #include "../../GLUtility/Header/Buffer.h"
 #include "../../GLUtility/Header/Shader.h"
 #include <stdio.h>
@@ -35,9 +36,10 @@ private:
 	Buffer			m_uniBuffer;
 	Shader			m_triShader;
 	HID*			m_pHID;
-	Game*			m_pGame;
+	//Game*			m_pGame;
 	int 			m_keyValue;
-
+	GLTexture*		m_pTexTest;
+	GLuint			m_pTexture;
 
 };
 

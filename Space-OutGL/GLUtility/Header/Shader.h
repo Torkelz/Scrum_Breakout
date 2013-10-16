@@ -22,13 +22,13 @@ public:
 	// ## applying ##
 	void apply();
 	void uniformBlockBinding(GLuint p_bindingPoint, const char* p_pUniformName);
-	GLint getProgram();
+	GLuint getProgram();
 
 private:
 	bool errorCheckShader(GLuint p_pShader, const char* p_pStrShaderType);
 
 private:
-	GLint		m_program;
+	GLuint		m_program;
 	GLuint		m_vertex;
 	GLuint		m_fragment;
 	GLuint		m_geometry;

@@ -1,0 +1,11 @@
+#version 400
+in vec4 colorGem;
+
+out vec4 fragColor;
+
+uniform sampler2D texUnit;
+uniform int textest;
+void main()
+{
+	fragColor = colorGem;
+}

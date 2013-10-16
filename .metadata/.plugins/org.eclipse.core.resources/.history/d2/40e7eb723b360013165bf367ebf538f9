@@ -1,0 +1,11 @@
+#version 400
+
+uniform sampler2D texUnit;
+in vec4 colorGem;
+
+out vec4 fragColor;
+
+void main()
+{
+	fragColor = vec4(colorGem.xy, texUnit.xy);
+}
