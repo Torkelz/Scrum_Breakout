@@ -31,7 +31,10 @@ enum SOUNDS
 struct Borders
 {
 	vec3	pos;
-	float	offset;
+	Borders(vec3 p_pos)
+	{
+		pos		= p_pos;
+	}
 };
 
 
@@ -58,7 +61,13 @@ public:
 
 	Camera*					getCamera();
 	void					setScreenBorders(vec4 p_screenBorder);
+
+	//borders
+	void					addBorders();
 private:
+	//borders	
+	vector<Borders>			m_borderList;
+
 	void					loadSounds();
 	FSound					m_soundManager;
 	float					m_newVolume;

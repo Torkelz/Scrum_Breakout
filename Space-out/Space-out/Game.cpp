@@ -58,6 +58,8 @@ void Game::init(PUObserver* p_pPUObserver)
 	loadSounds();
 	m_soundManager.play(m_pSoundList.at(BACKGROUND), 0);
 	m_soundManager.setVolume(0.1f, 0);
+	
+	addBorders();
 }
 
 void Game::update(float p_screenWidth, float p_dt)
@@ -474,22 +476,40 @@ void Game::loadSounds()
 void Game::setScreenBorders(vec4 p_screenBorders)
 {
 	m_screenBorders = p_screenBorders;
+
 }
 
-bool PlayField::addBorders()
+void Game::addBorders()
 {
 	//get playfield orgpos... 
 	//pos for 3 borders... 
 	//top, bot, left side... 
 	//add them to the vector of borders... 
-	//all done return 1... 
-	//else return 0
 
-	for(int i = 0; i > 3; i++)
+
+	for(int i = 0; i < (m_nrPlayFields * 3); i+3)
 	{
-		m_positionOriginal
+		int playfeildnr = i/3;
+
+		vec3 lol = m_playFields[playfeildnr]->getOriginalPosition();
+
+		//ONLY WORKS FOR THE FRONT SIDE!!!
+		//NEEDS TO USE THE PLAYFIELDS VECTORS TO CORRECT THE BORDERS!
+
+
+		//##TOP##
+		m_borderList.push_back(Borders(vec3(m_playFields[playfeildnr]->getOriginalPosition().x + (m_playFields[playfeildnr]->getSize().x * 0.5f), 
+									m_playFields[playfeildnr]->getOriginalPosition().y, 
+									m_playFields[playfeildnr]->getOriginalPosition().z)));
+
+		//##LEFT##
+		m_borderList.push_back(Borders(vec3(m_playFields[playfeildnr]->getOriginalPosition().x, 
+									m_playFields[playfeildnr]->getOriginalPosition().y + (m_playFields[playfeildnr]->getSize().y * 0.5f), 
+									m_playFields[playfeildnr]->getOriginalPosition().z)));
+
+		//##BOT##
+		m_borderList.push_back(Borders(vec3(m_playFields[playfeildnr]->getOriginalPosition().x + (m_playFields[playfeildnr]->getSize().x * 0.5f), 
+									m_playFields[playfeildnr]->getOriginalPosition().y + (m_playFields[playfeildnr]->getSize().y), 
+									m_playFields[playfeildnr]->getOriginalPosition().z)));
 	}
-
-
-	return 1;
 }
