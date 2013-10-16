@@ -361,19 +361,37 @@ void Camera::setYaw(int p_activePlayField)
 	switch (p_activePlayField)
 	{
 	case 0:
+		if(m_yawNext == -90.0f * PI/180.0f)
+		{
+			m_yawNext  = -180.0f;
+		}
 		m_yawNext = 180.0f;
 		break;
 
 	case 1:
+		if(m_yawNext == 360.0f * PI/180.0f)
+		{
+			m_yawNext = 450.0f;
+			break;
+		}
 		m_yawNext = 90.0f;
 		break;
 
 	case 2:
+		
+		if(m_yawNext == (270.0f * PI/180.0f))
+		{
+			m_yawNext = 360.0f;
+			break;
+		}
 		m_yawNext = 0.0f;
 		break;
 
 	case 3:
-		m_yawNext = 270.0f;
+		if(m_yawNext == (180.0f * PI/180.0f))//0.0174532925f))
+			m_yawNext = 270.0f;
+		if(m_yawNext == 0.0f)
+			m_yawNext = -90.0f;
 		break;
 	default:
 		break;
