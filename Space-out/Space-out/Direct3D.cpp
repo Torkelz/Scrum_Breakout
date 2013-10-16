@@ -167,7 +167,30 @@ void Direct3D::initApp()
 	m_blockTexture.createTexture(m_game.getActiveField()->getBlock(0)->getTexturePath(),  0);
 
 	//## BLOCK END ##
+	//## BORDERS START ##
+
+	BufferInitDesc borderBufferDesc;
+	borderBufferDesc.elementSize		= sizeof(Borders);
+	borderBufferDesc.initData			= m_game.getBorders()->data();
+	borderBufferDesc.numElements		= m_game.getNrofBorders();
+	borderBufferDesc.type				= VERTEX_BUFFER;
+	borderBufferDesc.usage				= BUFFER_CPU_WRITE_DISCARD;
+
+	m_borderBuffers.init(m_pDevice, m_pDeviceContext, borderBufferDesc);
+
+	D3D11_INPUT_ELEMENT_DESC BorderInputdesc[] = 
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	};
+	m_blockShader.init(m_pDevice, m_pDeviceContext, 1);
+	
+	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "VS", "vs_5_0", VERTEX_SHADER, blockInputdesc);
+	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "GS", "gs_5_0", GEOMETRY_SHADER, NULL);
+	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "PS", "ps_5_0", PIXEL_SHADER, NULL);
+
+	//## BORDERS END ##
 	//## BALL START ##
+
 	m_ballBuffer =  Buffer();
 	m_constantBallBuffer = Buffer();
 	m_ballShader = Shader();
@@ -418,7 +441,17 @@ void Direct3D::drawScene()
 		m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
 	}
 	//## BLOCK DRAW END ##
-	
+	//## BORDERS START ##
+	m_borderBuffers.apply(0);
+	cBlockBufferStruct.sizeX = 5.0f; // need to put on the right extentin
+	cBlockBufferStruct.sizeY = m_game.getActiveField()->getSize().y/2;
+	cBlockBufferStruct.sizeZ = 5.0f;
+
+	cBlockBufferStruct.rotation = XMMatrixIdentity(); // A proper rotation matrix here
+	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
+
+	m_pDeviceContext->Draw(m_game.getNrofBorders(), 0);
+
 	//## POWERUP DRAW START ##
 	if(m_powerUps.size() > 0)
 	{

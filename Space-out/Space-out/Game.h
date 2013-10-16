@@ -58,7 +58,8 @@ public:
 	PlayField*				getField(int p_id);
 	PlayField*				getActiveField();
 	unsigned int			getActiveFieldNr();
-
+	int						getNrofBorders();
+	vector<Borders>*		getBorders();
 	Camera*					getCamera();
 	void					setScreenBorders(vec4 p_screenBorder);
 
