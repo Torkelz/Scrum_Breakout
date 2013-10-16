@@ -301,12 +301,12 @@ void Direct3D::initApp()
 	hr = m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
 	//POWER UP END!
 	//SKYBOX START
+#pragma region SKYBOX
 	m_skyBox = new SkyBox();
 	m_skyBox->init( m_game.getCamera()->getFarPlane()-10.0f);
 	//Vertices
 	BufferInitDesc skyVBufferDesc;
 	skyVBufferDesc.elementSize		= sizeof(vec3);
-	//skyVBufferDesc.initData		= &m_skyBox->getVertices();
 	skyVBufferDesc.initData			= m_skyBox->getVertexData();
 	skyVBufferDesc.numElements		= m_skyBox->getVertices().size();
 	skyVBufferDesc.type				= VERTEX_BUFFER;
@@ -316,7 +316,6 @@ void Direct3D::initApp()
 	//Indices
 	BufferInitDesc skyIBufferDesc;
 	skyIBufferDesc.elementSize		= sizeof(unsigned int);
-	//skyIBufferDesc.initData		= &m_skyBox->getIndices();
 	skyIBufferDesc.initData			= m_skyBox->getIndicesData();
 	skyIBufferDesc.numElements		= m_skyBox->getIndices().size();
 	skyIBufferDesc.type				= INDEX_BUFFER;
@@ -375,7 +374,7 @@ void Direct3D::initApp()
 
 
 	hr = m_pDevice->CreateRasterizerState(&rssky,&m_pRasterState);
-
+#pragma endregion Initializations of skybox variables
 	//SKYBOX END
 }
 
@@ -439,8 +438,6 @@ void Direct3D::drawScene()
 	cBlockBuffer cBlockBufferStruct;
 
 	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
-
-	
 
 	// Bounding Volume DEBUGGING DRAW
 	//BoundingVolume* t_v;
