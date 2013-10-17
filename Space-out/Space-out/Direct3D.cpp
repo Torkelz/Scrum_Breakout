@@ -497,6 +497,12 @@ void Direct3D::drawScene()
 	m_pDeviceContext->RSSetState(NULL);
 	//SKYBOX DRAW END
 	
+	//## DRAW TEXT ##
+	XMMATRIX orthoMatrix;
+	orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+	m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
+	//## DRAW TEXT END ##
+	
 	//## PAD DRAW START ##
 	XMMATRIX translatePadMatrix;
 
@@ -542,7 +548,7 @@ void Direct3D::drawScene()
 		m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
 	}
 	//## BLOCK DRAW END ##
-	
+
 	//## POWERUP DRAW START ##
 	if(m_powerUps.size() > 0)
 	{
@@ -593,15 +599,6 @@ void Direct3D::drawScene()
 
 	m_pDeviceContext->Draw(1, 0);
 	//## BALL DRAW END ##
-	
-	//PAINTSTRUCT ps;
-	//BeginPaint(m_hMainWnd, &ps);
-	//m_pTextDevice->DrawD2DContent();
-    //EndPaint( m_hMainWnd, &ps );
-
-	XMMATRIX orthoMatrix;
-	orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
-	m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
 	
 	m_pSwapChain->Present(0, 0);
 }

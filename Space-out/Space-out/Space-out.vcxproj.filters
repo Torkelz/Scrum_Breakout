@@ -136,7 +136,6 @@
     <ClCompile Include="GameTimer.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="AdvancedText.cpp" />
     <ClCompile Include="D3DTextDevice.cpp" />
     <ClCompile Include="D3DFont.cpp" />
   </ItemGroup>
@@ -256,7 +255,6 @@
     <ClInclude Include="PUBiggerPad.h">
       <Filter>Powerups\Header</Filter>
     </ClInclude>
-    <ClInclude Include="AdvancedText.h" />
     <ClInclude Include="D3DTextDevice.h" />
     <ClInclude Include="D3DFont.h" />
   </ItemGroup>

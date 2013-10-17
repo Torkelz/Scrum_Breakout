@@ -101,7 +101,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ABlock.cpp" />
-    <ClCompile Include="AdvancedText.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="AABB.cpp" />
     <ClCompile Include="Ball.cpp" />
@@ -142,7 +141,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ABlock.h" />
-    <ClInclude Include="AdvancedText.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="AABB.h" />
     <ClInclude Include="Ball.h" />
