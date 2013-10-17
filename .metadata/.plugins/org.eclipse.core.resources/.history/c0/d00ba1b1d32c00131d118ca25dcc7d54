@@ -1,0 +1,128 @@
+#version 400
+layout (points) in;
+layout (triangle_strip, max_vertices = 24) out;
+
+in vec4 outputColor[];
+out vec4 colorGem;
+
+void main()
+{
+	float m_sizeX = 1;
+	float m_sizeY = 1;
+	float m_sizeZ = 1;
+	
+	vec4 vert0 = gl_in[0].gl_Position + vec4(-.2*m_sizeX, -.2*m_sizeY, -.2*m_sizeZ, 0.0);// * oProj[0]; // 0 --- UpperLeftFront
+	vec4 vert1 = gl_in[0].gl_Position + vec4( .2*m_sizeX, -.2*m_sizeY, -.2*m_sizeZ, 0.0);//* oProj[0]; // 1 +-- LowerLeftFront
+	vec4 vert2 = gl_in[0].gl_Position + vec4(-.2*m_sizeX, .2*m_sizeY, -.2*m_sizeZ, 0.0);//* oProj[0]; // 2 -+- UpperRightFront
+	vec4 vert3 = gl_in[0].gl_Position + vec4( .2*m_sizeX, .2*m_sizeY, -.2*m_sizeZ, 0.0);//* oProj[0]; // 3 ++- LowerRightFront
+	vec4 vert4 = gl_in[0].gl_Position + vec4(-.5*m_sizeX, -.5*m_sizeY, .5*m_sizeZ, 0.0);//* oProj[0]; // 4 --+ LowerLeftBack
+	vec4 vert5 = gl_in[0].gl_Position + vec4( .5*m_sizeX, -.5*m_sizeY, .5*m_sizeZ, 0.0);//* oProj[0]; // 5 +-+ UpperLeftBack
+	vec4 vert6 = gl_in[0].gl_Position + vec4(-.5*m_sizeX, .5*m_sizeY, .5*m_sizeZ, 0.0);//* oProj[0]; // 6 -++ LowerRightBack
+	vec4 vert7 = gl_in[0].gl_Position + vec4( .5*m_sizeX, .5*m_sizeY, .5*m_sizeZ, 0.0);//* oProj[0]; // 7 +++ UpperRightBack
+	
+	
+	
+	// Front
+	gl_Position = vert5;
+	colorGem = outputColor[0];
+	EmitVertex();
+	gl_Position = vert7;
+	colorGem = outputColor[0];
+	EmitVertex();
+	gl_Position  = vert4;
+	colorGem = outputColor[0];
+	EmitVertex();
+	gl_Position  = vert6;
+	colorGem = outputColor[0];
+	EmitVertex();
+	EndPrimitive();
+	
+	// Back
+	gl_Position  = vert3;
+	colorGem = outputColor[0];
+	EmitVertex();
+	gl_Position  = vert1;
+	colorGem = outputColor[0];
+	EmitVertex();
+	gl_Position  = vert2;
+	colorGem = outputColor[0];
+	EmitVertex();
+	gl_Position  = vert0;
+	colorGem = outputColor[0];
+	EmitVertex();
+	EndPrimitive();
+	
+	// Top
+	gl_Position = vert7;
+	colorGem = vec4(1.0f, 0, 0, 1.0f);
+	EmitVertex();
+	gl_Position = vert3;
+	colorGem = vec4(1.0f, 0, 0, 1.0f);
+	EmitVertex();
+	gl_Position = vert6;
+	colorGem = vec4(1.0f, 0, 0, 1.0f);
+	EmitVertex();
+	gl_Position = vert2;
+	colorGem = vec4(1.0f, 0, 0, 1.0f);
+	EmitVertex();
+	EndPrimitive();
+	
+	// Bottom
+	gl_Position  = vert1;
+	colorGem = vec4(1.0f, 0, 1.0f, 1.0f);
+	EmitVertex();
+	gl_Position = vert5;
+	colorGem = vec4(1.0f, 0, 1.0f, 1.0f);
+	EmitVertex();
+	gl_Position  = vert0;
+	colorGem = vec4(1.0f, 0, 1.0f, 1.0f);
+	EmitVertex();
+	gl_Position  = vert4;
+	colorGem = vec4(1.0f, 0, 1.0f, 1.0f);
+	EmitVertex();
+	EndPrimitive();
+	
+	// Right
+	gl_Position  = vert3;
+	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	EmitVertex();
+	gl_Position  = vert7;
+	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	EmitVertex();
+	gl_Position  = vert1;
+	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	EmitVertex();
+	gl_Position  = vert5;
+	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	EmitVertex();
+	EndPrimitive();
+	
+	// Left
+	gl_Position  = vert6;
+	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	EmitVertex();
+	gl_Position  = vert2;
+	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);;
+	EmitVertex();
+	gl_Position  = vert4;
+	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);;
+	EmitVertex();
+	gl_Position  = vert0;
+	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);;
+	EmitVertex();
+	EndPrimitive();
+		
+		/*
+		gl_Position = gl_in[0].gl_Position;
+		colorGem = outputColor[0];
+		EmitVertex();
+		
+		gl_Position = vec4(gl_in[0].gl_Position.x + 2, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z, 1.0f);
+		colorGem = outputColor[0];
+		EmitVertex();
+		
+		gl_Position = vec4(gl_in[0].gl_Position.x + 1, gl_in[0].gl_Position.y + 2, gl_in[0].gl_Position.z, 1.0f);
+		colorGem = outputColor[0];
+		EmitVertex();
+	EndPrimitive();*/
+}

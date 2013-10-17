@@ -1,0 +1,18 @@
+/*
+ * LinMouse.cpp
+ *
+ *  Created on: Oct 4, 2013
+ *      Author: bthp0000
+ */
+
+#include "LinMouse.h"
+
+LinMouse::LinMouse() {
+	// TODO Auto-generated constructor stub
+
+}
+
+LinMouse::~LinMouse() {
+	// TODO Auto-generated destructor stub
+}
+

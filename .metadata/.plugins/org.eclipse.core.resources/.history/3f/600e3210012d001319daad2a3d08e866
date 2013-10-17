@@ -1,0 +1,16 @@
+#include "Header/LinHid.h"
+
+HID::HID(GLFWwindow p_hwnd)
+{
+
+}
+
+HID::~HID()
+{
+
+}
+
+void HID::update()
+{
+
+}

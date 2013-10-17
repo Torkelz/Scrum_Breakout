@@ -1,0 +1,33 @@
+#ifndef HID_H_
+#define HID_H_
+
+#include <glm/glm.hpp>
+#include "GLUtil.h"
+#include "HIDObservable.h"
+#include "LinKeyboard.h"
+#include "LinMouse.h"
+
+using namespace glm;
+
+class HID
+{
+private:
+	GLFWwindow* m_pHwnd;
+
+	HIDObservable	m_observable;
+	Mouse*			m_mouse;
+	//Keyboard		m_keyboard;
+
+public:
+	HID(GLFWwindow* p_pHwnd);
+	~HID();
+
+	void init();
+
+	void update(int p_action);
+
+	HIDObservable*	getObservable();
+};
+// http://www.glfw.org/docs/3.0/group__keys.html
+
+#endif /* LINHID_H_ */

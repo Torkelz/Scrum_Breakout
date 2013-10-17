@@ -1,0 +1,12 @@
+#include "Header/LinKeyboard.h"
+
+LinKeyboard::LinKeyboard(GLFWwindow* p_pHwnd)
+{
+
+}
+
+LinKeyboard::~LinKeyboard()
+{
+
+}
+

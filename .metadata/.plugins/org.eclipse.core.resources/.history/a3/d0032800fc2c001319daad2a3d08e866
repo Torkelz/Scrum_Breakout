@@ -1,0 +1,18 @@
+/*
+ * LinKeyboard.cpp
+ *
+ *  Created on: Oct 4, 2013
+ *      Author: bthp0000
+ */
+
+#include "LinKeyboard.h"
+
+LinKeyboard::LinKeyboard() {
+	// TODO Auto-generated constructor stub
+
+}
+
+LinKeyboard::~LinKeyboard() {
+	// TODO Auto-generated destructor stub
+}
+

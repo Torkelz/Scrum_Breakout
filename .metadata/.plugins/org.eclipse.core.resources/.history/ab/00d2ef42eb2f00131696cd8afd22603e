@@ -1,0 +1,16 @@
+#include "Header/LinKeyboard.h"
+
+Keyboard::Keyboard(GLFWwindow* p_pHwnd)
+{
+	m_pHwnd = p_pHwnd;
+}
+
+Keyboard::~Keyboard()
+{
+
+}
+
+Keyboard::KeyDown(unsigned short p_key)
+{
+	return glfwGetKey(m_pHwnd, p_key);
+}

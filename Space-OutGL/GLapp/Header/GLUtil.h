@@ -2,8 +2,8 @@
 #define GLUTIL_H_
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <GLFW/glfw3.h>
 #include <string>
 
 struct vertexVec

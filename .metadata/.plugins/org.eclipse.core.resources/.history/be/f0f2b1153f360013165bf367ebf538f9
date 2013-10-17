@@ -1,0 +1,23 @@
+#version 400
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec3 in_color;
+
+out vec4 outputColor;
+out mat4 oProj;
+out int oTextest;
+uniform int textest;
+//uniform float gWorld;
+uniform ColorBlock
+{
+	vec4 pos;
+	vec4 color;
+	mat4x4 gWorld;
+};
+
+void main()
+{
+	oTextest = textest;
+	outputColor = color;
+	gl_Position = pos;		//vec4(in_position, 1.0f);
+	oProj = gWorld;
+}

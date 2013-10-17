@@ -1,9 +1,11 @@
 #version 400
-in vec3 colorGem;
+in vec4 colorGem;
 
 out vec4 fragColor;
 
+uniform sampler2D texUnit;
+
 void main()
 {
-	fragColor = vec4(colorGem, 1.0f);
+	fragColor = texture(texUnit, colorGem.xy);
 }

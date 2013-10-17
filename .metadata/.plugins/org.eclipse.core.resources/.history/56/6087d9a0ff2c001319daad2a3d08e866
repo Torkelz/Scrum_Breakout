@@ -1,0 +1,15 @@
+#ifndef HID_H_
+#define HID_H_
+
+using namespace glm;
+
+class HID
+{
+public:
+	HID();
+	~HID();
+
+	void update();
+};
+
+#endif /* LINHID_H_ */
