@@ -594,3 +594,7 @@ int Game::getScore()
 	return m_player.highscore;
 }
 
+vector<Borders>* Game::getBorders()
+{
+        return &m_borderList;
+}

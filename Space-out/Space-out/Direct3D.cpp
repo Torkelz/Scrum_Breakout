@@ -605,29 +605,6 @@ void Direct3D::drawScene()
 
 	m_pDeviceContext->Draw(4, 4);
 
-	//## PAD DRAW START ##
-	XMMATRIX translatePadMatrix;
-
-	vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
-	translatePadMatrix = XMMatrixTranslation(padPos.x, padPos.y, padPos.z);
-
-	m_world = XMMatrixIdentity();
-	
-	XMMATRIX t_scaleMatrix = XMMatrixIdentity() * ((Pad*)(m_game.getPad()))->getScale();
-	t_scaleMatrix.r[3].m128_f32[3] = 1.0f;
-	m_WVP = m_world * playFieldRotation * t_scaleMatrix * translatePadMatrix * m_camView * m_camProjection;
-
-	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
-	m_cBuffer.apply(0);
-	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
-	m_shader.setShaders();
-	m_shader.setResource(PIXEL_SHADER, 0, 1, m_padTexture.getResourceView());
-	m_shader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	m_buffer.apply(0);
-	m_pDeviceContext->Draw(4, 0);
-	//## PAD DRAW END ##
-
 	//## POWERUP DRAW START ##
 	if(m_powerUps.size() > 0)
 	{
