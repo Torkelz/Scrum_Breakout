@@ -53,9 +53,10 @@ void Direct3D::initApp()
 	m_pPUObserver		= new PUObserver(this);
 	m_game = Game();
 	m_game.init(m_pPUObserver, NORMAL);
+	
 
 	m_pCamera = m_game.getCamera();
-
+	m_pCamera->createOrthoMatrix((float)m_ClientWidth,(float)m_ClientHeight,1.0f, 500.0f);
 	//Set up world view proj
 	//m_camPosition = XMVectorSet( 0.0f, 0.0f, 250.f, 0.0f );
 	//m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
@@ -587,7 +588,9 @@ void Direct3D::drawScene()
 	//m_pTextDevice->DrawD2DContent();
     //EndPaint( m_hMainWnd, &ps );
 
-	m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &XMMatrixIdentity(), m_pBallSampler, m_pRasterState);
+	XMMATRIX orthoMatrix;
+	orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+	m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
 	
 	m_pSwapChain->Present(0, 0);
 }

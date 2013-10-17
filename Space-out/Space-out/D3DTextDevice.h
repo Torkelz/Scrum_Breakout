@@ -2,6 +2,7 @@
 
 #include "D3DFont.h"
 #include "Shader.h"
+#include "Buffer.h"
 
 using namespace DirectX;
 
@@ -49,5 +50,6 @@ private:
 	XMMATRIX		m_baseViewMatrix;
 	SentenceType*	m_sentence1;
 	SentenceType*	m_sentence2;
+	Buffer*			m_cBuffer;
 	FontCB			m_cb;
 };

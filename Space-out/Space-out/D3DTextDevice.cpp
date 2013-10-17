@@ -17,6 +17,19 @@ bool D3DTextDevice::Initialize(ID3D11Device* device, ID3D11DeviceContext* device
 {
 	bool result;
 
+	m_cBuffer = new Buffer();
+
+	BufferInitDesc cbBallDesc;
+	cbBallDesc.elementSize = sizeof(FontCB);
+	cbBallDesc.initData = NULL;
+	cbBallDesc.numElements = 1;
+	cbBallDesc.type = CONSTANT_BUFFER_ALL;
+	cbBallDesc.usage = BUFFER_DEFAULT;
+	
+	m_cBuffer->init(device, deviceContext, cbBallDesc);
+	deviceContext->UpdateSubresource(m_cBuffer->getBufferPointer(), 0, NULL, &m_cb, 0, 0);
+	m_cBuffer->apply(0);
+
 	// Store the screen width and height.
 	m_screenWidth = screenWidth;
 	m_screenHeight = screenHeight;
@@ -348,15 +361,19 @@ bool D3DTextDevice::RenderSentence(ID3D11DeviceContext* deviceContext, SentenceT
 
 	// Render the text using the font shader.
 
-	m_cb.worldMatrix		= XMMatrixIdentity();
-	m_cb.projectionMatrix	= XMMatrixIdentity();
-	m_cb.viewMatrix			= XMMatrixIdentity();
+	m_cb.worldMatrix		= *worldMatrix;
+	m_cb.projectionMatrix	= *orthoMatrix;
+	m_cb.viewMatrix			= m_baseViewMatrix;
 
 	m_FontShader->setShaders();
+	deviceContext->UpdateSubresource(m_cBuffer->getBufferPointer(), 0, NULL, &m_cb, 0, 0);
+	m_cBuffer->apply(0);
 	m_FontShader->setBlendState(NULL);
 	m_FontShader->setResource(PIXEL_SHADER, 0, 1, m_Font->GetTexture());
 	m_FontShader->setSamplerState(PIXEL_SHADER, 0, 1, pSS);
 	//m_pDeviceContext->RSSetState(m_pRasterState);
+
+	deviceContext->DrawIndexed(sentence->indexCount, 0, 0);
 
 	//result = m_FontShader->Render(deviceContext, sentence->indexCount, worldMatrix, m_baseViewMatrix, orthoMatrix, m_Font->GetTexture(), 
 								  //pixelColor);
