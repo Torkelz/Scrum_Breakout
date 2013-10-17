@@ -114,7 +114,8 @@ bool D3DFont::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceConte
 	ID3D11Texture2D* tex = 0;
 	ID3D11Resource* tt = 0;
 	
-	DirectX::CreateDDSTextureFromFile(device, L"Picatures/TT.dds",&tt, nullptr );
+    const wchar_t* temp = filename->c_str();
+	HRESULT yr = DirectX::CreateDDSTextureFromFile(device, temp,&tt,  nullptr );
 	//ID3D11Resource to ID3D11Texture2D
 	tt->QueryInterface(&tex);
 	D3D11_TEXTURE2D_DESC td;

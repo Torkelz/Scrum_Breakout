@@ -284,7 +284,8 @@ bool D3DTextDevice::UpdateSentence(SentenceType* sentence, char* text, int posit
 	drawY = (float)((m_screenHeight / 2) - positionY);
 
 	// Use the font class to build the vertex array from the sentence text and sentence draw location.
-	m_Font->BuildVertexArray((void*)vertices, text, drawX, drawY);
+	//m_Font->BuildVertexArray((void*)vertices, text, drawX, drawY);
+	m_Font->BuildVertexArray((void*)vertices, text, positionX, positionY);
 
 	// Lock the vertex buffer so it can be written to.
 	result = deviceContext->Map(sentence->vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);

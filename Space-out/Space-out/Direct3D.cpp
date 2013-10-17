@@ -447,6 +447,8 @@ void Direct3D::drawScene()
 
 	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
 
+	
+
 	// Bounding Volume DEBUGGING DRAW
 	//BoundingVolume* t_v;
 	//t_v = m_game.getBall()->getBoundingVolume();
