@@ -540,3 +540,13 @@ void Game::resetBall(PlayField* pf)
 		pf->getOriginalPosition(), pf->getRightDir(), pf->getDownDir() );
 	((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 }
+
+int Game::getRemainingLives()
+{
+	return m_player.lives;
+}
+
+int Game::getScore()
+{
+	return m_player.highscore;
+}

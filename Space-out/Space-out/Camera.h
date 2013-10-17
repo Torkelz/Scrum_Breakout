@@ -21,6 +21,7 @@ public:
 
 	void				createProjectionMatrix( float p_FOV, float p_aspect,
 												float p_nearPlane, float p_farPlane );
+	void				createOrthoMatrix(float p_width, float p_height, float p_nearPlane, float p_farPlane);
 	void				updateCameraPos(float p_dt);
 	void				updateViewMatrix();
 	void				setViewMatrix();
@@ -43,6 +44,7 @@ public:
 	vec3				getLookAt();
 	mat4				getProjectionMatrix();
 	mat4				getViewMatrix();
+	mat4				getOrthoMatrix();
 	float				getFarPlane();
 
 
@@ -57,6 +59,7 @@ private:
 					 
 	mat4			m_view;
 	mat4			m_projection;
+	mat4			m_orthoMatrix;
 					 
 	float			m_FOV;
 	float			m_aspect;

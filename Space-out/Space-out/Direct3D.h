@@ -18,6 +18,8 @@
 #include "Camera.h"
 #include "SkyBox.h"
 
+#include "D3DTextDevice.h"
+
 class Object;
 
 using namespace DirectX;
@@ -70,6 +72,12 @@ inline mat4 XMMatrixTomat4(XMMATRIX* p)
 	return r;
 };
 
+inline std::string IntToString(int i)
+{
+	std::stringstream ss;
+	ss << i;
+	return ss.str();
+};
 inline XMVECTOR vec3ToXMVector(vec3 p)
 {
 	XMVECTOR r;
@@ -155,6 +163,9 @@ private:
 	Shader			 m_powerShader;
 	ID3D11BlendState* m_pPowerBlend;
 	// DEBUGGING DRAW
-	
+
+	// TEXT TEST
+	D3DTextDevice*	 m_pTextDevice;
+
 };
 #endif

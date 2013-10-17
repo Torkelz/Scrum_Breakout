@@ -122,7 +122,14 @@ void D3DApp::onResize()
 	ID3D11Texture2D* backBuffer;
 	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
 	m_pDevice->CreateRenderTargetView(backBuffer, 0, &m_pRenderTargetView);
+
+	//IDXGISurface* pBackBuffer;
+	//m_pSwapChain->GetBuffer( 0, IID_PPV_ARGS(&pBackBuffer) );
+	//m_pTextDevice = new AdvancedText();
+	//m_pTextDevice->Initialize(m_hMainWnd, pBackBuffer);
+
 	ReleaseCOM(backBuffer);
+	//ReleaseCOM(pBackBuffer);
 
 	// Create the depth/stencil buffer and view.
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
@@ -172,7 +179,6 @@ void D3DApp::updateScene(float p_dt)
 {
 	// Code computes the average frames per second, and also the 
 	// average time it takes to render one frame.
-
 	static int frameCnt = 0;
 	static float t_base = 0.0f;
 
@@ -361,8 +367,6 @@ void D3DApp::initMainWindow()
 
 void D3DApp::initDirect3D()
 {
-	
-
 	// Create the device.
 
 	UINT createDeviceFlags = 0;

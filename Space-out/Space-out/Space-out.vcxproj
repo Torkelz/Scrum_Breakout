@@ -41,7 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\glm;$(SolutionDir)\DirectXTK\inc;$(SolutionDir)\FMOD\FmodInc;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\DirectXTK\inc;$(SolutionDir)\glm;C:\git\Scrum_Breakout\Space-out\cppUnit;C:\Users\BTH\Documents\GitHub\Scrum_Breakout\Space-out\glm;$(SolutionDir)\FMOD\FmodInc;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\FMOD\FmodLib;$(LibraryPath)</LibraryPath>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
     <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
@@ -65,7 +65,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>D3D11.lib;D3dcompiler.lib;FMODEX_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D3D11.lib;D3dcompiler.lib;FMODEX_vc.lib;D2d1.lib;dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>COPY /Y "$(SolutionDir)fmodex.dll" "$(SolutionDir)Debug" </Command>
@@ -101,6 +101,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ABlock.cpp" />
+    <ClCompile Include="AdvancedText.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="AABB.cpp" />
     <ClCompile Include="Ball.cpp" />
@@ -108,6 +109,8 @@
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="d3dApp.cpp" />
+    <ClCompile Include="D3DFont.cpp" />
+    <ClCompile Include="D3DTextDevice.cpp" />
     <ClCompile Include="D3DTexture.cpp" />
     <ClCompile Include="Difficulties.cpp" />
     <ClCompile Include="Direct3D.cpp" />
@@ -139,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ABlock.h" />
+    <ClInclude Include="AdvancedText.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="AABB.h" />
     <ClInclude Include="Ball.h" />
@@ -146,6 +150,8 @@
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="d3dApp.h" />
+    <ClInclude Include="D3DFont.h" />
+    <ClInclude Include="D3DTextDevice.h" />
     <ClInclude Include="D3DTexture.h" />
     <ClInclude Include="d3dUtil.h" />
     <ClInclude Include="Difficulties.h" />
@@ -207,6 +213,11 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Effect</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Font.fx">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Effect</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="SkyBox.fx">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">main</EntryPointName>

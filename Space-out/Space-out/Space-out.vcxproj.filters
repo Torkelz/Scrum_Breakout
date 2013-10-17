@@ -22,8 +22,12 @@
     <FxCompile Include="SkyBox.fx">
       <Filter>D3D\HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="Font.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="Buffer.cpp">
       <Filter>D3D</Filter>
     </ClCompile>
@@ -132,8 +136,12 @@
     <ClCompile Include="GameTimer.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="AdvancedText.cpp" />
+    <ClCompile Include="D3DTextDevice.cpp" />
+    <ClCompile Include="D3DFont.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameTimer.h" />
     <ClInclude Include="Buffer.h">
       <Filter>D3D\Header</Filter>
     </ClInclude>
@@ -248,6 +256,9 @@
     <ClInclude Include="PUBiggerPad.h">
       <Filter>Powerups\Header</Filter>
     </ClInclude>
+    <ClInclude Include="AdvancedText.h" />
+    <ClInclude Include="D3DTextDevice.h" />
+    <ClInclude Include="D3DFont.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

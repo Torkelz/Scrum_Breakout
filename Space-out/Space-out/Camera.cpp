@@ -1,6 +1,5 @@
 #include "Camera.h"
 
-
 Camera::Camera(){}
 
 Camera::~Camera(){}
@@ -50,6 +49,15 @@ void Camera::createProjectionMatrix( float p_FOV, float p_aspect,
 	m_projection[2].w = 1.0f;
 	m_projection[3].w = 0.0f;
 
+}
+void Camera::createOrthoMatrix(float p_width, float p_height, float p_nearPlane, float p_farPlane)
+{
+	m_orthoMatrix = mat4(1.0f);
+
+	m_orthoMatrix[0].x = 2.0f/p_width;
+	m_orthoMatrix[1].y = 2.0f/p_height;
+	m_orthoMatrix[2].z = 1.0f/(p_farPlane - p_nearPlane);
+	m_orthoMatrix[3].z = -p_nearPlane/(p_farPlane - p_nearPlane);
 }
 
 void Camera::updateViewMatrix()
@@ -344,6 +352,11 @@ float Camera::cotan( float p_d )
 mat4 Camera::getProjectionMatrix()
 {
 	return m_projection;
+}
+
+mat4 Camera::getOrthoMatrix()
+{
+	return m_orthoMatrix;
 }
 
 mat4 Camera::getViewMatrix()

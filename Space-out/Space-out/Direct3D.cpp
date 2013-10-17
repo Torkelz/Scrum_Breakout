@@ -52,10 +52,11 @@ void Direct3D::initApp()
 	m_cBlockBuffer		= Buffer();
 	m_pPUObserver		= new PUObserver(this);
 	m_game = Game();
-	m_game.init(m_pPUObserver, EASY);
+	m_game.init(m_pPUObserver, NORMAL);
+	
 
 	m_pCamera = m_game.getCamera();
-
+	m_pCamera->createOrthoMatrix((float)m_ClientWidth,(float)m_ClientHeight,1.0f, 500.0f);
 	//Set up world view proj
 	//m_camPosition = XMVectorSet( 0.0f, 0.0f, 250.f, 0.0f );
 	//m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
@@ -300,6 +301,7 @@ void Direct3D::initApp()
 
 	hr = m_pDevice->CreateSamplerState( &sd, &m_pBallSampler );
 	//POWER UP END!
+	
 	//SKYBOX START
 #pragma region SKYBOX
 	m_skyBox = new SkyBox();
@@ -376,6 +378,15 @@ void Direct3D::initApp()
 	hr = m_pDevice->CreateRasterizerState(&rssky,&m_pRasterState);
 #pragma endregion Initializations of skybox variables
 	//SKYBOX END
+	
+	// TEXT TEST
+	m_pTextDevice = new D3DTextDevice();
+	m_pTextDevice->Initialize(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600, &m_camView);
+	std::string message = "Remaining lives: " + IntToString(m_game.getRemainingLives());
+	m_pTextDevice->addSentence(&message[0], 0, m_pDevice, m_pDeviceContext);
+	std::string message2 = "Score: " + IntToString(m_game.getScore());
+	m_pTextDevice->addSentence(&message2[0], 1, m_pDevice, m_pDeviceContext);
+	//m_pTextDevice->DrawD2DContent();
 }
 
 void Direct3D::onResize()
@@ -430,14 +441,22 @@ void Direct3D::updateScene(float p_dt)
 	SetWindowTextW(m_hMainWnd,outs.str().c_str());
 
 	m_winTitle = outs.str();
+	
+	std::string message = "Remaining lives: " + IntToString(m_game.getRemainingLives());
+	m_pTextDevice->updateSentenceAt(0, &message[0], 50, 150, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	std::string message2 = "Score: " + IntToString(m_game.getScore());
+	m_pTextDevice->updateSentenceAt(1, &message2[0], 50, 100, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
 }
 
 void Direct3D::drawScene()
 {
 	D3DApp::drawScene();
+
 	cBlockBuffer cBlockBufferStruct;
 
 	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
+
+	
 
 	// Bounding Volume DEBUGGING DRAW
 	//BoundingVolume* t_v;
@@ -575,12 +594,22 @@ void Direct3D::drawScene()
 	m_pDeviceContext->Draw(1, 0);
 	//## BALL DRAW END ##
 	
-	m_pSwapChain->Present(1, 0);
+	//PAINTSTRUCT ps;
+	//BeginPaint(m_hMainWnd, &ps);
+	//m_pTextDevice->DrawD2DContent();
+    //EndPaint( m_hMainWnd, &ps );
+
+	XMMATRIX orthoMatrix;
+	orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+	m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
+	
+	m_pSwapChain->Present(0, 0);
 }
 
 LRESULT Direct3D::msgProc(UINT p_msg, WPARAM p_wParam, LPARAM p_lParam)
 {
 	m_HID.update(p_msg, p_lParam);
+	//m_pTextDevice->WndProc(m_hMainWnd, p_msg, p_wParam, p_lParam);
 
 	return D3DApp::msgProc(p_msg, p_wParam, p_lParam);;
 }

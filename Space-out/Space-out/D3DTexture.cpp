@@ -100,8 +100,8 @@ ID3D11ShaderResourceView* D3DTexture::createTextureSRV(ID3D11Texture2D* p_pTextu
         D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc; 
         ZeroMemory( &viewDesc, sizeof(viewDesc) ); 
         
-        viewDesc.Format                                        = td.Format;
-        viewDesc.ViewDimension                        = D3D11_SRV_DIMENSION_TEXTURE2D;
+        viewDesc.Format						= td.Format;
+        viewDesc.ViewDimension              = D3D11_SRV_DIMENSION_TEXTURE2D;
         viewDesc.Texture2D.MipLevels        = td.MipLevels;
 
 
