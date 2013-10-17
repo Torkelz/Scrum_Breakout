@@ -173,7 +173,36 @@ void Direct3D::initApp()
 	m_blockTexture.createTexture(m_game.getActiveField()->getBlock(0)->getTexturePath(),  0);
 
 	//## BLOCK END ##
+	//## BORDERS START ##
+
+	BufferInitDesc borderBufferDesc;
+	borderBufferDesc.elementSize		= sizeof(Borders);
+	borderBufferDesc.initData			= m_game.getBorders()->data();
+	borderBufferDesc.numElements		= m_game.getNrofBorders();
+	borderBufferDesc.type				= VERTEX_BUFFER;
+	borderBufferDesc.usage				= BUFFER_CPU_WRITE_DISCARD;
+
+	m_borderBuffers.init(m_pDevice, m_pDeviceContext, borderBufferDesc);
+
+	D3D11_INPUT_ELEMENT_DESC borderInputdesc[] = 
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	};
+	
+	// not really needed when using same shader as blocks.
+	//m_blockShader.init(m_pDevice, m_pDeviceContext, 1);
+	// here ends the not really needed things!!!
+	
+	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "VS", "vs_5_0", VERTEX_SHADER, borderInputdesc);
+	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "GS", "gs_5_0", GEOMETRY_SHADER, NULL);
+	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "PS", "ps_5_0", PIXEL_SHADER, NULL);
+
+	m_borderTexture = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_borderTexture.createTexture(new std::wstring(L"Picatures/border.png"), 0);
+
+	//## BORDERS END ##
 	//## BALL START ##
+
 	m_ballBuffer =  Buffer();
 	m_constantBallBuffer = Buffer();
 	m_ballShader = Shader();
@@ -548,6 +577,56 @@ void Direct3D::drawScene()
 		m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
 	}
 	//## BLOCK DRAW END ##
+	//## BORDERS START ##
+	m_borderBuffers.apply(0);
+
+	m_blockShader.setResource(PIXEL_SHADER, 0, 1, m_borderTexture.getResourceView());
+	m_blockShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
+
+	m_WVP = m_world *m_camView * m_camProjection;
+	cBlockBufferStruct.WVP = XMMatrixTranspose(m_WVP);
+
+	cBlockBufferStruct.sizeX = m_game.getActiveField()->getSize().x * 0.5f; // need to put on the right extentin
+	cBlockBufferStruct.sizeY = 5.0f;
+	cBlockBufferStruct.sizeZ = 5.0f;
+
+	for(int i = 0; i < 4; i++)
+	{
+		cBlockBufferStruct.rotation = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()));
+		m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
+		m_pDeviceContext->Draw(1, i);
+	}
+
+	cBlockBufferStruct.sizeX = 5.0f; // need to put on the right extentin
+	cBlockBufferStruct.sizeY = m_game.getActiveField()->getSize().y * 0.5f + 10.0f;
+	cBlockBufferStruct.sizeZ = 5.0f;
+
+	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
+
+	m_pDeviceContext->Draw(4, 4);
+
+	//## PAD DRAW START ##
+	XMMATRIX translatePadMatrix;
+
+	vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
+	translatePadMatrix = XMMatrixTranslation(padPos.x, padPos.y, padPos.z);
+
+	m_world = XMMatrixIdentity();
+	
+	XMMATRIX t_scaleMatrix = XMMatrixIdentity() * ((Pad*)(m_game.getPad()))->getScale();
+	t_scaleMatrix.r[3].m128_f32[3] = 1.0f;
+	m_WVP = m_world * playFieldRotation * t_scaleMatrix * translatePadMatrix * m_camView * m_camProjection;
+
+	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
+	m_cBuffer.apply(0);
+	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+	m_shader.setShaders();
+	m_shader.setResource(PIXEL_SHADER, 0, 1, m_padTexture.getResourceView());
+	m_shader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	m_buffer.apply(0);
+	m_pDeviceContext->Draw(4, 0);
+	//## PAD DRAW END ##
 
 	//## POWERUP DRAW START ##
 	if(m_powerUps.size() > 0)

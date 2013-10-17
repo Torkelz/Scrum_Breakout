@@ -52,6 +52,16 @@ struct SPlayer
 	}
 };
 
+struct Borders
+{
+	vec3	pos;
+	Borders(vec3 p_pos)
+	{
+		pos		= p_pos;
+	}
+};
+
+
 class Game
 {
 public:
@@ -72,12 +82,18 @@ public:
 	PlayField*				getField(int p_id);
 	PlayField*				getActiveField();
 	unsigned int			getActiveFieldNr();
-
+	int						getNrofBorders();
+	vector<Borders>*		getBorders();
 	Camera*					getCamera();
 	void					setScreenBorders(vec4 p_screenBorder);
 	int						getRemainingLives();
 	int						getScore();
+	
+	//borders
+	void					addBorders();
 private:
+	//borders	
+	vector<Borders>			m_borderList;
 	void					loadSounds();
 	void					powerUpSpawn(vec3 pos);
 	int					    random();

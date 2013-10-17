@@ -126,6 +126,11 @@ private:
 	D3DTexture		 m_blockTexture;
 	Camera*			 m_pCamera;
 
+	//border
+	Buffer			m_borderBuffers;
+	D3DTexture		m_borderTexture;
+		
+
 	//Pad
 	Buffer			m_buffer;
 	Buffer			m_cBuffer;

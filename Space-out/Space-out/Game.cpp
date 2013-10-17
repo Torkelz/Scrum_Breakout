@@ -64,6 +64,8 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 	loadSounds();
 	m_soundManager.play(m_pSoundList.at(BACKGROUND), 0);
 	m_soundManager.setVolume(0.0f, 0);
+	
+	addBorders();
 }
 
 void Game::update(float p_screenWidth, float p_dt)
@@ -541,12 +543,54 @@ void Game::resetBall(PlayField* pf)
 	((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 }
 
+void Game::addBorders()
+{
+	//get playfield orgpos... 
+	//pos for 3 borders... 
+	//top, bot, left side... 
+	//add them to the vector of borders... 
+
+		//vec3 lol = m_playFields[playfeildnr]->getOriginalPosition();
+
+	for(int playField = 0; playField < 4; playField++)
+	{
+		vec3 rightDir = m_playFields[playField]->getRightDir();
+		vec3 downDir = m_playFields[playField]->getDownDir();
+		vec3 crossDir = cross(rightDir, downDir);
+
+		vec3 top = m_playFields[playField]->getOriginalPosition() + (m_playFields[playField]->getSize().x * 0.5f * rightDir)
+					- downDir * 5.f
+					+ crossDir * 5.f;
+		m_borderList.push_back(Borders(top));
+
+		//vec3 bottom = m_playFields[playField]->getOriginalPosition() + (m_playFields[playField]->getSize().x * 0.5f * rightDir)
+		//			+ m_playFields[playField]->getSize().y * downDir
+		//			+ crossDir * 5.f;
+		//m_borderList.push_back(Borders(bottom));
+	}
+
+	for(int playField = 0; playField < 4; playField++)
+	{
+		vec3 rightDir = m_playFields[playField]->getRightDir();
+		vec3 downDir = m_playFields[playField]->getDownDir();
+		vec3 crossDir = cross(rightDir, downDir);
+
+		vec3 center = m_playFields[playField]->getOriginalPosition() - 5.f * rightDir
+			+ m_playFields[playField]->getSize().y * 0.5f * downDir
+			+ crossDir * 5.f;
+		m_borderList.push_back(Borders(center));
+	}
+}
+int Game::getNrofBorders()
+{
+	return (int)m_borderList.size();
+}
 int Game::getRemainingLives()
 {
 	return m_player.lives;
 }
-
 int Game::getScore()
 {
 	return m_player.highscore;
 }
+
