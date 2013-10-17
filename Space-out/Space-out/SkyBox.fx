@@ -25,10 +25,11 @@ struct PSSceneIn
 //};
 cbuffer	cb
 {
-	float4		eyePosW;
-	float4x4	viewProj;
-	float4x4	translation;
-	float2		size;
+	float4x4 WVP;
+	float4 eyePosW;
+	float4x4 viewProj;
+	float4x4 translation;
+	float2 size;
 };
 //-----------------------------------------------------------------------------------------
 // VertexShader: VSScene

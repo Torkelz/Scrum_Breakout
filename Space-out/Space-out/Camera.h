@@ -37,6 +37,8 @@ public:
 	bool				isCinematic();
 	void				startCinematic();
 	bool				timeToChange();
+	void				setRunOnce(bool p);
+	bool				getRunOnce();
 
 	void				setYaw(int p_activePlayField);
 	vec3				getPosition();
@@ -74,6 +76,7 @@ private:
 	bool				m_isCinematic;
 	float				m_lifeTime;
 	float				m_angleToNextPF;
+	bool				m_runOnce;
 
 	std::vector<vec3>	m_cinematicPos;
 

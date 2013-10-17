@@ -28,13 +28,9 @@ struct Vertex
 	vec2 m_textureCoordinates;
 };
 
-struct CBPad
+struct ConstantBuffer
 {
 	XMMATRIX WVP;
-};
-
-struct CBBall
-{
 	XMVECTOR eyePosW;
 	XMMATRIX viewProj;
 	XMMATRIX translation;
@@ -104,6 +100,8 @@ private:
 					 
 	HID				 m_HID;
 	Game			 m_game;
+	ConstantBuffer	 m_CONSTBUFFER;
+	Buffer*			 m_CONSTANTBUFFER;
 
 	//Block Test
 	
@@ -120,16 +118,12 @@ private:
 
 	//Pad
 	Buffer			m_buffer;
-	Buffer			m_cBuffer;
 	Shader			m_shader;
-	CBPad			m_cbPad;
 	D3DTexture		m_padTexture;
 
 	//Ball
 	Buffer		m_ballBuffer;
-	Buffer		m_constantBallBuffer;
 	Shader		m_ballShader;
-	CBBall		m_cbBall;
 	D3DTexture	m_ballTexture;
 	ID3D11SamplerState* m_pBallSampler;
 
@@ -137,7 +131,6 @@ private:
 	SkyBox*		m_skyBox;
 	Buffer*		m_skyBoxVbuffer;
 	Buffer*		m_skyBoxIbuffer;
-	Buffer		m_constantSkyBuffer;
 	Shader		m_skyBoxShader;
 	D3DTexture	m_skyTexture;
 	ID3D11ShaderResourceView* m_skysrv;

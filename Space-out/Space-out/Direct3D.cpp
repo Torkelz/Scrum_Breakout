@@ -42,7 +42,7 @@ void Direct3D::initApp()
 	D3DApp::initApp();
 	HRESULT hr = S_OK;
 	m_buffer = Buffer();
-	m_cBuffer = Buffer();
+	//m_CONSTANTBUFFER = Buffer();
 	m_shader = Shader();
 
 	for(int i = 0; i < 4; i++)
@@ -57,17 +57,6 @@ void Direct3D::initApp()
 	m_pCamera = m_game.getCamera();
 
 	//Set up world view proj
-	//m_camPosition = XMVectorSet( 0.0f, 0.0f, 250.f, 0.0f );
-	//m_camTarget = XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
-	//m_camUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
-	//
-	//m_camView = XMMatrixLookAtLH( m_camPosition, m_camTarget, m_camUp );
-	//m_camProjection = XMMatrixPerspectiveFovLH( 0.4f*3.14f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 1000.0f);
-	//m_camProjection = XMMatrixPerspectiveFovLH( PI*0.25f, (float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
-
-	//m_pCamera = new Camera(vec3(0.0f, 0.0f, 250.0f));
-	//m_pCamera->setViewMatrix(vec3(0.0f, 0.0f, 250.0f));
-	//m_pCamera->createProjectionMatrix(PI*0.25f,(float)m_ClientWidth/m_ClientHeight, 1.0f, 500.0f);
 	m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
 	m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
 	m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
@@ -115,22 +104,21 @@ void Direct3D::initApp()
 	m_shader.compileAndCreateShaderFromFile(L"VertexShader.fx", "main","vs_5_0", VERTEX_SHADER , desc);
 	m_shader.compileAndCreateShaderFromFile(L"PixelShader.fx", "main", "ps_5_0", PIXEL_SHADER, NULL);
 	
-	//m_WVP	= m_world * m_camView * m_camProjection;
-	//m_cbPad.WVP = XMMatrixTranspose(m_WVP);
-	BufferInitDesc cbbd;	
+	BufferInitDesc ConstantBufferDesc;	
 
-	cbbd.elementSize = sizeof(CBPad);
-	cbbd.initData = NULL;
-	cbbd.numElements = 1;
-	cbbd.type = CONSTANT_BUFFER_VS;
-	cbbd.usage = BUFFER_DEFAULT;
-	
-	m_cBuffer.init(m_pDevice, m_pDeviceContext, cbbd);
+	ConstantBufferDesc.elementSize = sizeof(ConstantBuffer);
+	ConstantBufferDesc.initData = NULL;
+	ConstantBufferDesc.numElements = 1;
+	ConstantBufferDesc.type = CONSTANT_BUFFER_ALL;
+	ConstantBufferDesc.usage = BUFFER_DEFAULT;
+	m_CONSTANTBUFFER = new Buffer();
+	m_CONSTANTBUFFER->init(m_pDevice, m_pDeviceContext, ConstantBufferDesc);
+
 	m_padTexture = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_padTexture.createTexture(m_game.getPad()->getTexturePath(), 0);
 
-	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
-	m_cBuffer.apply(0);
+	m_pDeviceContext->UpdateSubresource(m_CONSTANTBUFFER->getBufferPointer(), 0, NULL, &m_CONSTBUFFER, 0, 0);
+	m_CONSTANTBUFFER->apply(0);
 
 	//## PAD END ##
 	//## BLOCK START ##
@@ -174,7 +162,6 @@ void Direct3D::initApp()
 	//## BLOCK END ##
 	//## BALL START ##
 	m_ballBuffer =  Buffer();
-	m_constantBallBuffer = Buffer();
 	m_ballShader = Shader();
 
 	m_ballShader.init(m_pDevice, m_pDeviceContext, 1);
@@ -188,19 +175,6 @@ void Direct3D::initApp()
 	m_ballBuffer.init(m_pDevice, m_pDeviceContext, bufferDesc);
 	m_ballTexture = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_ballTexture.createTexture(m_game.getBall()->getTexturePath(), 0);
-	
-	CBBall cbBall;
-
-	BufferInitDesc cbBallDesc;
-	cbBallDesc.elementSize = sizeof(CBBall);
-	cbBallDesc.initData = NULL;
-	cbBallDesc.numElements = 1;
-	cbBallDesc.type = CONSTANT_BUFFER_ALL;
-	cbBallDesc.usage = BUFFER_DEFAULT;
-	
-	m_constantBallBuffer.init(m_pDevice, m_pDeviceContext, cbBallDesc);
-	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &cbBall, 0, 0);
-	m_constantBallBuffer.apply(0);
 
 	D3D11_SAMPLER_DESC sd;
 	ZeroMemory(&sd, sizeof(sd));
@@ -461,10 +435,10 @@ void Direct3D::drawScene()
 
 	vec3 camppos = m_game.getCamera()->getPosition();
 
-	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
-	m_constantBallBuffer.apply(0);
+	m_CONSTBUFFER.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
+	m_CONSTANTBUFFER->apply(0);
 
-	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+	m_pDeviceContext->UpdateSubresource(m_CONSTANTBUFFER->getBufferPointer(), 0, NULL, &m_CONSTBUFFER, 0, 0);
 	
 	m_skyBoxVbuffer->apply();
 	m_skyBoxIbuffer->apply();
@@ -490,9 +464,9 @@ void Direct3D::drawScene()
 	t_scaleMatrix.r[3].m128_f32[3] = 1.0f;
 	m_WVP = m_world * playFieldRotation * t_scaleMatrix * translatePadMatrix * m_camView * m_camProjection;
 
-	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
-	m_cBuffer.apply(0);
-	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+	m_CONSTBUFFER.WVP = XMMatrixTranspose(m_WVP);
+	m_CONSTANTBUFFER->apply(0);
+	m_pDeviceContext->UpdateSubresource(m_CONSTANTBUFFER->getBufferPointer(), 0, NULL, &m_CONSTBUFFER, 0, 0);
 	m_shader.setShaders();
 	m_shader.setResource(PIXEL_SHADER, 0, 1, m_padTexture.getResourceView());
 	m_shader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
@@ -540,9 +514,9 @@ void Direct3D::drawScene()
 			else
 				translatePadMatrix = XMMatrixTranslation(padPos.x, pu->getPos()->y, pu->getPos()->z);
 			m_WVP = m_world * playFieldRotation * translatePadMatrix * m_camView * m_camProjection;
-			m_cbPad.WVP = XMMatrixTranspose(m_WVP);
-			m_cBuffer.apply(0);
-			m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+			m_CONSTBUFFER.WVP = XMMatrixTranspose(m_WVP);
+			m_CONSTANTBUFFER->apply(0);
+			m_pDeviceContext->UpdateSubresource(m_CONSTANTBUFFER->getBufferPointer(), 0, NULL, &m_CONSTBUFFER, 0, 0);
 			m_powerShader.setResource(PIXEL_SHADER, 0, 1, m_powerTextures[pu->getType()].getResourceView());
 			m_powerBuffer.apply();
 			m_pDeviceContext->Draw(4, 0);
@@ -558,13 +532,13 @@ void Direct3D::drawScene()
 	//## BALL DRAW START ##
 	vec3 t_ballPos = ((Ball*)m_game.getBall())->getRealPosition();
 
-	m_cbBall.eyePosW = m_camPosition;
-	m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
-	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos.x, t_ballPos.y, t_ballPos.z));
-	m_cbBall.size = XMFLOAT2(5.0f, 5.0f);
-	m_constantBallBuffer.apply(0);
+	m_CONSTBUFFER.eyePosW = m_camPosition;
+	m_CONSTBUFFER.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
+	m_CONSTBUFFER.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos.x, t_ballPos.y, t_ballPos.z));
+	m_CONSTBUFFER.size = XMFLOAT2(5.0f, 5.0f);
+	m_CONSTANTBUFFER->apply(0);
 
-	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+	m_pDeviceContext->UpdateSubresource(m_CONSTANTBUFFER->getBufferPointer(), 0, NULL, &m_CONSTBUFFER, 0, 0);
 	m_ballShader.setShaders();
 	m_ballShader.setResource(PIXEL_SHADER, 0, 1, m_ballTexture.getResourceView());
 	m_ballShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
