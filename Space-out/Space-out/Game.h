@@ -94,6 +94,13 @@ private:
 	vector<Borders>			m_borderList;
 
 	void					loadSounds();
+	//FSound					m_soundManager;
+	//float					m_newVolume;
+
+	//vector<FMOD::Sound*>	m_pSoundList;
+	
+
+
 	void					powerUpSpawn(vec3 pos);
 	int					    random();
 	void					powerUpCheck(int i);

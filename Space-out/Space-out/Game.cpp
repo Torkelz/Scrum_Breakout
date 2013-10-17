@@ -536,11 +536,13 @@ void Game::resetBall(PlayField* pf)
 {
 	((Ball*)m_pBall)->setStuck(true);
 	((Pad*)m_pPad)->setSavedVector(vec3(0.0f, 4.0f, 0.0f) * ((Pad*)m_pPad)->getScale());
+
 	((Ball*)m_pBall)->setInternalPosition( *m_pPad->getBoundingVolume()->getPosition() + 
 		((Pad*)m_pPad)->getSavedVector(),
 		pf->getOriginalPosition(), pf->getRightDir(), pf->getDownDir() );
 	((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 }
+
 void Game::addBorders()
 {
 	//get playfield orgpos... 
