@@ -106,6 +106,7 @@ void GLApp::initOpenGL()
 	        glfwTerminate();
 	    }
 	    glfwMakeContextCurrent(m_hMainWnd);
+	    glEnable(GL_DEPTH_TEST);
 }
 
 void GLApp::errorCallback(int p_error, const char* p_pDescription)

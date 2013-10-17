@@ -1,0 +1,77 @@
+#include "Header/GLTexture.h"
+
+GLTexture::GLTexture()//ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext)
+{
+	success = IL_TRUE;
+}
+
+GLTexture::~GLTexture()
+{
+
+}
+
+void GLTexture::init()
+{
+
+	ilInit();
+}
+
+//ID3D11Texture2D* D3DTexture::getResource()
+//{
+//	return m_pResource;
+//}
+//
+//ID3D11ShaderResourceView* D3DTexture::getResourceView()
+//{
+//	return m_pResourceView;
+//}
+
+void GLTexture::bindTextureResource(GLuint p_program, char* p_pUniform, GLuint p_textureID)
+{
+	GLint texUnitLoc = glGetUniformLocation(p_program, p_pUniform);
+	glProgramUniform1i(p_program, texUnitLoc, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, p_textureID);
+}
+
+void GLTexture::createTexture(std::string p_pTexturePath, unsigned int& p_textureID)
+{
+	ILuint ilImageID;
+	ilGenImages(1, &ilImageID);
+	ilBindImage(ilImageID);
+	ilEnable(IL_ORIGIN_SET);
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+	ilLoadImage(p_pTexturePath.c_str());
+
+	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+	glGenTextures(1, &p_textureID);
+	glBindTexture(GL_TEXTURE_2D, p_textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), 0, GL_RGBA, GL_UNSIGNED_BYTE, ilGetData());
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	ilDeleteImages(1, &ilImageID);
+}
+
+//ID3D11ShaderResourceView* D3DTexture::createTextureSRV(ID3D11Texture2D* p_pTexture)
+//{
+//	ID3D11ShaderResourceView* pSRV = NULL;
+//
+//	D3D11_TEXTURE2D_DESC td;
+//	p_pTexture->GetDesc(&td);
+//
+//	//init view description
+//	D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+//	ZeroMemory( &viewDesc, sizeof(viewDesc) );
+//
+//	viewDesc.Format					= td.Format;
+//	viewDesc.ViewDimension			= D3D11_SRV_DIMENSION_TEXTURE2D;
+//	viewDesc.Texture2D.MipLevels	= td.MipLevels;
+//
+//	if(FAILED(m_pDevice->CreateShaderResourceView(p_pTexture, &viewDesc, &pSRV)))
+//	{
+//		MessageBox(0, "Unable to create shader resource view", "Error!", 0);
+//	}
+//
+//	return pSRV;
+//}

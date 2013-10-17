@@ -2,22 +2,18 @@
 
 GLTexture::GLTexture()//ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext)
 {
-//	m_pDevice			= p_pDevice;
-//	m_pDeviceContext	= p_pDeviceContext;
-//	m_pResource			= NULL;
-//	m_pResourceView		= NULL;
-//	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	//success = IL_TRUE;
 }
 
 GLTexture::~GLTexture()
 {
-	release();
+
 }
 
-void GLTexture::release()
+void GLTexture::init()
 {
-	//ReleaseCOM(m_pResource);
-	//ReleaseCOM(m_pResourceView);
+
+	//ilInit();
 }
 
 //ID3D11Texture2D* D3DTexture::getResource()
@@ -38,31 +34,62 @@ void GLTexture::bindTextureResource(GLuint p_program, char* p_pUniform, GLuint p
 	glBindTexture(GL_TEXTURE_2D, p_textureID);
 }
 
-void GLTexture::createTexture(char* p_pTexturePath, GLuint p_textureID)
+void GLTexture::createTexture(std::string p_pTexturePath, unsigned int& p_textureID)
 {
-	FREE_IMAGE_FORMAT format = FreeImage_GetFileType(p_pTexturePath,0);
-	FIBITMAP* imagen = FreeImage_Load(format, p_pTexturePath);
+	FREE_IMAGE_FORMAT format = FreeImage_GetFileType(p_pTexturePath.c_str(),0);
+	FIBITMAP* image = FreeImage_Load(format, p_pTexturePath.c_str());
 
-	FIBITMAP* temp = imagen;
-	imagen = FreeImage_ConvertTo32Bits(imagen);
+	FIBITMAP* temp = image;
+	image = FreeImage_ConvertTo32Bits(image);
 	FreeImage_Unload(temp);
 
-	int w = FreeImage_GetWidth(imagen);
-	int h = FreeImage_GetHeight(imagen);
-	GLubyte* texture = new GLubyte[4*w*h];
-	char* pixels = (char*)FreeImage_GetBits(imagen);
+	int w = FreeImage_GetWidth(image);
+	int h = FreeImage_GetHeight(image);
 
-	for(int j = 0; j<w*h; j++)
+	GLubyte* textur = new GLubyte[4*w*h];
+	char* pixels = (char*)FreeImage_GetBits(image);
+	for(int j = 0; j < w*h; j++)
 	{
-		texture[j*4+0]= pixels[j*4+2];
-		texture[j*4+1]= pixels[j*4+1];
-		texture[j*4+2]= pixels[j*4+0];
-		texture[j*4+3]= pixels[j*4+3];
+		textur[j*4+0]= pixels[j*4+2];
+		textur[j*4+1]= pixels[j*4+1];
+		textur[j*4+2]= pixels[j*4+0];
+		textur[j*4+3]= pixels[j*4+3];
 	}
+
 	glGenTextures(1, &p_textureID);
 	glBindTexture(GL_TEXTURE_2D, p_textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)textur);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+//	ilEnable(IL_ORIGIN_SET);
+//	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+//
+//	ILuint ilImageID = ilGenImage();
+//	ilBindImage(ilImageID);
+//	if (!ilLoadImage(p_pTexturePath.c_str()))
+//	{
+//		ILenum err = ilGetError();
+//		//fprintf(stderr, "%s\n", ilGetString(ilGetError()));
+//		int dummy = 42;
+//	}
+//
+//
+//	//ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+//	//ILubyte* data = ilGetData();
+//	glGenTextures(1, &p_textureID);
+//	glBindTexture(GL_TEXTURE_2D, p_textureID);
+//	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData());
+//	float data[16] = {
+//			0.f, 1.f, 1.f, 1.f,
+//			0.f, 0.f, 1.f, 1.f,
+//			0.f, 1.f, 0.f, 1.f,
+//			1.f, 0.f, 0.f, 1.f};
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_FLOAT, data);
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//
+//	ilDeleteImage(ilImageID);
 }
 
 //ID3D11ShaderResourceView* D3DTexture::createTextureSRV(ID3D11Texture2D* p_pTexture)

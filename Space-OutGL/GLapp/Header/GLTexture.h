@@ -3,13 +3,12 @@
 #include "GLUtil.h"
 #include "FreeImage.h"
 
+using namespace std;
+
 class GLTexture
 {
-private:
-//	ID3D11Texture2D*			m_pResource;
-//	ID3D11ShaderResourceView*	m_pResourceView;
-//	ID3D11DeviceContext*        m_pDeviceContext;
-//	ID3D11Device*				m_pDevice;
+public:
+	//ILboolean success;
 
 //	ID3D11ShaderResourceView*	createTextureSRV(ID3D11Texture2D* p_pTexture);
 public:
@@ -17,12 +16,12 @@ public:
 	GLTexture(char* p_pTexturePath, GLuint* p_pTextureID);// p_pDevice, ID3D11DeviceContext* p_pDeviceContext);
 	~GLTexture();
 
-	void release();
+	void init();
 
 //	ID3D11Texture2D*			getResource();
 //	ID3D11ShaderResourceView*	getResourceView();
-	void						bindTextureResource(GLuint p_program, char* p_pUniform, GLuint p_textureID);
-	void						createTexture(char* p_pTexturePath, GLuint p_textureID);
+	void						bindTextureResource(GLuint p_program, char* p_pUniform, unsigned int p_textureID);
+	void						createTexture(std::string p_pTexturePath, unsigned int& p_textureID);
 
 };
 //http://lwjgl.org/wiki/index.php?title=GLSL_Tutorial:_Texturing

@@ -1,5 +1,5 @@
 #include "Header/OpenGL.h"
-
+#include "glm/gtc/matrix_transform.hpp"
 //struct triangleVertex
 //{
 //	vec3 pos;
@@ -10,13 +10,13 @@
 struct vertexColor
 {
 	vec4 pos;
-	vec4 col;
+	vec4 tex;
 	mat4 proj;
 	//0.78f, 0.651f, 0.8f
 };
 vertexColor col[1];
 float colValue;
-float scale;
+
 int main(void)
 {
 	OpenGL theApp;
@@ -32,6 +32,7 @@ OpenGL::OpenGL() : GLApp()
 	m_rotation = 0;
 	m_pTexTest = NULL;
 	m_pTexture = 0;
+	m_scale = 1.f;
 }
 
 OpenGL::~OpenGL()
@@ -44,11 +45,11 @@ OpenGL::~OpenGL()
 void OpenGL::initApp()
 {
 	GLApp::initApp();
-
+	m_pTexTest->init();
 	col[0].pos = vec4(0.0f, 0.0f, 0.f,1.0f); //Uniform performs a padding on the buffer that can make
-	col[0].col = vec4(0.f, 1.f, 0.f,0);        //the result look really odd. Always use vec4 or mat4x4;
-	m_pTexTest->createTexture((char*)("/home/bthp0000/Desktop/GitHub/Git/Space-OutGL/GLapp/cat.tiff"), m_pTexture);
-	scale = 0;
+	col[0].tex = vec4(0.f, 0.f, 0.f, 0.f);   //the result look really odd. Always use vec4 or mat4x4;
+	m_pTexTest->createTexture("./GLapp/Textures/cat.png", m_pTexture);
+	m_scale = 0;
 //	BufferInputDesc* desc = new BufferInputDesc[2];
 //	desc[0].size = 3;
 //	desc[0].type = GL_FLOAT;
@@ -119,7 +120,7 @@ void OpenGL::drawScene()
 
 	m_triShader.apply();
 
-	scale += 0.01f;
+	m_scale += 0.01f;
 
 	mat4 view;
 
@@ -141,16 +142,12 @@ void OpenGL::drawScene()
 
 	mat4 proj;
 
-    const float ar         = m_ClientWidth / m_ClientHeight;
-    const float zNear      = 1.0f;
-    const float zFar       = 100.0f;
-    const float zRange     = zNear - zFar;
-    const float tanHalfFOV = tanf((30.0f / 2.0f)*M_PI/180.0f);
+//    const float ar         = m_ClientWidth / m_ClientHeight;
+//    const float zNear      = 1.0f;
+//    const float zFar       = 100.0f;
+//    const float zRange     = zNear - zFar;
+//    const float tanHalfFOV = tanf((30.0f / 2.0f)*M_PI/180.0f);
 
-    proj[0][0] = 1.0f/(tanHalfFOV * ar); proj[0][1] = 0.0f;            proj[0][2] = 0.0f;                   proj[0][3] = 0.0;
-    proj[1][0] = 0.0f;                   proj[1][1] = 1.0f/tanHalfFOV; proj[1][2] = 0.0f;                   proj[1][3] = 0.0;
-    proj[2][0] = 0.0f;                   proj[2][1] = 0.0f;            proj[2][2] = (-zNear -zFar)/zRange ; proj[2][3] = 2.0f * zFar*zNear/zRange;
-    proj[3][0] = 0.0f;                   proj[3][1] = 0.0f;            proj[3][2] = 1.0f;                   proj[3][3] = 0.0;
 
     mat4 World;
 
@@ -162,23 +159,24 @@ void OpenGL::drawScene()
 	mat4 ry;
 	mat4 rx;
 
-	    ry[0][0] = cosf(scale);	ry[0][1] = 0.0f; 	ry[0][2] = -sinf(scale); ry[0][3] = 0.0f;
+	    ry[0][0] = cosf(m_scale);	ry[0][1] = 0.0f; 	ry[0][2] = -sinf(m_scale); ry[0][3] = 0.0f;
 	    ry[1][0] = 0.0f;			ry[1][1] = 1.0f;  	ry[1][2] = 0.0f; 		ry[1][3] = 0.0f;
-	    ry[2][0] = sinf(scale);	ry[2][1] = 0.0f;     ry[2][2] = cosf(scale); 	ry[2][3] = 0.0f;
+	    ry[2][0] = sinf(m_scale);	ry[2][1] = 0.0f;     ry[2][2] = cosf(m_scale); 	ry[2][3] = 0.0f;
 	    ry[3][0] = 0.0f;        	ry[3][1] = 0.0f;     ry[3][2] = 0.0f; 		ry[3][3] = 1.0f;
 
 	    rx[0][0] = 1.0f; rx[0][1] = 0.0f   ; rx[0][2] = 0.0f    ; rx[0][3] = 0.0f;
-	    rx[1][0] = 0.0f; rx[1][1] = cosf(scale); rx[1][2] = -sinf(scale); rx[1][3] = 0.0f;
-	    rx[2][0] = 0.0f; rx[2][1] = sinf(scale); rx[2][2] = cosf(scale) ; rx[2][3] = 0.0f;
+	    rx[1][0] = 0.0f; rx[1][1] = cosf(m_scale); rx[1][2] = -sinf(m_scale); rx[1][3] = 0.0f;
+	    rx[2][0] = 0.0f; rx[2][1] = sinf(m_scale); rx[2][2] = cosf(m_scale) ; rx[2][3] = 0.0f;
 	    rx[3][0] = 0.0f; rx[3][1] = 0.0f   ; rx[3][2] = 0.0f    ; rx[3][3] = 1.0f;
-	    col[0].proj = glm::transpose(proj * view) * glm::transpose(ry);
+	    proj = glm::perspective(45.f, 1.f, 1.0f, 100.f);
+	    col[0].proj = proj * view * glm::transpose(ry * rx);
 	    //glUniformMatrix4fv(glGetUniformLocation(m_triShader.getProgram(), "gWorld"), 1, GL_TRUE, &World.m[0][0]);
 	//Update buffer here!
 
 	m_uniBuffer.setSubData(0, sizeof(col), col);
 
 	// stop updating here!
-
+	glDisable(GL_CULL_FACE);
 	triBuffer.apply();
 	// Draw the triangle !
 	glDrawArrays(GL_POINTS, 0, 1); // Starting from vertex 0; 3 vertices total -> 1 triangle
