@@ -55,7 +55,7 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 	m_pCamera->init(pf->calculateCameraCenterPos());
 	m_pCamera->setViewMatrix();
 	m_pCamera->createProjectionMatrix(PI*0.25f,(float)CLIENTWIDTH/CLIENTHEIGHT, 1.0f, 500.0f);
-	m_pCamera->setYaw(m_activePlayField);
+	//m_pCamera->setYaw(m_activePlayField);
 
 	m_loadLevel.~LevelGenerator();
 	m_pPUObservable = new PUObservable();
@@ -305,7 +305,7 @@ void Game::keyEvent(unsigned short key)
 			m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
 									m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
 									m_originWorld,
-									3);
+									4);
 			m_pCamera->setYaw(m_activePlayFieldNext);
 			m_pCamera->startCinematic();
 		}
@@ -321,7 +321,7 @@ void Game::keyEvent(unsigned short key)
 			m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
 									m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
 									m_originWorld,
-									3);
+									4);
 			m_pCamera->setYaw(m_activePlayFieldNext);
 			m_pCamera->startCinematic();
 		}
