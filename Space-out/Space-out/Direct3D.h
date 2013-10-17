@@ -72,6 +72,12 @@ inline mat4 XMMatrixTomat4(XMMATRIX* p)
 	return r;
 };
 
+inline std::string IntToString(int i)
+{
+	std::stringstream ss;
+	ss << i;
+	return ss.str();
+};
 inline XMVECTOR vec3ToXMVector(vec3 p)
 {
 	XMVECTOR r;

@@ -14,6 +14,7 @@ private:
 		ID3D11Buffer *vertexBuffer, *indexBuffer;
 		int vertexCount, indexCount, maxLength;
 		float red, green, blue;
+		int id;
 	};
 
 	struct VertexType
@@ -26,7 +27,8 @@ private:
 	{
 		XMMATRIX worldMatrix;
 		XMMATRIX viewMatrix;
-		XMMATRIX projectionMatrix; 
+		XMMATRIX projectionMatrix;
+		XMFLOAT4 color;
 	};
 
 public:
@@ -36,7 +38,9 @@ public:
 	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, HWND hwnd, int screenWidth, int screenHeight, XMMATRIX* baseViewMatrix);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, XMMATRIX*, XMMATRIX*, ID3D11SamplerState*, ID3D11RasterizerState*);
-
+	void addSentence(char* message, int id, ID3D11Device*, ID3D11DeviceContext*);
+	void removeSentence(int id);
+	void updateSentenceAt(int id, char* newMessage, int, int, float, float, float, ID3D11DeviceContext*);
 private:
 	bool InitializeSentence(SentenceType**, int, ID3D11Device*);
 	bool UpdateSentence(SentenceType*, char*, int, int, float, float, float, ID3D11DeviceContext*);
@@ -48,8 +52,8 @@ private:
 	Shader*			m_FontShader;
 	int				m_screenWidth, m_screenHeight;
 	XMMATRIX		m_baseViewMatrix;
-	SentenceType*	m_sentence1;
-	SentenceType*	m_sentence2;
 	Buffer*			m_cBuffer;
 	FontCB			m_cb;
+	
+	std::vector<SentenceType*>	m_sentence;
 };

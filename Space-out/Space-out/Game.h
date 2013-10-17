@@ -75,6 +75,8 @@ public:
 
 	Camera*					getCamera();
 	void					setScreenBorders(vec4 p_screenBorder);
+	int						getRemainingLives();
+	int						getScore();
 private:
 	void					loadSounds();
 	void					powerUpSpawn(vec3 pos);

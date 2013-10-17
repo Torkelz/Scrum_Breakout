@@ -96,39 +96,12 @@ void D3DFont::ReleaseFontData()
 }
 
 bool D3DFont::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceContext, std::wstring* filename)
-{
-	bool result;
-
-	//// Create the texture object.
-	//m_Texture = new D3DTexture(device, deviceContext);
-	//if(!m_Texture)
-	//{
-	//	return false;
-	//}
-
-	//// Initialize the texture object.
-	////result = m_Texture->Initialize(device, filename);
-	//m_Texture->createTexture(filename, NULL);
-	
-	//Texture
-	ID3D11Texture2D* tex = 0;
-	ID3D11Resource* tt = 0;
-	
-    const wchar_t* temp = filename->c_str();
-	HRESULT yr = DirectX::CreateDDSTextureFromFile(device, temp,&tt,  nullptr );
-	//ID3D11Resource to ID3D11Texture2D
-	tt->QueryInterface(&tex);
-	D3D11_TEXTURE2D_DESC td;
-	tex->GetDesc(&td);
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-	viewDesc.Format						= td.Format;
-    viewDesc.ViewDimension              = D3D11_SRV_DIMENSION_TEXTURE2D;
-    viewDesc.Texture2D.MipLevels        = td.MipLevels;
-
-	device->CreateShaderResourceView(tex, &viewDesc, &m_srv);
-
-	return true;
+{		
+	HRESULT yr = DirectX::CreateDDSTextureFromFile(device, filename->c_str(), nullptr,  &m_srv );
+	if(yr == S_OK)
+		return true;
+	else
+		return false;
 }
 
 ID3D11ShaderResourceView* D3DFont::GetTexture()
@@ -164,6 +137,32 @@ void D3DFont::BuildVertexArray(void* vertices, char* sentence, float drawX, floa
 		}
 		else
 		{
+			//// First triangle in quad.
+			//vertexPtr[index].position = XMFLOAT3(drawX, drawY, 0.0f);  // Top left.
+			//vertexPtr[index].texture = XMFLOAT2(m_Font[letter].right, 0.0f);
+			//index++;
+
+			//vertexPtr[index].position = XMFLOAT3((drawX + m_Font[letter].size), (drawY - 16), 0.0f);  // Bottom right.
+			//vertexPtr[index].texture = XMFLOAT2(m_Font[letter].left, 1.0f);
+			//index++;
+
+			//vertexPtr[index].position = XMFLOAT3(drawX, (drawY - 16), 0.0f);  // Bottom left.
+			//vertexPtr[index].texture = XMFLOAT2(m_Font[letter].right, 1.0f);
+			//index++;
+
+			//// Second triangle in quad.
+			//vertexPtr[index].position = XMFLOAT3(drawX, drawY, 0.0f);  // Top left.
+			//vertexPtr[index].texture = XMFLOAT2(m_Font[letter].right, 0.0f);
+			//index++;
+
+			//vertexPtr[index].position = XMFLOAT3(drawX + m_Font[letter].size, drawY, 0.0f);  // Top right.
+			//vertexPtr[index].texture = XMFLOAT2(m_Font[letter].left, 0.0f);
+			//index++;
+
+			//vertexPtr[index].position = XMFLOAT3((drawX + m_Font[letter].size), (drawY - 16), 0.0f);  // Bottom right.
+			//vertexPtr[index].texture = XMFLOAT2(m_Font[letter].left, 1.0f);
+			//index++;
+
 			// First triangle in quad.
 			vertexPtr[index].position = XMFLOAT3(drawX, drawY, 0.0f);  // Top left.
 			vertexPtr[index].texture = XMFLOAT2(m_Font[letter].left, 0.0f);
@@ -189,6 +188,8 @@ void D3DFont::BuildVertexArray(void* vertices, char* sentence, float drawX, floa
 			vertexPtr[index].position = XMFLOAT3((drawX + m_Font[letter].size), (drawY - 16), 0.0f);  // Bottom right.
 			vertexPtr[index].texture = XMFLOAT2(m_Font[letter].right, 1.0f);
 			index++;
+
+			FontType temp = m_Font[letter];
 
 			// Update the x location for drawing by the size of the letter and one pixel.
 			drawX = drawX + m_Font[letter].size + 1.0f;

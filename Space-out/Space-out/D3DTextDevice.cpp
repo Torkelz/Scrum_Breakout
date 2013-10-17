@@ -4,9 +4,6 @@ D3DTextDevice::D3DTextDevice()
 {
 	m_Font = 0;
 	m_FontShader = 0;
-
-	m_sentence1 = 0;
-	m_sentence2 = 0;
 }
 
 D3DTextDevice::~D3DTextDevice(){}
@@ -70,45 +67,11 @@ bool D3DTextDevice::Initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	m_FontShader->compileAndCreateShaderFromFile(L"Font.fx", "FontVertexShader", "vs_5_0", VERTEX_SHADER, desc);
 	m_FontShader->compileAndCreateShaderFromFile(L"Font.fx", "FontPixelShader", "ps_5_0", PIXEL_SHADER, NULL);
 
-	// Initialize the first sentence.
-	result = InitializeSentence(&m_sentence1, 16, device);
-	if(!result)
-	{
-		return false;
-	}
-
-	// Now update the sentence vertex buffer with the new string information.
-	result = UpdateSentence(m_sentence1, "Hello", 100, 100, 1.0f, 1.0f, 1.0f, deviceContext);
-	if(!result)
-	{
-		return false;
-	}
-
-	// Initialize the first sentence.
-	result = InitializeSentence(&m_sentence2, 16, device);
-	if(!result)
-	{
-		return false;
-	}
-
-	// Now update the sentence vertex buffer with the new string information.
-	result = UpdateSentence(m_sentence2, "Goodbye", 100, 200, 1.0f, 1.0f, 0.0f, deviceContext);
-	if(!result)
-	{
-		return false;
-	}
-
 	return true;
 }
 
 void D3DTextDevice::Shutdown()
 {
-	// Release the first sentence.
-	ReleaseSentence(&m_sentence1);
-
-	// Release the second sentence.
-	ReleaseSentence(&m_sentence2);
-
 	// Release the font object.
 	if(m_Font)
 	{
@@ -122,20 +85,9 @@ void D3DTextDevice::Shutdown()
 
 bool D3DTextDevice::Render(ID3D11DeviceContext* deviceContext, XMMATRIX* worldMatrix, XMMATRIX* orthoMatrix, ID3D11SamplerState* pSS, ID3D11RasterizerState* pRS)
 {
-	bool result;
-
-	// Draw the first sentence.
-	result = RenderSentence(deviceContext, m_sentence1, worldMatrix, orthoMatrix, pSS, pRS);
-	if(!result)
+	for (int i = 0; i < m_sentence.size(); i++)
 	{
-		return false;
-	}
-
-	// Draw the second sentence.
-	result = RenderSentence(deviceContext, m_sentence2, worldMatrix, orthoMatrix, pSS, pRS);
-	if(!result)
-	{
-		return false;
+		RenderSentence(deviceContext, m_sentence.at(i), worldMatrix, orthoMatrix, pSS, pRS);
 	}
 
 	return true;
@@ -285,7 +237,7 @@ bool D3DTextDevice::UpdateSentence(SentenceType* sentence, char* text, int posit
 
 	// Use the font class to build the vertex array from the sentence text and sentence draw location.
 	//m_Font->BuildVertexArray((void*)vertices, text, drawX, drawY);
-	m_Font->BuildVertexArray((void*)vertices, text, positionX, positionY);
+	m_Font->BuildVertexArray((void*)vertices, text, drawX, drawY);
 
 	// Lock the vertex buffer so it can be written to.
 	result = deviceContext->Map(sentence->vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -364,7 +316,8 @@ bool D3DTextDevice::RenderSentence(ID3D11DeviceContext* deviceContext, SentenceT
 
 	m_cb.worldMatrix		= *worldMatrix;
 	m_cb.projectionMatrix	= *orthoMatrix;
-	m_cb.viewMatrix			= m_baseViewMatrix;
+	m_cb.viewMatrix			= XMMatrixIdentity();
+	m_cb.color				= pixelColor;
 
 	m_FontShader->setShaders();
 	deviceContext->UpdateSubresource(m_cBuffer->getBufferPointer(), 0, NULL, &m_cb, 0, 0);
@@ -372,16 +325,46 @@ bool D3DTextDevice::RenderSentence(ID3D11DeviceContext* deviceContext, SentenceT
 	m_FontShader->setBlendState(NULL);
 	m_FontShader->setResource(PIXEL_SHADER, 0, 1, m_Font->GetTexture());
 	m_FontShader->setSamplerState(PIXEL_SHADER, 0, 1, pSS);
-	//m_pDeviceContext->RSSetState(m_pRasterState);
+	deviceContext->RSSetState(pRS);
 
 	deviceContext->DrawIndexed(sentence->indexCount, 0, 0);
 
-	//result = m_FontShader->Render(deviceContext, sentence->indexCount, worldMatrix, m_baseViewMatrix, orthoMatrix, m_Font->GetTexture(), 
-								  //pixelColor);
-	//if(!result)
-	//{
-	//	false;
-	//}
-
 	return true;
+}
+
+void D3DTextDevice::addSentence(char* message, int id, ID3D11Device* device, ID3D11DeviceContext* deviceContext)
+{
+	// Initialize the first sentence.
+	SentenceType* tempSentence;
+	InitializeSentence(&tempSentence, 30, device);
+
+	// Now update the sentence vertex buffer with the new string information.
+	//UpdateSentence(tempSentence, message, 100, 200, 1.0f, 1.0f, 1.0f, deviceContext);
+	tempSentence->id = id;
+
+	m_sentence.push_back(tempSentence);
+}
+
+void D3DTextDevice::removeSentence(int id)
+{
+	for (int i = 0; i < m_sentence.size(); i++)
+	{
+		if(m_sentence.at(i)->id == id)
+		{
+			m_sentence.erase(m_sentence.begin() + i);
+			m_sentence.shrink_to_fit();
+		}
+	}
+}
+
+void D3DTextDevice::updateSentenceAt(int id, char* newMessage, int positionX, int positionY, float red, float green, float blue,
+							   ID3D11DeviceContext* deviceContext)
+{
+	for (int i = 0; i < m_sentence.size(); i++)
+	{
+		if(m_sentence.at(i)->id == id)
+		{
+			UpdateSentence(m_sentence.at(i), newMessage, positionX, positionY, red, green, blue, deviceContext);
+		}
+	}
 }

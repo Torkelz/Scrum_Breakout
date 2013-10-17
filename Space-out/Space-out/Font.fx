@@ -3,6 +3,7 @@ cbuffer PerFrameBuffer
 	matrix worldMatrix;
 	matrix viewMatrix;
 	matrix projectionMatrix;
+    float4 pixelColor;
 };
 
 struct VertexInputType
@@ -42,11 +43,6 @@ PixelInputType FontVertexShader(VertexInputType input)
 /////////////
 Texture2D m_texture : register ( t0 );
 SamplerState m_textureSampler : register ( s0 );
-
-cbuffer PixelBuffer
-{
-    float4 pixelColor;
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
