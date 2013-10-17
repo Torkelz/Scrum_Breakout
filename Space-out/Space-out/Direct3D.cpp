@@ -192,10 +192,10 @@ void Direct3D::initApp()
 	// not really needed when using same shader as blocks.
 	//m_blockShader.init(m_pDevice, m_pDeviceContext, 1);
 	// here ends the not really needed things!!!
-	
-	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "VS", "vs_5_0", VERTEX_SHADER, borderInputdesc);
-	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "GS", "gs_5_0", GEOMETRY_SHADER, NULL);
-	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "PS", "ps_5_0", PIXEL_SHADER, NULL);
+	m_borderShader.init(m_pDevice, m_pDeviceContext, 1);
+	m_borderShader.compileAndCreateShaderFromFile(L"BorderShader.fx", "VS", "vs_5_0", VERTEX_SHADER, borderInputdesc);
+	m_borderShader.compileAndCreateShaderFromFile(L"BorderShader.fx", "GS", "gs_5_0", GEOMETRY_SHADER, NULL);
+	m_borderShader.compileAndCreateShaderFromFile(L"BorderShader.fx", "PS", "ps_5_0", PIXEL_SHADER, NULL);
 
 	m_borderTexture = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_borderTexture.createTexture(new std::wstring(L"Picatures/border.png"), 0);
@@ -577,11 +577,12 @@ void Direct3D::drawScene()
 		m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
 	}
 	//## BLOCK DRAW END ##
-	//## BORDERS START ##
+	//## BORDERS DRAW START ##
 	m_borderBuffers.apply(0);
 
-	m_blockShader.setResource(PIXEL_SHADER, 0, 1, m_borderTexture.getResourceView());
-	m_blockShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
+	m_borderShader.setShaders();
+	m_borderShader.setResource(PIXEL_SHADER, 0, 1, m_borderTexture.getResourceView());
+	m_borderShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 
 	m_WVP = m_world *m_camView * m_camProjection;
 	cBlockBufferStruct.WVP = XMMatrixTranspose(m_WVP);
@@ -604,7 +605,7 @@ void Direct3D::drawScene()
 	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 
 	m_pDeviceContext->Draw(4, 4);
-
+	//## BORDERS DRAW END ##
 	//## POWERUP DRAW START ##
 	if(m_powerUps.size() > 0)
 	{

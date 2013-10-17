@@ -25,6 +25,7 @@ void Camera::init(vec3 initPos)
 
 	m_lifeTime = 0;
 	m_isCinematic = false;
+	m_runOnce = false;
 
 	m_angleToNextPF = 90.0f;
 }
@@ -269,7 +270,17 @@ bool Camera::timeToChange()
 	//if((m_lifeTime / m_cinematicPos.size() - 2) > 0.5f)
 	//	return true;
 
-	return (m_lifeTime / m_cinematicPos.size() - 2) > 0.5f ? true : false;
+	return (m_lifeTime / (m_cinematicPos.size() - 2)) > 0.5f ? true : false;
+}
+
+bool Camera::getRunOnce()
+{
+	return m_runOnce;
+}
+
+void Camera::setRunOnce(bool p)
+{
+	m_runOnce = p;
 }
 
 void Camera::buildPath(vec3 p_start, vec3 p_stop, vec3 p_originWorld, int p_nrPoints)

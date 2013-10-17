@@ -85,7 +85,7 @@ void Game::update(float p_screenWidth, float p_dt)
 		}
 	}
 
-	if(!m_pCamera->isCinematic())
+	if(!m_pCamera->isCinematic() || (m_pCamera->timeToChange() && m_pCamera->getRunOnce()))
 	{
 		if(m_counter > 0.0f)
 		{
@@ -310,6 +310,8 @@ void Game::keyEvent(unsigned short key)
 									4);
 			m_pCamera->setYaw(m_activePlayFieldNext);
 			m_pCamera->startCinematic();
+			
+			m_pCamera->setRunOnce(true);
 		}
 	}
 	if(key == 0x51) // Q
@@ -326,6 +328,8 @@ void Game::keyEvent(unsigned short key)
 									4);
 			m_pCamera->setYaw(m_activePlayFieldNext);
 			m_pCamera->startCinematic();
+
+			m_pCamera->setRunOnce(true);
 		}
 	}
 	if(key == 0x1B) //ESC

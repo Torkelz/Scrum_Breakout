@@ -25,7 +25,6 @@ struct GSOutput
 {
 	float4 m_posH : SV_POSITION;
 	float2 m_tex  : TEXCOORD;
-	float3 m_backColor : POSITION;
 };
 
 VSOutput VS(VSInput p_vIn)
@@ -56,7 +55,7 @@ void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStrea
 
 
 	GSOutput outVertex = (GSOutput)0;
-	outVertex.m_backColor = float3(1,1,1);
+
 	// Back
 	outVertex.m_posH = vert5;
 	outVertex.m_tex = float2(1.0f, 1.0f);
@@ -71,7 +70,6 @@ void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStrea
 	outVertex.m_tex = float2(0.0f, 0.0f);
 	p_outputStream.Append(outVertex);
 	p_outputStream.RestartStrip();
-	outVertex.m_backColor = float3(1,0,0);
 	// Front
 	outVertex.m_posH = vert3;
 	outVertex.m_tex = float2(0.0f, 1.0f);
@@ -86,7 +84,6 @@ void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStrea
 	outVertex.m_tex = float2(1.0f, 0.0f);
 	p_outputStream.Append(outVertex);
 	p_outputStream.RestartStrip();
-	outVertex.m_backColor = float3(1,1,1);
 	// Top
 	outVertex.m_posH = vert7;
 	outVertex.m_tex = float2(1.0f, 0.0f);
@@ -153,7 +150,6 @@ void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStrea
 float4 PS(GSOutput p_input) : SV_Target
 {
 	float4 temp = m_texture.Sample(m_textureSampler, p_input.m_tex);
-		temp *= float4(p_input.m_backColor,1);
 	return temp;
     //float4(1.0f, 1.0f, 1.0f, 1.0f);
 }

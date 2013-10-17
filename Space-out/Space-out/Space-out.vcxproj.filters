@@ -25,6 +25,9 @@
     <FxCompile Include="Font.fx">
       <Filter>D3D\HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="BorderShader.fx">
+      <Filter>D3D\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameTimer.cpp" />

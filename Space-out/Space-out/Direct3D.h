@@ -129,6 +129,7 @@ private:
 	//border
 	Buffer			m_borderBuffers;
 	D3DTexture		m_borderTexture;
+	Shader			 m_borderShader;
 		
 
 	//Pad
