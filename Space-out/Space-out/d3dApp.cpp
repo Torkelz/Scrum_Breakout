@@ -1,5 +1,4 @@
 #include "d3dApp.h"
-#include <sstream>
 #include "Direct3D.h"
 
 LRESULT CALLBACK
@@ -35,7 +34,7 @@ D3DApp::D3DApp(HINSTANCE p_hInstance)
 
 	m_FrameStats = (LPCWSTR)"";
  
-	m_pDevice          = 0;
+	m_pDevice			  = 0;
 	m_pSwapChain          = 0;
 	m_pDepthStencilBuffer = 0;
 	m_pRenderTargetView   = 0;
@@ -49,6 +48,8 @@ D3DApp::D3DApp(HINSTANCE p_hInstance)
 
 	m_4xMsaaQuality = 0;
 	m_pDeviceContext = 0;
+
+	m_winTitle = L"";
 }
 
 D3DApp::~D3DApp()
@@ -189,7 +190,9 @@ void D3DApp::updateScene(float p_dt)
 			<< L"FPS: " << fps << L"    " 
 			<< L"Frame Time: " << mspf << L" (ms)";
 
-		SetWindowTextW(m_hMainWnd, outs.str().c_str());
+
+		m_winTitle = outs.str();
+		//SetWindowTextW(m_hMainWnd, m_winTitle.c_str());
 
 		// Reset for next average.
 		frameCnt = 0;

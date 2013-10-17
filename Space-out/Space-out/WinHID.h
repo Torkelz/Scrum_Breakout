@@ -6,7 +6,9 @@
 #include "WinKeyboard.h"
 #include "WinMouse.h"
 #include "HIDObservable.h"
-#include "Vector2.h"
+#include <glm.hpp>
+
+using namespace glm;
 
 class HID
 {

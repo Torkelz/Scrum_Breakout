@@ -3,25 +3,31 @@
 
 #include <string>
 #include <vector>
-#include "Vector2.h"
+#include "BoundingVolume.h"
+#include <stdint.h>
 
 class Object
 {
 protected:
 	std::string		m_objectName;
-	Vector3			m_pos;
-	Vector3			m_color;
+	vec3			m_pos;
+	vec3			m_color;
 	float			m_size;
-
-	std::vector<Vector3> m_vertices;
-
+	BoundingVolume*	m_boundingVolume;
+	int				m_textureID;
+	std::vector<vec3> m_vertices;
+	std::wstring*	m_texturePath;
 public:
-	Object(Vector3* p_pPos, Vector3* p_pColor, std::string p_objectName);
+	Object(vec3* p_pPos, vec3* p_pColor, std::string p_objectName);
 	~Object();
 
-	Vector3*				getPos();
-	std::vector<Vector3>*	getVertices();
+	void					update();
 
+	void					setPos(vec3 p_pos);
+	vec3*					getPos();
+	std::vector<vec3>*		getVertices();
+	BoundingVolume*			getBoundingVolume();
+	std::wstring*			getTexturePath();
 };
 
 #endif OBJECT_H

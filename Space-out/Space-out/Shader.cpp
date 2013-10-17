@@ -14,6 +14,7 @@ HRESULT Shader::compileAndCreateShaderFromFile( LPCWSTR p_pFileName, char* p_pEn
 {
 	HRESULT hr = S_OK;
 	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+	dwShaderFlags |= D3DCOMPILE_DEBUG;
 
 	ID3DBlob* pErrBlob;
 	ID3DBlob* pBlob;
@@ -146,4 +147,43 @@ void Shader::setResource(ShaderType p_pShaderType,UINT p_StartSpot,UINT p_NumVie
 			break;
 		}
 	}
+}
+
+void Shader::setSamplerState(ShaderType p_pShaderType,UINT p_StartSpot,UINT p_NumSamples, ID3D11SamplerState* p_pSamplerState)
+{
+	switch(p_pShaderType)
+	{
+		case VERTEX_SHADER:
+		{
+			m_pDeviceContext->VSSetSamplers(p_StartSpot, p_NumSamples, &p_pSamplerState);
+			break;
+		}
+		case PIXEL_SHADER:
+		{
+			m_pDeviceContext->PSSetSamplers(p_StartSpot, p_NumSamples, &p_pSamplerState);
+			break;
+		}
+		case GEOMETRY_SHADER:
+		{
+			m_pDeviceContext->GSSetSamplers(p_StartSpot, p_NumSamples, &p_pSamplerState);
+			break;
+		}
+		case HULL_SHADER:
+		{
+			m_pDeviceContext->HSSetSamplers(p_StartSpot, p_NumSamples, &p_pSamplerState);
+			break;
+		}
+		case DOMAIN_SHADER:
+		{
+			m_pDeviceContext->DSSetSamplers(p_StartSpot, p_NumSamples, &p_pSamplerState);
+			break;
+		}
+	}
+}
+
+void Shader::setBlendState(ID3D11BlendState* p_pBlendState)
+{
+	float blendfactor[] = {0.0f, 0.0f, 0.0f, 0.0f};
+	UINT sampleMask = 0xffffffff;
+	m_pDeviceContext->OMSetBlendState(p_pBlendState, blendfactor, sampleMask);
 }

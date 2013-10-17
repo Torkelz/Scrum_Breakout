@@ -6,7 +6,6 @@
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT   0x0600 // Vista
 #endif
-
  
 // Enable extra D3D debugging in debug builds if using the debug DirectX runtime.  
 // This makes D3D objects work well in the debugger watch window, but slows down 
@@ -21,6 +20,7 @@
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif
+
 
 #include <d3d11.h>
 #include <cassert>
