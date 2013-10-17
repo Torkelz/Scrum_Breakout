@@ -486,15 +486,13 @@ void Game::addBorders()
 	//top, bot, left side... 
 	//add them to the vector of borders... 
 
+		//vec3 lol = m_playFields[playfeildnr]->getOriginalPosition();
 
 	for(int playField = 0; playField < 4; playField++)
 	{
-		//vec3 lol = m_playFields[playfeildnr]->getOriginalPosition();
 		vec3 rightDir = m_playFields[playField]->getRightDir();
 		vec3 downDir = m_playFields[playField]->getDownDir();
 		vec3 crossDir = cross(rightDir, downDir);
-		vec3 dirs = (rightDir + downDir + crossDir);
-		float offset = 5.0f;
 
 		vec3 top = m_playFields[playField]->getOriginalPosition() + (m_playFields[playField]->getSize().x * 0.5f * rightDir)
 					- downDir * 5.f
@@ -505,10 +503,17 @@ void Game::addBorders()
 		//			+ m_playFields[playField]->getSize().y * downDir
 		//			+ crossDir * 5.f;
 		//m_borderList.push_back(Borders(bottom));
+	}
+
+	for(int playField = 0; playField < 4; playField++)
+	{
+		vec3 rightDir = m_playFields[playField]->getRightDir();
+		vec3 downDir = m_playFields[playField]->getDownDir();
+		vec3 crossDir = cross(rightDir, downDir);
 
 		vec3 center = m_playFields[playField]->getOriginalPosition() - 5.f * rightDir
-					+ m_playFields[playField]->getSize().y * 0.5f * downDir
-					+ crossDir * 5.f;
+			+ m_playFields[playField]->getSize().y * 0.5f * downDir
+			+ crossDir * 5.f;
 		m_borderList.push_back(Borders(center));
 	}
 }
