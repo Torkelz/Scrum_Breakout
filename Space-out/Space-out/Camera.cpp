@@ -14,7 +14,7 @@ void Camera::init(vec3 initPos)
 	m_up			= vec3( 0.0f, 1.0f, 0.0f );
 	m_lookAt		= vec3( 0.0f, 0.0f, 1.0f );
 
-	m_pitch		= 0.0f;
+	m_pitch		= 10.0f;
 	m_yaw		= 0.0f;
 	m_lookAtPos	= m_cameraPos + m_lookAt;
 
@@ -26,6 +26,8 @@ void Camera::init(vec3 initPos)
 
 	m_lifeTime = 0;
 	m_isCinematic = false;
+
+	m_angleToNextPF = 90.0f;
 }
 
 void Camera::createProjectionMatrix( float p_FOV, float p_aspect,
@@ -111,7 +113,7 @@ void Camera::setViewMatrix()
 	m_lookAt = vec3(0.0f,0.0f,1.0f);
 	m_right = vec3(1.0f,0.0f,0.0f);
 	
-	m_pitch = 0;
+	m_pitch *= (PI/180.0f);
 
 	m_yawStart = 180.0f*(PI/180.0f);
 	m_yaw = m_yawStart;
@@ -191,14 +193,14 @@ void Camera::updateCameraPos(float p_dt)
 		m_cameraPos.z  = 200;
 
 	m_velocity = vec3( 0.0f, 0.0f, 0.0f );*/
-	if(m_yaw < 0.0f)
+/*	if(m_yaw < 0.0f)
 		m_yaw += (2*PI);
 	if(m_yaw > 2*PI)
-		m_yaw -= 2*PI; 
+		m_yaw -= 2*PI;*/ 
 
 	if(m_isCinematic)
 	{
-		m_lifeTime += p_dt;
+		m_lifeTime += p_dt * 2.f;
 
 		if((unsigned int)m_lifeTime > m_cinematicPos.size() - 2)
 			resetCinematic();
@@ -265,31 +267,36 @@ bool Camera::timeToChange()
 void Camera::buildPath(vec3 p_start, vec3 p_stop, vec3 p_originWorld, int p_nrPoints)
 {
 	m_cinematicPos.push_back(p_start);
-	
+
 	vec3 dirStart = normalize(p_start - p_originWorld);
 	vec3 dirStop = normalize(p_stop - p_originWorld);
 	vec3 zoomOut = (p_start - p_originWorld) + dirStart * 30.f;
 
 	vec3 checkAngle = cross(dirStart, dirStop);
 
-	float angle = 90.f;//(PI/180.0f);
+	//float angle = 90.f;//(PI/180.0f);
 
-	if(checkAngle.y < 0) // Test if its right, rotating right direction
-		angle *= -1;
-
-	mat4 rot = rotate(mat4(1.0f), angle/p_nrPoints, m_up);
-
+	if(checkAngle.y > 0) // Test if its right, rotating right direction
+		m_angleToNextPF = -90.0f;
+	else if(checkAngle.y < 0) // Test if its right, rotating right direction
+		m_angleToNextPF = 90.0f;
+	
+	mat4 rot = rotate(mat4(1.0f), -m_angleToNextPF/p_nrPoints, vec3(0.0f, 1.0f, 0.0f));
+	
 	vec4 tempZoomOut;
 
 	tempZoomOut = vec4(zoomOut, 0.0f);
 
-	for(int i = 0; i < p_nrPoints; i++)
+	for(int i = 0; i < p_nrPoints-1; i++)
 	{
 		tempZoomOut = rot * tempZoomOut;
 
 		m_cinematicPos.push_back(p_originWorld + tempZoomOut.xyz());
 	}
 	
+	//m_cinematicPos.push_back(p_originWorld + ((p_stop - p_originWorld) + (dirStop * 10.f)));
+
+
 	m_cinematicPos.push_back(p_stop);
 }
 
@@ -358,28 +365,52 @@ void Camera::setYaw(int p_activePlayField)
 {
 	m_yawStart = m_yaw;
 
-	switch (p_activePlayField)
-	{
-	case 0:
-		m_yawNext = 180.0f;
-		break;
+	//switch (p_activePlayField)
+	//{
+	//case 0:
+	//	if(m_yawNext == 90.0f * PI/180.0f)
+	//	{
+	//		m_yawNext  = -180.0f;
+	//		break;
+	//	}
+	//	m_yawNext = 180.0f;
+	//	break;
 
-	case 1:
-		m_yawNext = 90.0f;
-		break;
+	//case 1:
+	//	if(m_yawNext == 360.0f * PI/180.0f)
+	//	{
+	//		m_yawNext = 450.0f;
+	//		break;
+	//	}
+	//	m_yawNext = 90.0f;
+	//	break;
 
-	case 2:
-		m_yawNext = 360.0f;
-		break;
+	//case 2:
+	//	
+	//	if(m_yawNext == (270.0f * PI/180.0f))
+	//	{
+	//		m_yawNext = 360.0f;
+	//		break;
+	//	}
+	//	m_yawNext = 0.0f;
+	//	break;
 
-	case 3:
-		m_yawNext = 270.0f;
-		break;
-	default:
-		break;
-	}
+	//case 3:
+	//	//if(m_yawNext == (180.0f * PI/180.0f))//0.0174532925f))
+	//	if(m_yawNext == 0.0f)
+	//	{
+	//		m_yawNext = -90.0f;
+	//		break;
+	//	}
+	//	m_yawNext = 270.0f;
+	//	break;
 
-	m_yawNext *= (PI/180.0f);
+	//default:
+	//	break;
+	//}
+
+
+	m_yawNext += m_angleToNextPF * (PI/180.0f);
 }
 
 void Camera::setPosition(float p_x, float p_y, float p_z)

@@ -73,6 +73,7 @@ private:
 	// Spline thingy
 	bool				m_isCinematic;
 	float				m_lifeTime;
+	float				m_angleToNextPF;
 
 	std::vector<vec3>	m_cinematicPos;
 
