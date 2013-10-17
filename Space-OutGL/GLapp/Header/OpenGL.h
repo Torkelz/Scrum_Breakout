@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-using namespace glm;
 static int keyValueStatic;
 
 class OpenGL : public GLApp{
@@ -41,6 +40,7 @@ private:
 	GLTexture*		m_pTexTest;
 	GLuint			m_pTexture;
 
+	float m_scale;
 };
 
 #endif /* OPENGL_H_ */

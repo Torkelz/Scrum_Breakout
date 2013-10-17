@@ -1,0 +1,26 @@
+#ifndef	GLTEXTURES_H_
+#define GLTEXTURES_H_
+#include "GLUtil.h"
+#include "IL/il.h"
+
+class GLTexture
+{
+private:
+	ILboolean succes;
+
+//	ID3D11ShaderResourceView*	createTextureSRV(ID3D11Texture2D* p_pTexture);
+public:
+	GLTexture();
+	GLTexture(char* p_pTexturePath, GLuint* p_pTextureID);// p_pDevice, ID3D11DeviceContext* p_pDeviceContext);
+	~GLTexture();
+
+	void init();
+
+//	ID3D11Texture2D*			getResource();
+//	ID3D11ShaderResourceView*	getResourceView();
+	void						bindTextureResource(GLuint p_program, char* p_pUniform, GLuint p_textureID);
+	void						createTexture(char* p_pTexturePath, GLuint p_textureID);
+
+};
+//http://lwjgl.org/wiki/index.php?title=GLSL_Tutorial:_Texturing
+#endif /* GLTEXTURES_H_ */
