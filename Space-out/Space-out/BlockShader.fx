@@ -37,6 +37,7 @@ VSOutput VS(VSInput p_vIn)
 	
 	// Transform to homogeneous clip space.
 	vOut.m_posH = mul(float4(p_vIn.m_posL, 1.0f), m_WVP);
+	vOut.m_blockType = p_vIn.m_blockType;
 
     return vOut;
 }
@@ -59,6 +60,7 @@ void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStrea
 
 
 	GSOutput outVertex = (GSOutput)0;
+	outVertex.m_blockType = p_input[0].m_blockType;
 
 	// Back
 	outVertex.m_posH = vert5;

@@ -3,7 +3,7 @@
 ABlock::ABlock(vec3* p_pPos, vec3* p_pColor, unsigned int p_blockType, std::string p_objectName, vec2 p_blockID) : Object(p_pPos, p_pColor, p_objectName)
 {
 	
-	m_hp = 0;
+	m_hp = 1;
 	m_blockID = p_blockID;
 	m_vertex.pos = *p_pPos;
 	m_vertex.blockType = p_blockType;
@@ -37,6 +37,18 @@ void ABlock::setPos(vec3 p_pos, mat4* p_pRotMat)
 	m_boundingVolume->updatePosition(mat4(1.0f),mat4(1.0f), trans);
 }
 
+void ABlock::decreaseHP(int p_hp)
+{
+	m_hp -= p_hp;
+}
+
+bool ABlock::isDead()
+{
+	if(m_hp <= 0)
+		return true;
+	return false;
+}
+
 int ABlock::getHp()
 {
 	return m_hp;
@@ -50,6 +62,11 @@ vec2 ABlock::getBlockID()
 BlockVertex ABlock::getBlockVertex()
 {
 	return m_vertex;
+}
+
+unsigned int ABlock::getBlockType()
+{
+	return m_vertex.blockType;
 }
 
 void ABlock::init(mat4* p_pRotMat)

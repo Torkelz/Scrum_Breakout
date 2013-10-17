@@ -34,6 +34,8 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 	size *= 2;
 	float angle = 0;
 
+	m_nrOfBlocksXY = m_loadLevel.getNrBlocks();	
+
 	//Create Fields
 	for(UINT i = 0; i < m_nrPlayFields; i++, angle += 90)
 	{
@@ -146,21 +148,47 @@ void Game::update(float p_screenWidth, float p_dt)
 			}
 
 			// ## BLOCKS ##
-			for(int i = 0; i < m_playFields[m_activePlayField]->getListSize();i++)
+			for(int i = 0; i < m_playFields[m_activePlayField]->getBlockListSize();i++)
 			{
 				AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
 
 				if(bv->collide(m_pBall->getBoundingVolume()))
 				{
+
 					m_soundManager.play(m_pSoundList[COLLISION], 1);
 					m_soundManager.setVolume(0.35f, 1);
 					vec3 s = ((Ball*)m_pBall)->getSpeed();
 					vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), s);
 					((Ball*)m_pBall)->setSpeed( tempSpeed );
-					powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
-					m_playFields[m_activePlayField]->deleteBlock(i);
+
+					m_playFields[m_activePlayField]->getBlock(i)->decreaseHP(1);
+					
+					if(m_playFields[m_activePlayField]->getBlock(i)->isDead())
+					{
+						if( m_playFields[m_activePlayField]->getBlock(i)->getBlockType() == BLOCK ) 
+						{
+							m_playFields[m_activePlayField]->deleteBlock(i);
+						}
+						else if( m_playFields[m_activePlayField]->getBlock(i)->getBlockType() == EXPBLOCK ) 
+						{
+						
+							vector<int> temp = findBlockWhoWILLDIEByExplosion(i);
+							for(int exp = temp.size() - 1; exp >= 0; exp--)
+								m_playFields[m_activePlayField]->deleteBlock(temp.at(exp));
+
+						}
+					}
+
 					bv = NULL;
 					break;
+
+				}
+
+				if(m_playFields[m_activePlayField]->getBlock(i)->getBlockType() == EXPBLOCK && m_playFields[m_activePlayField]->getBlock(i)->isDead())
+				{
+
+					powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
+					
 				}
 			}
 			// ## WALLS ##
@@ -248,7 +276,7 @@ void Game::update(float p_screenWidth, float p_dt)
 		}
 		// ## COLLISION STUFF END ##
 
-		if(pf->getListSize() <= 0) // If playfield is empty move the ball to the pad.
+		if(pf->getBlockListSize() <= 0) // If playfield is empty move the ball to the pad.
 		{
 			resetBall(pf);
 		}
@@ -264,7 +292,7 @@ void Game::update(float p_screenWidth, float p_dt)
 		int nrOfRemainingBlocks = 0;
 		for (int pl = 0; pl < 4; pl++)
 		{
-			nrOfRemainingBlocks += m_playFields[pl]->getListSize();
+			nrOfRemainingBlocks += m_playFields[pl]->getBlockListSize();
 		}
 		if(nrOfRemainingBlocks <= 0)
 		{
@@ -274,6 +302,85 @@ void Game::update(float p_screenWidth, float p_dt)
 
 	// SOUND IS OFF HERE REMOVE WHEN NEEDING ZE SOUNDS
 	m_soundManager.setPauseAll(true);
+}
+
+vector<int> Game::findBlockWhoWILLDIEByExplosion(int i)
+{
+	vec2 blockID = m_playFields[m_activePlayField]->getBlock(i)->getBlockID();
+	vector<vec2> blockIndexToExp;
+	vector<int>	 neighbourBlockIndex;
+
+	// TOP BLOCK
+	if(blockID.y != 0)
+	{
+		for(int blockCount = i - m_nrOfBlocksXY.x; blockCount < i; blockCount++)
+		{
+			if(blockCount > 0)
+			{
+				vec2 temp;
+				temp = m_playFields[m_activePlayField]->getBlock(blockCount)->getBlockID();
+
+				if(temp.x == blockID.x && temp.y == blockID.y - 1)
+				{
+					blockIndexToExp.push_back(m_playFields[m_activePlayField]->getBlock(blockCount)->getBlockID());
+					neighbourBlockIndex.push_back(blockCount);
+					break;
+				}
+			}
+		}
+	}
+
+	// LEFT BLOCK 
+	if(blockID.x != 0)
+	{
+		vec2 temp;
+		temp = m_playFields[m_activePlayField]->getBlock(i - 1)->getBlockID();
+		if(temp.x == blockID.x - 1 && temp.y == blockID.y)
+		{
+			blockIndexToExp.push_back(m_playFields[m_activePlayField]->getBlock(i - 1)->getBlockID());
+			neighbourBlockIndex.push_back(i-1);
+		}
+	}
+
+	//done for destroying the exploding block
+	neighbourBlockIndex.push_back(i);
+						
+	// RIGHT
+	if(blockID.x != m_nrOfBlocksXY.x - 1)
+	{
+		vec2 temp;
+		temp = m_playFields[m_activePlayField]->getBlock(i + 1)->getBlockID();
+		if(temp.x == blockID.x + 1 && temp.y == blockID.y)
+		{
+			blockIndexToExp.push_back(m_playFields[m_activePlayField]->getBlock(i + 1)->getBlockID());
+			neighbourBlockIndex.push_back(i+1);
+		}
+	}
+
+
+
+	// BOTTOM BLOCK
+	if(blockID.y != m_nrOfBlocksXY.y - 1)
+	{
+		for(int blockCount = i + m_nrOfBlocksXY.x; blockCount > i; blockCount--)
+		{
+								
+			if(blockCount < m_playFields[m_activePlayField]->getBlockListSize())
+			{
+				vec2 temp;
+				temp = m_playFields[m_activePlayField]->getBlock(blockCount)->getBlockID();
+
+				if(temp.x == blockID.x && temp.y == blockID.y + 1)
+				{
+					blockIndexToExp.push_back(m_playFields[m_activePlayField]->getBlock(blockCount)->getBlockID());
+					neighbourBlockIndex.push_back(blockCount);
+					break;
+				}
+			}
+		}
+	}
+
+	return neighbourBlockIndex;
 }
 
 void Game::keyEvent(unsigned short key)

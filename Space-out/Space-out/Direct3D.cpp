@@ -140,20 +140,19 @@ void Direct3D::initApp()
 		BufferInitDesc blockBufferDesc;
 		blockBufferDesc.elementSize		= sizeof(BlockVertex);
 		blockBufferDesc.initData		= m_game.getField(i)->getBufferData();
-		blockBufferDesc.numElements		= m_game.getField(i)->getListSize();
+		blockBufferDesc.numElements		= m_game.getField(i)->getBlockListSize();
 		blockBufferDesc.type			= VERTEX_BUFFER;
 		blockBufferDesc.usage			= BUFFER_CPU_WRITE_DISCARD;
 
 		m_blockBuffers[i].init(m_pDevice, m_pDeviceContext, blockBufferDesc);
 	}
 
-
 	D3D11_INPUT_ELEMENT_DESC blockInputdesc[] = 
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"BLOCKTYPE", 0, DXGI_FORMAT_R16_UINT,			0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
-	m_blockShader.init(m_pDevice, m_pDeviceContext, 1);
+	m_blockShader.init(m_pDevice, m_pDeviceContext, 2);
 	
 	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "VS", "vs_5_0", VERTEX_SHADER, blockInputdesc);
 	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "GS", "gs_5_0", GEOMETRY_SHADER, NULL);
@@ -403,7 +402,7 @@ void Direct3D::updateScene(float p_dt)
 		D3D11_MAPPED_SUBRESOURCE* ms = m_blockBuffers[active].getMappedResource();
 		int u = sizeof(BlockVertex);
 
-		memcpy(ms->pData, m_game.getField(active)->getBufferData(), u *m_game.getField(active)->getListSize() );
+		memcpy(ms->pData, m_game.getField(active)->getBufferData(), u *m_game.getField(active)->getBlockListSize() );
 
 		m_blockBuffers[active].unmap();
 		
@@ -523,7 +522,7 @@ void Direct3D::drawScene()
 		cBlockBufferStruct.rotation = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()));
 		m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 		m_blockBuffers[i].apply(0);
-		m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
+		m_pDeviceContext->Draw(m_game.getField(i)->getBlockListSize(), 0);
 	}
 	//## BLOCK DRAW END ##
 	

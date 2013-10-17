@@ -76,6 +76,8 @@ public:
 	Camera*					getCamera();
 	void					setScreenBorders(vec4 p_screenBorder);
 private:
+	vector<int>				findBlockWhoWILLDIEByExplosion(int i);
+
 	void					loadSounds();
 	void					powerUpSpawn(vec3 pos);
 	int					    random();
@@ -102,6 +104,9 @@ private:
 	int						m_wallCounter;
 	bool					m_padCrash;
 	bool					m_wallCrash;
+
+	// EXP BLOCK
+	vec2					m_nrOfBlocksXY;
 
 	vec4					m_screenBorders;
 	

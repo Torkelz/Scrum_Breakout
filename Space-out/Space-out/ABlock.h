@@ -12,7 +12,7 @@ enum BLOCKTYPE
 {
 	BLOCK,
 	EXPBLOCK,
-	SIZEOFBLOCKTYPE
+	HARDBLOCK
 };
 
 struct BlockVertex
@@ -41,10 +41,16 @@ public:
 	virtual void		init(mat4* p_pRotMat);
 	virtual void		update();
 	void				setPos(vec3 p_pos, mat4* p_pRotMat);
+	// m_hp -= p_hp, OBS minus.
+	void				decreaseHP(int p_hp);
+	bool				isDead();
+
 	int					getHp();
 	vec2				getBlockID();
 	BlockVertex			getBlockVertex();
+	unsigned int		getBlockType();
 	
+
 
 protected:
 	int m_hp;
