@@ -370,7 +370,7 @@ void Direct3D::initApp()
 	rssky.MultisampleEnable		=  false;	//DEFAULT
 	rssky.ScissorEnable			=  false;	//DEFAULT
 	rssky.SlopeScaledDepthBias	=  0.0f;	//DEFAULT
-
+	
 
 
 	hr = m_pDevice->CreateRasterizerState(&rssky,&m_pRasterState);
@@ -454,6 +454,29 @@ void Direct3D::drawScene()
 	//	t_bb.draw(m_world, m_camView, m_camProjection);
 	//}
 	// END DEBUGGING DRAW
+
+	// SKYBOX DRAW
+
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	vec3 camppos = m_game.getCamera()->getPosition();
+
+	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
+	m_constantBallBuffer.apply(0);
+
+	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+	
+	m_skyBoxVbuffer->apply();
+	m_skyBoxIbuffer->apply();
+
+	m_skyBoxShader.setShaders();
+	m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
+	m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
+	m_pDeviceContext->RSSetState(m_pRasterState);
+	
+	m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
+	m_pDeviceContext->RSSetState(NULL);
+	//SKYBOX DRAW END
 	
 	//## PAD DRAW START ##
 	XMMATRIX translatePadMatrix;
@@ -551,29 +574,6 @@ void Direct3D::drawScene()
 
 	m_pDeviceContext->Draw(1, 0);
 	//## BALL DRAW END ##
-	// SKYBOX DRAW
-
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	vec3 camppos = m_game.getCamera()->getPosition();
-
-	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
-	m_constantBallBuffer.apply(0);
-
-	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
-	
-	m_skyBoxVbuffer->apply();
-	m_skyBoxIbuffer->apply();
-
-	m_skyBoxShader.setShaders();
-	m_skyBoxShader.setBlendState(NULL);
-	m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
-	m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
-	m_pDeviceContext->RSSetState(m_pRasterState);
-	
-	m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
-
-	//SKYBOX DRAW END
 	
 	m_pSwapChain->Present(1, 0);
 }
