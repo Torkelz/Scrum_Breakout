@@ -279,93 +279,102 @@ void Game::update(float p_screenWidth, float p_dt)
 
 void Game::keyEvent(unsigned short key)
 {
-	if(key == 0x41) // A
+	if(m_active)
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(-50.0f, 0.0f, 0.0f) * 3.0f);
-	}
-	if(key == 0x44) // D
-	{
-		((Ball*)m_pBall)->setSpeed(vec3(50.0f, 0.0f, 0.0f) * 3.0f);
-	}
-	if(key == 0x57) // W
-	{
-		((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f) * 3.0f);
-	}
-	if(key == 0x53) // S
-	{
-		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f) * 3.0f);
-	}
-	if(key == 0x45) // E
-	{
-		if(!m_pCamera->isCinematic())
+		if(key == 0x41) // A
 		{
-			m_activePlayFieldNext--;
-			if(m_activePlayFieldNext < 0)
-				m_activePlayFieldNext = m_nrPlayFields - 1;
-
-			m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-									m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-									m_originWorld,
-									4);
-			m_pCamera->setYaw(m_activePlayFieldNext);
-			m_pCamera->startCinematic();
+			((Ball*)m_pBall)->setSpeed(vec3(-50.0f, 0.0f, 0.0f) * 3.0f);
 		}
-	}
-	if(key == 0x51) // Q
-	{
-		if(!m_pCamera->isCinematic())
+		if(key == 0x44) // D
 		{
-			m_activePlayFieldNext++;
-			if(m_activePlayFieldNext >= m_nrPlayFields)
-				m_activePlayFieldNext = 0;
-
-			m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-									m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-									m_originWorld,
-									4);
-			m_pCamera->setYaw(m_activePlayFieldNext);
-			m_pCamera->startCinematic();
+			((Ball*)m_pBall)->setSpeed(vec3(50.0f, 0.0f, 0.0f) * 3.0f);
 		}
-	}
-	if(key == 0x1B) //ESC
-		PostQuitMessage(0);
+		if(key == 0x57) // W
+		{
+			((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f) * 3.0f);
+		}
+		if(key == 0x53) // S
+		{
+			((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f) * 3.0f);
+		}
+		if(key == 0x45) // E
+		{
+			if(!m_pCamera->isCinematic())
+			{
+				m_activePlayFieldNext--;
+				if(m_activePlayFieldNext < 0)
+					m_activePlayFieldNext = m_nrPlayFields - 1;
 
-	if(key == 0x52) // R
-	{
-		PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-		powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-		m_pPUObservable->broadcastRebirth(powerUp);
-		m_powerUps.push_back(powerUp);
+				m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
+										m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
+										m_originWorld,
+										4);
+				m_pCamera->setYaw(m_activePlayFieldNext);
+				m_pCamera->startCinematic();
+			}
+		}
+		if(key == 0x51) // Q
+		{
+			if(!m_pCamera->isCinematic())
+			{
+				m_activePlayFieldNext++;
+				if(m_activePlayFieldNext >= m_nrPlayFields)
+					m_activePlayFieldNext = 0;
+
+				m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
+										m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
+										m_originWorld,
+										4);
+				m_pCamera->setYaw(m_activePlayFieldNext);
+				m_pCamera->startCinematic();
+			}
+		}
+		if(key == 0x1B) //ESC
+			PostQuitMessage(0);
+
+		if(key == 0x52) // R
+		{
+			PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+			powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
+			m_pPUObservable->broadcastRebirth(powerUp);
+			m_powerUps.push_back(powerUp);
+		}
+		//if( key == 0x46) // F
+		//{
+		//	//PUBiggerPad* powerUp = new PUBiggerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+		//	//powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
+		//	//m_pPUObservable->broadcastRebirth(powerUp);
+		//	//m_powerUps.push_back(powerUp);
+		//}
+		//if(key == 0x4C) // L
+		//{
+		//}
 	}
-	//if( key == 0x46) // F
-	//{
-	//	//PUBiggerPad* powerUp = new PUBiggerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-	//	//powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-	//	//m_pPUObservable->broadcastRebirth(powerUp);
-	//	//m_powerUps.push_back(powerUp);
-	//}
-	//if(key == 0x4C) // L
-	//{
-	//}
 }
 
 void Game::leftMouseClick( vec2 p_mousePosition )
 {
-	((Ball*)m_pBall)->setStuck(false);
-	vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
-	tempSpeed.y = -abs(tempSpeed.y);
-	((Ball*)m_pBall)->setSpeed( tempSpeed );
+	if(m_active)
+	{
+		((Ball*)m_pBall)->setStuck(false);
+		vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+		tempSpeed.y = -abs(tempSpeed.y);
+		((Ball*)m_pBall)->setSpeed( tempSpeed );
+	}
 }
 
 void Game::rightMouseClick( vec2 p_mousePosition ){}
 
 void Game::mouseMove( vec2 p_mousePosition )
 {
-	if(p_mousePosition.x >= m_screenBorders.x &&
-		p_mousePosition.x <= m_screenBorders.y &&
-		p_mousePosition.y >= m_screenBorders.z &&
-		p_mousePosition.y <= m_screenBorders.w)
-	((Pad*)m_pPad)->setPos( vec2(-p_mousePosition.x, p_mousePosition.y) );
+	if(m_active)
+	{
+		if(p_mousePosition.x >= m_screenBorders.x &&
+			p_mousePosition.x <= m_screenBorders.y &&
+			p_mousePosition.y >= m_screenBorders.z &&
+			p_mousePosition.y <= m_screenBorders.w)
+		((Pad*)m_pPad)->setPos( vec2(-p_mousePosition.x, p_mousePosition.y) );
+	}
 }
 
 Observer* Game::getObserver()

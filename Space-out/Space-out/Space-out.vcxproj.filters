@@ -141,6 +141,7 @@
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneObserver.cpp" />
+    <ClCompile Include="HighScore.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -264,6 +265,7 @@
     <ClInclude Include="SceneInclude.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneObserver.h" />
+    <ClInclude Include="HighScore.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

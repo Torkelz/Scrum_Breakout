@@ -166,7 +166,7 @@ private:
 
 	//Scene stuff
 	D3DTextDevice*	 m_pTextDevice;
-	//HighScore		 m_highScore;
+	HighScore		 m_highScore;
 	Menu			 m_menu;
 	//WinScreen		 m_winScreen;
 	//DeathScreen	 m_deathScreen;

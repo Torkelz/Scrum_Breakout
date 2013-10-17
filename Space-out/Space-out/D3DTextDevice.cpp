@@ -332,7 +332,7 @@ void D3DTextDevice::addSentence(char* message, int id, ID3D11Device* device, ID3
 {
 	// Initialize the first sentence.
 	SentenceType* tempSentence;
-	InitializeSentence(&tempSentence, 30, device);
+	InitializeSentence(&tempSentence, 50, device);
 
 	// Now update the sentence vertex buffer with the new string information.
 	//UpdateSentence(tempSentence, message, 100, 200, 1.0f, 1.0f, 1.0f, deviceContext);

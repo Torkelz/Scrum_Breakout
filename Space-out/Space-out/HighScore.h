@@ -5,15 +5,16 @@
 
 class D3DTextDevice;
 class Game;
-class HighScore;
+class Menu;
 
 using namespace DirectX;
 
-class Menu : public Scene
+class HighScore : public Scene
 {
 public:
-	Menu();
-	~Menu(void);
+	HighScore();
+	HighScore(Game* p_pGame, Menu* p_pMenu);
+	~HighScore();
 
 	void init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, HWND p_hwnd, int screenWidth, int screenHeight);
 	void update();
@@ -24,9 +25,9 @@ public:
 	void					mouseMove( vec2 p_mousePosition );
 	void					keyEvent( unsigned short p_key );
 	Observer*				getObserver();
-
+	
 	// Set pointers to scenes in Direct3D.
-	void setHighScore(HighScore* p_pHighScore);
+	void setMenu(Menu* p_pMenu);
 	void setGame(Game* p_pGame);
 
 private:
@@ -36,6 +37,6 @@ private:
 
 	// Pointers to scenes in Direct3D.
 	Game*					m_pGame;
-	HighScore*				m_pHighScore;
+	Menu*					m_pMenu;
 };
 

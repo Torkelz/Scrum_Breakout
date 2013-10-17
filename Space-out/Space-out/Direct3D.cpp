@@ -388,9 +388,19 @@ void Direct3D::initApp()
 	m_pTextDevice->addSentence(&message2[0], 1, m_pDevice, m_pDeviceContext);
 
 	//## SCENES ##
-	m_menu = Menu(&m_game);
+	m_menu = Menu();
 	m_menu.init(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
 	m_HID.getObservable()->addSubscriber(m_menu.getObserver());
+
+	m_highScore = HighScore();
+	m_highScore.init(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
+	m_HID.getObservable()->addSubscriber(m_highScore.getObserver());
+
+	m_menu.setGame(&m_game);
+	m_highScore.setGame(&m_game);
+
+	m_menu.setHighScore(&m_highScore);
+	m_highScore.setMenu(&m_menu);
 }
 
 void Direct3D::onResize()
@@ -456,6 +466,15 @@ void Direct3D::updateScene(float p_dt)
 	}
 
 	if(m_menu.active())
+	{
+		m_menu.update();
+
+		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
+		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
+		m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
+	}
+
+	if(m_highScore.active())
 	{
 		m_menu.update();
 
@@ -623,6 +642,39 @@ void Direct3D::drawScene()
 		XMMATRIX orthoMatrix;
 		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
 		m_menu.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
+
+		// CURRENTLY BROKEN
+		// SKYBOX DRAW
+
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		vec3 camppos = m_game.getCamera()->getPosition();
+
+		m_cbBall.eyePosW = vec3ToXMVector(camppos);
+		m_cbBall.viewProj = XMMatrixTranspose( m_camProjection * m_camView);
+		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
+		m_constantBallBuffer.apply(0);
+
+		m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+	
+		m_skyBoxVbuffer->apply();
+		m_skyBoxIbuffer->apply();
+
+		m_skyBoxShader.setShaders();
+		m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
+		m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
+		m_pDeviceContext->RSSetState(m_pRasterState);
+	
+		m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
+		m_pDeviceContext->RSSetState(NULL);
+		//SKYBOX DRAW END
+	}
+
+	if(m_highScore.active())
+	{
+		XMMATRIX orthoMatrix;
+		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+		m_highScore.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
 
 		// CURRENTLY BROKEN
 		// SKYBOX DRAW
