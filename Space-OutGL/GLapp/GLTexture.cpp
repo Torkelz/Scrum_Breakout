@@ -44,7 +44,7 @@ void GLTexture::createTexture(std::string p_pTexturePath, unsigned int& p_textur
 	FreeImage_Unload(temp);
 
 	int w = FreeImage_GetWidth(image);
-	int h = FreeImage_GetWidth(image);
+	int h = FreeImage_GetHeight(image);
 
 	GLubyte* textur = new GLubyte[4*w*h];
 	char* pixels = (char*)FreeImage_GetBits(image);
@@ -59,6 +59,8 @@ void GLTexture::createTexture(std::string p_pTexturePath, unsigned int& p_textur
 	glGenTextures(1, &p_textureID);
 	glBindTexture(GL_TEXTURE_2D, p_textureID);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)textur);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 //	ilEnable(IL_ORIGIN_SET);
 //	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);

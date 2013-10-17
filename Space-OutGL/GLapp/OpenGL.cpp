@@ -48,7 +48,7 @@ void OpenGL::initApp()
 	m_pTexTest->init();
 	col[0].pos = vec4(0.0f, 0.0f, 0.f,1.0f); //Uniform performs a padding on the buffer that can make
 	col[0].tex = vec4(0.f, 0.f, 0.f, 0.f);   //the result look really odd. Always use vec4 or mat4x4;
-	m_pTexTest->createTexture("/home/bthp0000/Desktop/GitHub/Git/Space-OutGL/GLapp/Textures/cat.tiff", m_pTexture);
+	m_pTexTest->createTexture("./GLapp/Textures/cat.png", m_pTexture);
 	m_scale = 0;
 //	BufferInputDesc* desc = new BufferInputDesc[2];
 //	desc[0].size = 3;
@@ -169,7 +169,7 @@ void OpenGL::drawScene()
 	    rx[2][0] = 0.0f; rx[2][1] = sinf(m_scale); rx[2][2] = cosf(m_scale) ; rx[2][3] = 0.0f;
 	    rx[3][0] = 0.0f; rx[3][1] = 0.0f   ; rx[3][2] = 0.0f    ; rx[3][3] = 1.0f;
 	    proj = glm::perspective(45.f, 1.f, 1.0f, 100.f);
-	    col[0].proj = proj * view * glm::transpose(rx);
+	    col[0].proj = proj * view * glm::transpose(ry * rx);
 	    //glUniformMatrix4fv(glGetUniformLocation(m_triShader.getProgram(), "gWorld"), 1, GL_TRUE, &World.m[0][0]);
 	//Update buffer here!
 

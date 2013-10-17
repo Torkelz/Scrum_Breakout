@@ -27,7 +27,7 @@ void main()
 	// Front
 	gl_Position  = oProj[0] * vert5;
 	colorGem = vec4(0.15f, 0.67f, 0.8f, 1.0f);
-	texCoord = vec2(1,0);
+	texCoord = vec2(0,1);
 	EmitVertex();
 	gl_Position  = oProj[0] * vert7;
 	colorGem = vec4(0.15f, 0.67f, 0.8f, 1.0f);
@@ -39,14 +39,14 @@ void main()
 	EmitVertex();
 	gl_Position  = oProj[0] * vert6;
 	colorGem = vec4(0.15f, 0.67f, 0.8f, 1.0f);
-	texCoord = vec2(0,1);
+	texCoord = vec2(1,0);
 	EmitVertex();
 	EndPrimitive();
 	
 	// Back
 	gl_Position = oProj[0] * vert3;
 	colorGem = vec4(0.5f, 0.5f, 0.5f, 1.0f);
-	texCoord = vec2(1,0);
+	texCoord = vec2(0,1);
 	EmitVertex();
 	gl_Position = oProj[0] * vert1;
 	colorGem = vec4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -58,83 +58,83 @@ void main()
 	EmitVertex();
 	gl_Position  = oProj[0] * vert0;
 	colorGem = vec4(0.5f, 0.5f, 0.5f, 1.0f);
-	texCoord = vec2(0,1);
+	texCoord = vec2(1,0);
 	EmitVertex();
 	EndPrimitive();
 	
-	/*// Top
+	// Top
 	gl_Position = oProj[0] * vert7;
 	colorGem = vec4(1.0f, 0, 0, 1.0f);
-	texCoord = vec2(0,0);
+	texCoord = vec2(0,1);
 	EmitVertex();
 	gl_Position = oProj[0] * vert3;
 	colorGem = vec4(1.0f, 0, 0, 1.0f);
-	texCoord = vec2(1,0);
+	texCoord = vec2(1,1);
 	EmitVertex();
 	gl_Position = oProj[0] * vert6;
 	colorGem = vec4(1.0f, 0, 0, 1.0f);
-	texCoord = vec2(1,1);
+	texCoord = vec2(0,0);
 	EmitVertex();
 	gl_Position = oProj[0] * vert2;
 	colorGem = vec4(1.0f, 0, 0, 1.0f);
-	texCoord = vec2(0,1);
+	texCoord = vec2(1,0);
 	EmitVertex();
-	EndPrimitive();*/
+	EndPrimitive();
 	
-/*// Bottom
+	// Bottom
 	gl_Position  = oProj[0] * vert1;
 	colorGem = vec4(1.0f, 0, 1.0f, 1.0f);
-	texCoord = vec2(0,0);
+	texCoord = vec2(0,1);
 	EmitVertex();
 	gl_Position = oProj[0] * vert5;
 	colorGem = vec4(1.0f, 0, 1.0f, 1.0f);
-	texCoord = vec2(1,0);
+	texCoord = vec2(1,1);
 	EmitVertex();
 	gl_Position  = oProj[0] * vert0;
 	colorGem = vec4(1.0f, 0, 1.0f, 1.0f);
-	texCoord = vec2(1,1);
+	texCoord = vec2(0,0);
 	EmitVertex();
 	gl_Position  = oProj[0] * vert4;
 	colorGem = vec4(1.0f, 0, 1.0f, 1.0f);
-	texCoord = vec2(0,1);
+	texCoord = vec2(1,0);
 	EmitVertex();
-	EndPrimitive();*/
+	EndPrimitive();
 	
-	/*// Right
+	// Right
 	gl_Position  = oProj[0] * vert3;
-	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	texCoord = vec2(0,0);
-	EmitVertex();
-	gl_Position  = oProj[0] * vert7;
 	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	texCoord = vec2(1,0);
 	EmitVertex();
-	gl_Position  = oProj[0] * vert1;
+	gl_Position  = oProj[0] * vert7;
 	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	texCoord = vec2(1,1);
+	EmitVertex();
+	gl_Position  = oProj[0] * vert1;
+	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	texCoord = vec2(0,0);
 	EmitVertex();
 	gl_Position  = oProj[0] * vert5;
 	colorGem = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	texCoord = vec2(0,1);
 	EmitVertex();
-	EndPrimitive();*/
+	EndPrimitive();
 	
 	// Left
-	gl_Position  = -oProj[0] * vert6;
+	gl_Position  = oProj[0] * vert6;
+	colorGem = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	texCoord = vec2(0,1);
+	EmitVertex();
+	gl_Position  = oProj[0] * vert2;
 	colorGem = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	texCoord = vec2(0,0);
 	EmitVertex();
-	gl_Position  = -oProj[0] * vert2;
-	colorGem = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	texCoord = vec2(1,0);
-	EmitVertex();
-	gl_Position  = -oProj[0] * vert4;
+	gl_Position  = oProj[0] * vert4;
 	colorGem = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	texCoord = vec2(1,1);
 	EmitVertex();
-	gl_Position  = -oProj[0] * vert0;
+	gl_Position  = oProj[0] * vert0;
 	colorGem = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	texCoord = vec2(0,1);
+	texCoord = vec2(1,0);
 	EmitVertex();
 	
 	//gl_Position = oProj[0] * gl_in[0].gl_Position;
