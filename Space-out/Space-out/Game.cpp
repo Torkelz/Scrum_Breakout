@@ -9,6 +9,7 @@ Game::~Game(){}
 
 void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 {
+	m_active = false;
 	Difficulties diff = Difficulties();
 	diff.setInitValues(p_diff);
 	m_sDiffData = diff.getDifficultyValues();

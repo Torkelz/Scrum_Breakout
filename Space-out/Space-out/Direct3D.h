@@ -19,6 +19,7 @@
 #include "SkyBox.h"
 
 #include "D3DTextDevice.h"
+#include "SceneInclude.h"
 
 class Object;
 
@@ -162,10 +163,12 @@ private:
 	D3DTexture		 m_powerTextures[10];
 	Shader			 m_powerShader;
 	ID3D11BlendState* m_pPowerBlend;
-	// DEBUGGING DRAW
 
-	// TEXT TEST
+	//Scene stuff
 	D3DTextDevice*	 m_pTextDevice;
-
+	//HighScore		 m_highScore;
+	Menu			 m_menu;
+	//WinScreen		 m_winScreen;
+	//DeathScreen	 m_deathScreen;
 };
 #endif

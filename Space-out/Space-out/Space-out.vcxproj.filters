@@ -138,6 +138,9 @@
     </ClCompile>
     <ClCompile Include="D3DTextDevice.cpp" />
     <ClCompile Include="D3DFont.cpp" />
+    <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneObserver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -257,6 +260,10 @@
     </ClInclude>
     <ClInclude Include="D3DTextDevice.h" />
     <ClInclude Include="D3DFont.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="SceneInclude.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneObserver.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

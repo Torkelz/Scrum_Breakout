@@ -379,14 +379,18 @@ void Direct3D::initApp()
 #pragma endregion Initializations of skybox variables
 	//SKYBOX END
 	
-	// TEXT TEST
+	//## TEXT ##
 	m_pTextDevice = new D3DTextDevice();
-	m_pTextDevice->Initialize(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600, &m_camView);
+	m_pTextDevice->Initialize(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
 	std::string message = "Remaining lives: " + IntToString(m_game.getRemainingLives());
 	m_pTextDevice->addSentence(&message[0], 0, m_pDevice, m_pDeviceContext);
 	std::string message2 = "Score: " + IntToString(m_game.getScore());
 	m_pTextDevice->addSentence(&message2[0], 1, m_pDevice, m_pDeviceContext);
-	//m_pTextDevice->DrawD2DContent();
+
+	//## SCENES ##
+	m_menu = Menu(&m_game);
+	m_menu.init(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
+	m_HID.getObservable()->addSubscriber(m_menu.getObserver());
 }
 
 void Direct3D::onResize()
@@ -397,208 +401,255 @@ void Direct3D::onResize()
 void Direct3D::updateScene(float p_dt)
 {
 	D3DApp::updateScene(p_dt);
-	m_game.update(m_ScreenViewport.Width, p_dt);
 
-	m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
-	m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
-	m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
-	
-	//Update Active block buffer
-	unsigned int active = m_game.getActiveFieldNr();
-	if(m_game.getField(active)->getUpdateBuffer())
+	if(m_game.active())
 	{
-		m_blockBuffers[active].map();
-		D3D11_MAPPED_SUBRESOURCE* ms = m_blockBuffers[active].getMappedResource();
-		int u = sizeof(BlockVertex);
+		m_game.update(m_ScreenViewport.Width, p_dt);
 
-		memcpy(ms->pData, m_game.getField(active)->getBufferData(), u *m_game.getField(active)->getListSize() );
+		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
+		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
+		m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
+	
+		//Update Active block buffer
+		unsigned int active = m_game.getActiveFieldNr();
+		if(m_game.getField(active)->getUpdateBuffer())
+		{
+			m_blockBuffers[active].map();
+			D3D11_MAPPED_SUBRESOURCE* ms = m_blockBuffers[active].getMappedResource();
+			int u = sizeof(BlockVertex);
 
-		m_blockBuffers[active].unmap();
+			memcpy(ms->pData, m_game.getField(active)->getBufferData(), u *m_game.getField(active)->getListSize() );
+
+			m_blockBuffers[active].unmap();
 		
-		m_game.getField(active)->setUpdateBuffer(false);
+			m_game.getField(active)->setUpdateBuffer(false);
+		}
+
+		float x,y;
+		x = ((Pad*)(m_game.getPad()))->getMousePos().x;
+		y = ((Pad*)(m_game.getPad()))->getMousePos().y;
+
+		std::wostringstream outs;   
+		outs.precision(6);
+		outs << L"    PAD:"
+			<< L" " << m_game.getPad()->getBoundingVolume()->getPosition()->x << L"," 
+			<< m_game.getPad()->getBoundingVolume()->getPosition()->y << L","
+			<< m_game.getPad()->getBoundingVolume()->getPosition()->z << L","
+		
+			<< L"    MP:" << L" " << x << L"," << y  << L","
+
+			<< L"    BALL:"
+			<< L" " << m_game.getBall()->getBoundingVolume()->getPosition()->x << L"," 
+			<< m_game.getBall()->getBoundingVolume()->getPosition()->y << L","
+			<< m_game.getBall()->getBoundingVolume()->getPosition()->z << L",";
+
+		
+
+		SetWindowTextW(m_hMainWnd,outs.str().c_str());
+
+		m_winTitle = outs.str();
+	
+		std::string message = "Remaining lives: " + IntToString(m_game.getRemainingLives());
+		m_pTextDevice->updateSentenceAt(0, &message[0], 50, 150, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+		std::string message2 = "Score: " + IntToString(m_game.getScore());
+		m_pTextDevice->updateSentenceAt(1, &message2[0], 50, 100, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
 	}
 
-	float x,y;
-	x = ((Pad*)(m_game.getPad()))->getMousePos().x;
-	y = ((Pad*)(m_game.getPad()))->getMousePos().y;
+	if(m_menu.active())
+	{
+		m_menu.update();
 
-	std::wostringstream outs;   
-	outs.precision(6);
-	outs << L"    PAD:"
-		<< L" " << m_game.getPad()->getBoundingVolume()->getPosition()->x << L"," 
-		<< m_game.getPad()->getBoundingVolume()->getPosition()->y << L","
-		<< m_game.getPad()->getBoundingVolume()->getPosition()->z << L","
-		
-		<< L"    MP:" << L" " << x << L"," << y  << L","
-
-		<< L"    BALL:"
-		<< L" " << m_game.getBall()->getBoundingVolume()->getPosition()->x << L"," 
-		<< m_game.getBall()->getBoundingVolume()->getPosition()->y << L","
-		<< m_game.getBall()->getBoundingVolume()->getPosition()->z << L",";
-
-		
-
-	SetWindowTextW(m_hMainWnd,outs.str().c_str());
-
-	m_winTitle = outs.str();
-	
-	std::string message = "Remaining lives: " + IntToString(m_game.getRemainingLives());
-	m_pTextDevice->updateSentenceAt(0, &message[0], 50, 150, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
-	std::string message2 = "Score: " + IntToString(m_game.getScore());
-	m_pTextDevice->updateSentenceAt(1, &message2[0], 50, 100, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
+		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
+		m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
+	}
 }
 
 void Direct3D::drawScene()
 {
 	D3DApp::drawScene();
 
-	cBlockBuffer cBlockBufferStruct;
-
-	XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
-
-	
-
-	// Bounding Volume DEBUGGING DRAW
-	//BoundingVolume* t_v;
-	//t_v = m_game.getBall()->getBoundingVolume();
-	//Sphere t_sphere = *((Sphere*)t_v);
-	//t_sphere.draw(m_world, m_camView, m_camProjection);
-	//t_v = m_game.getPad()->getBoundingVolume();
-	//AABB t_bb = *((AABB*)t_v);
-	//t_bb.draw(m_world, m_camView, m_camProjection);
-	//for(int i = 0; i < 4; i++)
-	//{
-	//	t_v = m_game.getActiveField()->getCollisionBorder(i);
-	//	AABB t_bb = *((AABB*)t_v);
-	//	t_bb.draw(m_world, m_camView, m_camProjection);
-	//}
-	// END DEBUGGING DRAW
-
-	// SKYBOX DRAW
-
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	vec3 camppos = m_game.getCamera()->getPosition();
-
-	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
-	m_constantBallBuffer.apply(0);
-
-	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
-	
-	m_skyBoxVbuffer->apply();
-	m_skyBoxIbuffer->apply();
-
-	m_skyBoxShader.setShaders();
-	m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
-	m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
-	m_pDeviceContext->RSSetState(m_pRasterState);
-	
-	m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
-	m_pDeviceContext->RSSetState(NULL);
-	//SKYBOX DRAW END
-	
-	//## DRAW TEXT ##
-	XMMATRIX orthoMatrix;
-	orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
-	m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
-	//## DRAW TEXT END ##
-	
-	//## PAD DRAW START ##
-	XMMATRIX translatePadMatrix;
-
-	vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
-	translatePadMatrix = XMMatrixTranslation(padPos.x, padPos.y, padPos.z);
-
-	m_world = XMMatrixIdentity();
-	
-	XMMATRIX t_scaleMatrix = XMMatrixIdentity() * ((Pad*)(m_game.getPad()))->getScale();
-	t_scaleMatrix.r[3].m128_f32[3] = 1.0f;
-	m_WVP = m_world * playFieldRotation * t_scaleMatrix * translatePadMatrix * m_camView * m_camProjection;
-
-	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
-	m_cBuffer.apply(0);
-	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
-	m_shader.setShaders();
-	m_shader.setResource(PIXEL_SHADER, 0, 1, m_padTexture.getResourceView());
-	m_shader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	m_buffer.apply(0);
-	m_pDeviceContext->Draw(4, 0);
-	//## PAD DRAW END ##
-
-	//## BLOCK DRAW START ##
-	m_WVP = m_world *m_camView * m_camProjection;
-	cBlockBufferStruct.WVP = XMMatrixTranspose(m_WVP);
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	m_blockShader.setShaders();
-	m_blockShader.setResource(PIXEL_SHADER, 0, 1, m_blockTexture.getResourceView());
-	m_blockShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
-	cBlockBufferStruct.sizeX = g_bvSize.x;
-	cBlockBufferStruct.sizeY = g_bvSize.y;
-	cBlockBufferStruct.sizeZ = g_bvSize.z;
-	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
-	m_cBlockBuffer.apply(0);
-	unsigned int active = m_game.getActiveFieldNr();
-
-	for(int i = 0; i < 4; i++)
+	if(m_game.active())
 	{
-		cBlockBufferStruct.rotation = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()));
-		m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
-		m_blockBuffers[i].apply(0);
-		m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
-	}
-	//## BLOCK DRAW END ##
+		cBlockBuffer cBlockBufferStruct;
 
-	//## POWERUP DRAW START ##
-	if(m_powerUps.size() > 0)
-	{
-		m_powerShader.setShaders();
+		XMMATRIX playFieldRotation = mat4ToXMMatrix(m_game.getActiveField()->getRotationMatrix());
+
+		// Bounding Volume DEBUGGING DRAW
+		//BoundingVolume* t_v;
+		//t_v = m_game.getBall()->getBoundingVolume();
+		//Sphere t_sphere = *((Sphere*)t_v);
+		//t_sphere.draw(m_world, m_camView, m_camProjection);
+		//t_v = m_game.getPad()->getBoundingVolume();
+		//AABB t_bb = *((AABB*)t_v);
+		//t_bb.draw(m_world, m_camView, m_camProjection);
+		//for(int i = 0; i < 4; i++)
+		//{
+		//	t_v = m_game.getActiveField()->getCollisionBorder(i);
+		//	AABB t_bb = *((AABB*)t_v);
+		//	t_bb.draw(m_world, m_camView, m_camProjection);
+		//}
+		// END DEBUGGING DRAW
+
+		// SKYBOX DRAW
+
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		vec3 camppos = m_game.getCamera()->getPosition();
+
+		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
+		m_constantBallBuffer.apply(0);
+
+		m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+	
+		m_skyBoxVbuffer->apply();
+		m_skyBoxIbuffer->apply();
+
+		m_skyBoxShader.setShaders();
+		m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
+		m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
+		m_pDeviceContext->RSSetState(m_pRasterState);
+	
+		m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
+		m_pDeviceContext->RSSetState(NULL);
+		//SKYBOX DRAW END
+	
+		//## DRAW TEXT ##
+		XMMATRIX orthoMatrix;
+		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+		m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
+		//## DRAW TEXT END ##
+	
+		//## PAD DRAW START ##
+		XMMATRIX translatePadMatrix;
+
+		vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
+		translatePadMatrix = XMMatrixTranslation(padPos.x, padPos.y, padPos.z);
+
+		m_world = XMMatrixIdentity();
+	
+		XMMATRIX t_scaleMatrix = XMMatrixIdentity() * ((Pad*)(m_game.getPad()))->getScale();
+		t_scaleMatrix.r[3].m128_f32[3] = 1.0f;
+		m_WVP = m_world * playFieldRotation * t_scaleMatrix * translatePadMatrix * m_camView * m_camProjection;
+
+		m_cbPad.WVP = XMMatrixTranspose(m_WVP);
+		m_cBuffer.apply(0);
+		m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+		m_shader.setShaders();
+		m_shader.setResource(PIXEL_SHADER, 0, 1, m_padTexture.getResourceView());
+		m_shader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-		m_powerShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
+		m_buffer.apply(0);
+		m_pDeviceContext->Draw(4, 0);
+		//## PAD DRAW END ##
 
-		for(unsigned int i = 0; i < m_powerUps.size(); i++)
+		//## BLOCK DRAW START ##
+		m_WVP = m_world *m_camView * m_camProjection;
+		cBlockBufferStruct.WVP = XMMatrixTranspose(m_WVP);
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		m_blockShader.setShaders();
+		m_blockShader.setResource(PIXEL_SHADER, 0, 1, m_blockTexture.getResourceView());
+		m_blockShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
+		cBlockBufferStruct.sizeX = g_bvSize.x;
+		cBlockBufferStruct.sizeY = g_bvSize.y;
+		cBlockBufferStruct.sizeZ = g_bvSize.z;
+		m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
+		m_cBlockBuffer.apply(0);
+		unsigned int active = m_game.getActiveFieldNr();
+
+		for(int i = 0; i < 4; i++)
 		{
-			PowerUp* pu;
-			pu = m_powerUps.at(i);
-			if (active == 0 || active == 2)
-				translatePadMatrix = XMMatrixTranslation(pu->getPos()->x, pu->getPos()->y, padPos.z); // Translate powerup
-			else
-				translatePadMatrix = XMMatrixTranslation(padPos.x, pu->getPos()->y, pu->getPos()->z);
-			m_WVP = m_world * playFieldRotation * translatePadMatrix * m_camView * m_camProjection;
-			m_cbPad.WVP = XMMatrixTranspose(m_WVP);
-			m_cBuffer.apply(0);
-			m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
-			m_powerShader.setResource(PIXEL_SHADER, 0, 1, m_powerTextures[pu->getType()].getResourceView());
-			m_powerBuffer.apply();
-			m_pDeviceContext->Draw(4, 0);
-
-			//t_v = pu->getBoundingVolume();
-			//t_bb = *((AABB*)t_v);
-			//t_bb.initDraw(m_pDevice, m_pDeviceContext);
-			//t_bb.draw(m_world, m_camView, m_camProjection);
+			cBlockBufferStruct.rotation = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()));
+			m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
+			m_blockBuffers[i].apply(0);
+			m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
 		}
-	}
-	//## POWERUP DRAW END ##
+		//## BLOCK DRAW END ##
 
-	//## BALL DRAW START ##
-	vec3 t_ballPos = ((Ball*)m_game.getBall())->getRealPosition();
+		//## POWERUP DRAW START ##
+		if(m_powerUps.size() > 0)
+		{
+			m_powerShader.setShaders();
+			m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+			m_powerShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 
-	m_cbBall.eyePosW = m_camPosition;
-	m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
-	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos.x, t_ballPos.y, t_ballPos.z));
-	m_cbBall.size = XMFLOAT2(5.0f, 5.0f);
-	m_constantBallBuffer.apply(0);
+			for(unsigned int i = 0; i < m_powerUps.size(); i++)
+			{
+				PowerUp* pu;
+				pu = m_powerUps.at(i);
+				if (active == 0 || active == 2)
+					translatePadMatrix = XMMatrixTranslation(pu->getPos()->x, pu->getPos()->y, padPos.z); // Translate powerup
+				else
+					translatePadMatrix = XMMatrixTranslation(padPos.x, pu->getPos()->y, pu->getPos()->z);
+				m_WVP = m_world * playFieldRotation * translatePadMatrix * m_camView * m_camProjection;
+				m_cbPad.WVP = XMMatrixTranspose(m_WVP);
+				m_cBuffer.apply(0);
+				m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+				m_powerShader.setResource(PIXEL_SHADER, 0, 1, m_powerTextures[pu->getType()].getResourceView());
+				m_powerBuffer.apply();
+				m_pDeviceContext->Draw(4, 0);
 
-	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
-	m_ballShader.setShaders();
-	m_ballShader.setResource(PIXEL_SHADER, 0, 1, m_ballTexture.getResourceView());
-	m_ballShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
+				//t_v = pu->getBoundingVolume();
+				//t_bb = *((AABB*)t_v);
+				//t_bb.initDraw(m_pDevice, m_pDeviceContext);
+				//t_bb.draw(m_world, m_camView, m_camProjection);
+			}
+		}
+		//## POWERUP DRAW END ##
+
+		//## BALL DRAW START ##
+		vec3 t_ballPos = ((Ball*)m_game.getBall())->getRealPosition();
+
+		m_cbBall.eyePosW = m_camPosition;
+		m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
+		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos.x, t_ballPos.y, t_ballPos.z));
+		m_cbBall.size = XMFLOAT2(5.0f, 5.0f);
+		m_constantBallBuffer.apply(0);
+
+		m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+		m_ballShader.setShaders();
+		m_ballShader.setResource(PIXEL_SHADER, 0, 1, m_ballTexture.getResourceView());
+		m_ballShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 	
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	m_ballBuffer.apply(0);
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		m_ballBuffer.apply(0);
 
-	m_pDeviceContext->Draw(1, 0);
-	//## BALL DRAW END ##
+		m_pDeviceContext->Draw(1, 0);
+		//## BALL DRAW END ##
+	}
+
+	if(m_menu.active())
+	{
+		XMMATRIX orthoMatrix;
+		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+		m_menu.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
+
+		// CURRENTLY BROKEN
+		// SKYBOX DRAW
+
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		vec3 camppos = m_game.getCamera()->getPosition();
+
+		m_cbBall.eyePosW = vec3ToXMVector(camppos);
+		m_cbBall.viewProj = XMMatrixTranspose( m_camProjection * m_camView);
+		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
+		m_constantBallBuffer.apply(0);
+
+		m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+	
+		m_skyBoxVbuffer->apply();
+		m_skyBoxIbuffer->apply();
+
+		m_skyBoxShader.setShaders();
+		m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
+		m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
+		m_pDeviceContext->RSSetState(m_pRasterState);
+	
+		m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
+		m_pDeviceContext->RSSetState(NULL);
+		//SKYBOX DRAW END
+	}
 	
 	m_pSwapChain->Present(0, 0);
 }

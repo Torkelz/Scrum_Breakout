@@ -9,8 +9,7 @@ D3DTextDevice::D3DTextDevice()
 D3DTextDevice::~D3DTextDevice(){}
 
 
-bool D3DTextDevice::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, HWND hwnd, int screenWidth, int screenHeight, 
-						   XMMATRIX* baseViewMatrix)
+bool D3DTextDevice::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, HWND hwnd, int screenWidth, int screenHeight)
 {
 	bool result;
 
@@ -30,9 +29,6 @@ bool D3DTextDevice::Initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	// Store the screen width and height.
 	m_screenWidth = screenWidth;
 	m_screenHeight = screenHeight;
-
-	// Store the base view matrix.
-	m_baseViewMatrix = *baseViewMatrix;
 
 	// Create the font object.
 	m_Font = new D3DFont();

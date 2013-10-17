@@ -4,7 +4,9 @@
 #define CLIENTWIDTH		800
 #define CLIENTHEIGHT	600
 
-#include <glm.hpp>
+#include "Scene.h"
+
+//#include <glm.hpp>
 #include <gtc\matrix_transform.hpp>
 #include <vector>
 #include "LevelGenerator.h"
@@ -17,7 +19,6 @@
 
 using namespace glm;
 
-class Observer;
 class Object;
 
 enum DIFFICULTIES
@@ -52,7 +53,7 @@ struct SPlayer
 	}
 };
 
-class Game
+class Game : public Scene
 {
 public:
 	Game();
@@ -85,6 +86,7 @@ private:
 	void					resetBall(PlayField* pf);
 
 	Observer*				m_pObserver;
+
 	// ## POWER UP OBSERVABLE ##
 	PUObservable*			m_pPUObservable;
 	Object*					m_pPad;
