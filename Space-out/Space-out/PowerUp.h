@@ -2,6 +2,7 @@
 
 #include "Object.h"
 #include "AABB.h"
+#include <gtc\matrix_transform.hpp>
 
 enum PowerUpType
 {
@@ -17,6 +18,7 @@ class PowerUp : public Object
 protected:
 	vec3			m_speed;
 	PowerUpType		m_type;
+	mat4			m_scale;
 public:
 	PowerUp(vec3* p_pPos, vec3* p_pColor, std::string p_objectName);
 	~PowerUp();
@@ -25,5 +27,6 @@ public:
 	void	updatePosition(float p_dt);
 	int		getType();
 	bool	collide(BoundingVolume* p_pVolume);
+	mat4	getScale();
 };
 

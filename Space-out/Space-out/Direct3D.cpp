@@ -310,7 +310,7 @@ void Direct3D::initApp()
 	m_powerTextures[SMALLERPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_powerTextures[SMALLERPAD].createTexture(new std::wstring(L"Picatures/smallerPad.png"), 0);
 	m_powerTextures[STICKYPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_powerTextures[STICKYPAD].createTexture(m_game.getBall()->getTexturePath(), 0);
+	m_powerTextures[STICKYPAD].createTexture(new std::wstring(L"Picatures/stickyBall.png"), 0);
 
 	D3D11_BLEND_DESC bd;
 	bd.AlphaToCoverageEnable = false;
@@ -618,7 +618,8 @@ void Direct3D::drawScene()
 		m_powerShader.setBlendState(m_pPowerBlend);
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_powerShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
-
+		XMMATRIX scale;
+		
 		for(unsigned int i = 0; i < m_powerUps.size(); i++)
 		{
 			PowerUp* pu;
@@ -627,7 +628,10 @@ void Direct3D::drawScene()
 				translatePadMatrix = XMMatrixTranslation(pu->getPos()->x, pu->getPos()->y, padPos.z); // Translate powerup
 			else
 				translatePadMatrix = XMMatrixTranslation(padPos.x, pu->getPos()->y, pu->getPos()->z);
-			m_WVP = m_world * playFieldRotation * translatePadMatrix * m_camView * m_camProjection;
+
+			scale = mat4ToXMMatrix(pu->getScale());
+
+			m_WVP = m_world * scale * playFieldRotation * translatePadMatrix * m_camView * m_camProjection;
 			m_cbPad.WVP = XMMatrixTranspose(m_WVP);
 			m_cBuffer.apply(0);
 			m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);

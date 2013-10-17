@@ -8,6 +8,8 @@ PowerUp::PowerUp(vec3* p_pPos, vec3* p_pColor, std::string p_objectName) : Objec
 	m_vertices.push_back(vec3(2.0f, 2.0f, 0.0f));
 	m_boundingVolume = new AABB(m_vertices.at(3), m_vertices.at(0), vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	m_speed = vec3(0.0f, -10.0f, 0.0f);
+
+	m_scale = scale(mat4(1.0f),vec3(1.5f,1.5f,1.5f));
 }
 
 PowerUp::~PowerUp(){}
@@ -15,7 +17,7 @@ PowerUp::~PowerUp(){}
 void PowerUp::update(float p_dt, mat4 p_translate)
 {
 	updatePosition(p_dt);
-	m_boundingVolume->updatePosition(mat4(1.0f),mat4(1.0f),p_translate);
+	m_boundingVolume->updatePosition(m_scale,mat4(1.0f),p_translate);
 }
 
 void PowerUp::updatePosition(float p_dt)
@@ -31,4 +33,9 @@ int PowerUp::getType()
 bool PowerUp::collide(BoundingVolume* p_pVolume)
 {
 	return ((AABB*)m_boundingVolume)->collide(p_pVolume);
+}
+
+mat4 PowerUp::getScale()
+{
+	return m_scale;
 }
