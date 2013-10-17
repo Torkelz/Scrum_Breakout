@@ -7,11 +7,17 @@
 Game::Game(){}
 Game::~Game(){}
 
-void Game::init(PUObserver* p_pPUObserver)
+void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 {
+	Difficulties diff = Difficulties();
+	diff.setInitValues(p_diff);
+	m_sDiffData = diff.getDifficultyValues();
+
+	m_player = SPlayer((short)m_sDiffData.lives, m_sDiffData.multiplier);
+
 	m_pObserver = new Observer(this);
-	m_pPad		= new Pad(&vec3(0.0f, 125.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad");
-	m_pBall		= new Ball(&vec3(50.0f, 100.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Ball");
+	m_pPad		= new Pad(&vec3(0.0f, 125.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad", m_sDiffData.padStartSize);
+	m_pBall		= new Ball(&vec3(50.0f, 100.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Ball", m_sDiffData.ballStartSpeed);
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
 
@@ -43,13 +49,13 @@ void Game::init(PUObserver* p_pPUObserver)
 	//Set ball bounding box
 	PlayField* pf = m_playFields[m_activePlayField];
 	((Ball*)m_pBall)->init(pf->getOriginalPosition(), pf->getRightDir(), pf->getDownDir());
+	resetBall(pf);
 
 	m_pCamera = new Camera();
 	m_pCamera->init(pf->calculateCameraCenterPos());
 	m_pCamera->setViewMatrix();
 	m_pCamera->createProjectionMatrix(PI*0.25f,(float)CLIENTWIDTH/CLIENTHEIGHT, 1.0f, 500.0f);
-	m_pCamera->setYaw(m_activePlayField);
-	
+	//m_pCamera->setYaw(m_activePlayField);
 
 	m_loadLevel.~LevelGenerator();
 	m_pPUObservable = new PUObservable();
@@ -57,7 +63,7 @@ void Game::init(PUObserver* p_pPUObserver)
 
 	loadSounds();
 	m_soundManager.play(m_pSoundList.at(BACKGROUND), 0);
-	m_soundManager.setVolume(0.1f, 0);
+	m_soundManager.setVolume(0.0f, 0);
 	
 	addBorders();
 }
@@ -71,6 +77,12 @@ void Game::update(float p_screenWidth, float p_dt)
 	if(m_pCamera->timeToChange())
 	{
 		m_activePlayField = m_activePlayFieldNext;
+		int tempPowerUpSize = m_powerUps.size() - 1;
+		for(int i = tempPowerUpSize; i >= 0; i--)
+		{
+			m_pPUObservable->broadcastDeath(i);
+			m_powerUps.erase(m_powerUps.begin() + i);
+		}
 	}
 
 	if(!m_pCamera->isCinematic())
@@ -122,6 +134,7 @@ void Game::update(float p_screenWidth, float p_dt)
 				if(!((Pad*)m_pPad)->getSticky())
 				{
 					vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
+					
 					tempSpeed.y = -abs(tempSpeed.y);
 					((Ball*)m_pBall)->setSpeed( tempSpeed );
 					m_padCrash = true;
@@ -159,11 +172,16 @@ void Game::update(float p_screenWidth, float p_dt)
 
 				if(  bv->collide(m_pBall->getBoundingVolume()) && !m_wallCrash)
 				{
+					if (i == 3)
+					{
+						resetBall(pf);
+						m_sDiffData.lives--;
+					}
 					vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 					tempSpeed.y = tempSpeed.y;
 					((Ball*)m_pBall)->setSpeed( tempSpeed );
 					m_wallCrash = true;
-					m_wallCounter = 2;
+					m_wallCounter = 6;
 					break;
 				}
 			}
@@ -174,7 +192,6 @@ void Game::update(float p_screenWidth, float p_dt)
 			((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 		}
 
-		pf = NULL;
 		//Pad vs Borders NEEDS FINE TUNING
 		for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders()-2; i++)
 		{
@@ -232,27 +249,52 @@ void Game::update(float p_screenWidth, float p_dt)
 			}
 		}
 		// ## COLLISION STUFF END ##
+
+		if(pf->getListSize() <= 0) // If playfield is empty move the ball to the pad.
+		{
+			resetBall(pf);
+		}
+
+		pf = NULL;
+
+		// TEST LIVES
+		if (m_sDiffData.lives <= 0)
+		{
+			PostQuitMessage(0);
+		}
+
+		int nrOfRemainingBlocks = 0;
+		for (int pl = 0; pl < 4; pl++)
+		{
+			nrOfRemainingBlocks += m_playFields[pl]->getListSize();
+		}
+		if(nrOfRemainingBlocks <= 0)
+		{
+			PostQuitMessage(1);
+		}
 	}
+
+	// SOUND IS OFF HERE REMOVE WHEN NEEDING ZE SOUNDS
+	m_soundManager.setPauseAll(true);
 }
 
 void Game::keyEvent(unsigned short key)
 {
-	float Rotation = 0;
 	if(key == 0x41) // A
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(-50.0f, 0.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(-50.0f, 0.0f, 0.0f) * 3.0f);
 	}
 	if(key == 0x44) // D
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(50.0f, 0.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(50.0f, 0.0f, 0.0f) * 3.0f);
 	}
 	if(key == 0x57) // W
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f) * 3.0f);
 	}
 	if(key == 0x53) // S
 	{
-		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f));
+		((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f) * 3.0f);
 	}
 	if(key == 0x45) // E
 	{
@@ -265,7 +307,7 @@ void Game::keyEvent(unsigned short key)
 			m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
 									m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
 									m_originWorld,
-									3);
+									4);
 			m_pCamera->setYaw(m_activePlayFieldNext);
 			m_pCamera->startCinematic();
 		}
@@ -281,7 +323,7 @@ void Game::keyEvent(unsigned short key)
 			m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
 									m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
 									m_originWorld,
-									3);
+									4);
 			m_pCamera->setYaw(m_activePlayFieldNext);
 			m_pCamera->startCinematic();
 		}
@@ -289,13 +331,13 @@ void Game::keyEvent(unsigned short key)
 	if(key == 0x1B) //ESC
 		PostQuitMessage(0);
 
-	//if(key == 0x52) // R
-	//{
-	//	//PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-	//	//powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-	//	//m_pPUObservable->broadcastRebirth(powerUp);
-	//	//m_powerUps.push_back(powerUp);
-	//}
+	if(key == 0x52) // R
+	{
+		PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+		powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
+		m_pPUObservable->broadcastRebirth(powerUp);
+		m_powerUps.push_back(powerUp);
+	}
 	//if( key == 0x46) // F
 	//{
 	//	//PUBiggerPad* powerUp = new PUBiggerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
@@ -392,24 +434,17 @@ void Game::powerUpSpawn(vec3 pos)
 {
 	if(m_powerUps.size() < 10)
 	{
+		int chance = 25;
 		int r = rand() % 100;
-		if(r < 50)
+		// chance for powerups
+		if(r < chance * m_sDiffData.dropRate)
 		{
-			r = rand() % 5;
+			r = rand() % 3;
 			switch (r)
 			{
 			case FASTERBALL:
 				{
 					PUFasterBall* powerUp = new PUFasterBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-					powerUp->setPos(pos);
-					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
-					m_pPUObservable->broadcastRebirth(powerUp);
-					m_powerUps.push_back(powerUp);
-				}
-				break;
-			case SLOWERBALL:
-				{
-					PUSlowerBall* powerUp = new PUSlowerBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
 					powerUp->setPos(pos);
 					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
 					m_pPUObservable->broadcastRebirth(powerUp);
@@ -425,6 +460,32 @@ void Game::powerUpSpawn(vec3 pos)
 					m_powerUps.push_back(powerUp);
 				}
 				break;
+			case STICKYPAD:
+				{
+					PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
+					m_pPUObservable->broadcastRebirth(powerUp);
+					m_powerUps.push_back(powerUp);
+				}
+			default:
+				break;
+			}
+		} // Drop chance for powerdowns!
+		else if(r < chance)
+		{
+			r = rand() % 2;
+			switch(r)
+			{
+			case SLOWERBALL:
+				{
+					PUSlowerBall* powerUp = new PUSlowerBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
+					m_pPUObservable->broadcastRebirth(powerUp);
+					m_powerUps.push_back(powerUp);
+				}
+				break;
 			case SMALLERPAD:
 				{
 					PUSmallerPad* powerUp = new PUSmallerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
@@ -434,14 +495,7 @@ void Game::powerUpSpawn(vec3 pos)
 					m_powerUps.push_back(powerUp);
 				}
 				break;
-			case STICKYPAD:
-				{
-					PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-					powerUp->setPos(pos);
-					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
-					m_pPUObservable->broadcastRebirth(powerUp);
-					m_powerUps.push_back(powerUp);
-				}
+
 			default:
 				break;
 			}
@@ -476,7 +530,17 @@ void Game::loadSounds()
 void Game::setScreenBorders(vec4 p_screenBorders)
 {
 	m_screenBorders = p_screenBorders;
+}
 
+void Game::resetBall(PlayField* pf)
+{
+	((Ball*)m_pBall)->setStuck(true);
+	((Pad*)m_pPad)->setSavedVector(vec3(0.0f, 4.0f, 0.0f) * ((Pad*)m_pPad)->getScale());
+
+	((Ball*)m_pBall)->setInternalPosition( *m_pPad->getBoundingVolume()->getPosition() + 
+		((Pad*)m_pPad)->getSavedVector(),
+		pf->getOriginalPosition(), pf->getRightDir(), pf->getDownDir() );
+	((Ball*)m_pBall)->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 }
 
 void Game::addBorders()

@@ -18,12 +18,13 @@ public:
 	void transBorders(bool p_x);
 	void update();
 
-	BlockVertex*	getBufferData(); //Transfer to a array of blockvertex structs from blocklist
+	BlockVertex* 	getBufferData(); //Transfer to a array of blockvertex structs from blocklist
 	int				getListSize();
 	mat4			getRotationMatrix();
 	ABlock*			getBlock(unsigned int p_id);
 	void			deleteBlock(unsigned int p_id);
-
+	
+	//The offset in y axis is done because the camera is shifted down ( pitch )
 	vec3			calculateCameraCenterPos();
 
 	bool			getUpdateBuffer();

@@ -16,6 +16,7 @@
 #include "D3DTexture.h"
 #include "PUObserver.h"
 #include "Camera.h"
+#include "SkyBox.h"
 
 class Object;
 
@@ -136,6 +137,17 @@ private:
 	CBBall		m_cbBall;
 	D3DTexture	m_ballTexture;
 	ID3D11SamplerState* m_pBallSampler;
+
+	//Skybox
+	SkyBox*		m_skyBox;
+	Buffer*		m_skyBoxVbuffer;
+	Buffer*		m_skyBoxIbuffer;
+	Buffer		m_constantSkyBuffer;
+	Shader		m_skyBoxShader;
+	D3DTexture	m_skyTexture;
+	ID3D11ShaderResourceView* m_skysrv;
+	ID3D11SamplerState* m_pSkySampler;
+	ID3D11RasterizerState* m_pRasterState;
 
 	//TEST
 	ID3D11Buffer*    mVB;

@@ -152,6 +152,7 @@ void PlayField::deleteBlock(unsigned int p_id)
 	setUpdateBuffer(true);
 }
 
+//The offset in y axis is done because the camera is shifted down ( pitch )
 vec3 PlayField::calculateCameraCenterPos()
 {
 	m_orto			= cross( m_planeVectorX, m_planeVectorY );
@@ -160,6 +161,8 @@ vec3 PlayField::calculateCameraCenterPos()
 
 	pos = m_positionOriginal + (m_planeVectorX * m_size.x * 0.5f) + (m_planeVectorY * m_size.y * 0.5f);
 	pos = pos + m_orto * 200.0f;
+
+	pos += vec3(0.0f, -35.0f, 0.0f);
 
 	return pos;
 }

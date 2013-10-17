@@ -179,6 +179,7 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 	float speed;
 	vec3 t_centerVector;
 	vec3 direction;
+	vec3 normSpeed = normalize(p_speed);
 
 	int plane = findPlane(p_sphereCenter);
 
@@ -186,12 +187,60 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 	{
 		case TOP:
 		case BOTTOM:
-			returnVector = vec3(p_speed.x, -p_speed.y, p_speed.z);
+			if(abs(normSpeed.x) > 0.9f)
+			{
+				// Ball is going down and left. After calc it's going up and left.
+				if(p_speed.y < 0.0f && p_speed.x < 0.0f)
+					returnVector = vec3(p_speed.y, -p_speed.x, p_speed.z);
+
+				// Ball is going down and right. After calc it's going up and right.
+				else if(p_speed.y < 0.0f && p_speed.x > 0.0f)
+					returnVector = vec3(-p_speed.y, p_speed.x, p_speed.z);
+
+				// Ball is going up and left. After calc it's going down and left.
+				else if(p_speed.y > 0.0f && p_speed.x < 0.0f)
+					returnVector = vec3(-p_speed.y, p_speed.x, p_speed.z);
+
+				// Ball is going up and right. After calc it's going down and right
+				else if(p_speed.y > 0.0f && p_speed.x > 0.0f)
+					returnVector = vec3(p_speed.y, -p_speed.x, p_speed.z);
+
+				// Ball is going just left or right.
+				else
+					returnVector = vec3(p_speed.y, p_speed.x, p_speed.z);
+			}
+
+			else
+				returnVector = vec3(p_speed.x, -p_speed.y, p_speed.z);
 			break;
 
 		case LEFT:
 		case RIGHT:
-			returnVector = vec3(-p_speed.x, p_speed.y, -p_speed.z);
+
+			if(abs(normSpeed.y) > 0.9f)
+			{
+				// Ball is going down and left. After calc it's going down and right.
+				if(p_speed.y < 0.0f && (p_speed.x + p_speed.z) < 0.0f)
+					returnVector = vec3(-p_speed.y, p_speed.x, p_speed.z);
+
+				// Ball is going down and right. After calc it's going down and left.
+				else if(p_speed.y < 0.0f && (p_speed.x + p_speed.z) > 0.0f)
+					returnVector = vec3(p_speed.y, -p_speed.x, p_speed.z);
+
+				// Ball is going up and left. After calc it's going up and right.
+				else if(p_speed.y > 0.0f && (p_speed.x + p_speed.z) < 0.0f)
+					returnVector = vec3(p_speed.y, -p_speed.x, p_speed.z);
+
+				// Ball is going up and right. After calc it's going up and left.
+				else if(p_speed.y > 0.0f && (p_speed.x + p_speed.z) > 0.0f)
+					returnVector = vec3(-p_speed.y, p_speed.x, p_speed.z);
+
+				else
+					returnVector = vec3(p_speed.y, p_speed.x, p_speed.z);
+			}
+
+			else
+				returnVector = vec3(-p_speed.x, p_speed.y, -p_speed.z);
 			break;
 
 		case CORNER:

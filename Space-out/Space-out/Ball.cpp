@@ -1,11 +1,11 @@
 #include "Ball.h"
 
-Ball::Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName):Object(p_pPos, p_pColor, p_objectName)
+Ball::Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, vec3 p_speed) : Object(p_pPos, p_pColor, p_objectName)
 {
 	m_texturePath = new std::wstring(L"Picatures/BallTexture.png");
 	m_internPosition = vec2(*p_pPos);
 	
-	m_speed = vec3(10.0f, -20.0f, 0.0f);
+	m_speed = p_speed;
 	m_stuck = false;
 	m_maxSpeedUps = 4;
 	m_nrOfSpeedUps = 0;
@@ -55,7 +55,7 @@ void Ball::speedUp()
 {
 	if(m_nrOfSpeedUps < m_maxSpeedUps)
 	{
-		m_speed *= 1.5f;
+		m_speed *= 1.15f;
 		m_nrOfSpeedUps++;
 	}
 }
@@ -64,7 +64,7 @@ void Ball::speedDown()
 {
 	if(m_nrOfSpeedUps > -m_maxSpeedUps)
 	{
-		m_speed *= 0.5f;
+		m_speed *= 0.85f;
 		m_nrOfSpeedUps--;
 	}
 }
