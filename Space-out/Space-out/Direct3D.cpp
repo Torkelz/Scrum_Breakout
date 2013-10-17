@@ -198,7 +198,7 @@ void Direct3D::initApp()
 	m_borderShader.compileAndCreateShaderFromFile(L"BorderShader.fx", "PS", "ps_5_0", PIXEL_SHADER, NULL);
 
 	m_borderTexture = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_borderTexture.createTexture(new std::wstring(L"Picatures/border.png"), 0);
+	m_borderTexture.createTexture(new std::wstring(L"Picatures/border2.png"), 0);
 
 	//## BORDERS END ##
 	//## BALL START ##
@@ -319,12 +319,12 @@ void Direct3D::initApp()
 	bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	bd.RenderTarget[0].DestBlend =  D3D11_BLEND_INV_SRC_ALPHA;
 	bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
-	bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+	bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+	bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 	bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	m_pDevice->CreateBlendState(&bd, &m_pPowerBlend);
-	m_powerShader.setBlendState(m_pPowerBlend);
+	//m_powerShader.setBlendState(m_pPowerBlend);
 	
 	m_pBallSampler = nullptr;
 
@@ -518,12 +518,14 @@ void Direct3D::drawScene()
 	m_skyBoxIbuffer->apply();
 
 	m_skyBoxShader.setShaders();
+	m_skyBoxShader.setBlendState(m_pPowerBlend);
 	m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
 	m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
 	m_pDeviceContext->RSSetState(m_pRasterState);
-	
+
 	m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
 	m_pDeviceContext->RSSetState(NULL);
+
 	//SKYBOX DRAW END
 	
 	//## DRAW TEXT ##
@@ -532,28 +534,7 @@ void Direct3D::drawScene()
 	m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
 	//## DRAW TEXT END ##
 	
-	//## PAD DRAW START ##
-	XMMATRIX translatePadMatrix;
-
-	vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
-	translatePadMatrix = XMMatrixTranslation(padPos.x, padPos.y, padPos.z);
-
-	m_world = XMMatrixIdentity();
 	
-	XMMATRIX t_scaleMatrix = XMMatrixIdentity() * ((Pad*)(m_game.getPad()))->getScale();
-	t_scaleMatrix.r[3].m128_f32[3] = 1.0f;
-	m_WVP = m_world * playFieldRotation * t_scaleMatrix * translatePadMatrix * m_camView * m_camProjection;
-
-	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
-	m_cBuffer.apply(0);
-	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
-	m_shader.setShaders();
-	m_shader.setResource(PIXEL_SHADER, 0, 1, m_padTexture.getResourceView());
-	m_shader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	m_buffer.apply(0);
-	m_pDeviceContext->Draw(4, 0);
-	//## PAD DRAW END ##
 
 	//## BLOCK DRAW START ##
 	m_WVP = m_world *m_camView * m_camProjection;
@@ -581,6 +562,7 @@ void Direct3D::drawScene()
 	m_borderBuffers.apply(0);
 
 	m_borderShader.setShaders();
+	m_borderShader.setBlendState(m_pPowerBlend);
 	m_borderShader.setResource(PIXEL_SHADER, 0, 1, m_borderTexture.getResourceView());
 	m_borderShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 
@@ -606,10 +588,34 @@ void Direct3D::drawScene()
 
 	m_pDeviceContext->Draw(4, 4);
 	//## BORDERS DRAW END ##
+	//## PAD DRAW START ##
+	XMMATRIX translatePadMatrix;
+
+	vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
+	translatePadMatrix = XMMatrixTranslation(padPos.x, padPos.y, padPos.z);
+
+	m_world = XMMatrixIdentity();
+	
+	XMMATRIX t_scaleMatrix = XMMatrixIdentity() * ((Pad*)(m_game.getPad()))->getScale();
+	t_scaleMatrix.r[3].m128_f32[3] = 1.0f;
+	m_WVP = m_world * playFieldRotation * t_scaleMatrix * translatePadMatrix * m_camView * m_camProjection;
+
+	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
+	m_cBuffer.apply(0);
+	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+	m_shader.setShaders();
+	m_shader.setBlendState(m_pPowerBlend);
+	m_shader.setResource(PIXEL_SHADER, 0, 1, m_padTexture.getResourceView());
+	m_shader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	m_buffer.apply(0);
+	m_pDeviceContext->Draw(4, 0);
+	//## PAD DRAW END ##
 	//## POWERUP DRAW START ##
 	if(m_powerUps.size() > 0)
 	{
 		m_powerShader.setShaders();
+		m_powerShader.setBlendState(m_pPowerBlend);
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_powerShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 
@@ -636,7 +642,7 @@ void Direct3D::drawScene()
 		}
 	}
 	//## POWERUP DRAW END ##
-
+	m_ballShader.setBlendState(m_pPowerBlend);
 	//## BALL DRAW START ##
 	vec3 t_ballPos = ((Ball*)m_game.getBall())->getRealPosition();
 
