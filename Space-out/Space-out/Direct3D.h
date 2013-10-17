@@ -115,7 +115,7 @@ private:
 	int				 m_blockBufferSizeB;
 	int				 m_blockBufferSizeL;
 	int				 m_blockBufferSizeR;
-	D3DTexture		 m_blockTexture;
+	D3DTexture		 m_blockTexture[3];
 	Camera*			 m_pCamera;
 
 	//Pad

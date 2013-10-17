@@ -111,6 +111,7 @@
     <ClCompile Include="D3DTexture.cpp" />
     <ClCompile Include="Difficulties.cpp" />
     <ClCompile Include="Direct3D.cpp" />
+    <ClCompile Include="ExpBlock.cpp" />
     <ClCompile Include="LevelGenerator.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="PlayField.cpp" />
@@ -150,6 +151,7 @@
     <ClInclude Include="d3dUtil.h" />
     <ClInclude Include="Difficulties.h" />
     <ClInclude Include="Direct3D.h" />
+    <ClInclude Include="ExpBlock.h" />
     <ClInclude Include="FSound.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="LevelGenerator.h" />

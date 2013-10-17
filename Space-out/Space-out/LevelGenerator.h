@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include "Block.h"
+#include "ExpBlock.h"
 #include <glm.hpp>
 
 using namespace glm;
@@ -51,6 +52,7 @@ private:
 
 	int				stringToNumber(string p_number);
 	void			addBlockToList(int i, int row, FACE p_face);
+	void			addExpBlockToList(int i, int row, FACE p_face);
 	void			calcOffsets();
 };
 

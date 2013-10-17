@@ -1,11 +1,12 @@
 #include "ABlock.h"
 
-ABlock::ABlock(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, vec2 p_blockID) : Object(p_pPos, p_pColor, p_objectName)
+ABlock::ABlock(vec3* p_pPos, vec3* p_pColor, unsigned int p_blockType, std::string p_objectName, vec2 p_blockID) : Object(p_pPos, p_pColor, p_objectName)
 {
 	
 	m_hp = 0;
 	m_blockID = p_blockID;
 	m_vertex.pos = *p_pPos;
+	m_vertex.blockType = p_blockType;
 	//m_vertex.color = vec4(p_pColor->x, p_pColor->y, p_pColor->z, 1.0f);
 	m_boundingVolume = nullptr;
 }

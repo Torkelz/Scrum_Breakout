@@ -173,7 +173,7 @@ void Game::update(float p_screenWidth, float p_dt)
 					if (i == 3)
 					{
 						resetBall(pf);
-						m_sDiffData.lives--;
+						m_player.lives--;
 					}
 					vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 					tempSpeed.y = tempSpeed.y;
@@ -256,7 +256,7 @@ void Game::update(float p_screenWidth, float p_dt)
 		pf = NULL;
 
 		// TEST LIVES
-		if (m_sDiffData.lives <= 0)
+		if (m_player.lives <= 0)
 		{
 			PostQuitMessage(0);
 		}

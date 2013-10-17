@@ -1,6 +1,6 @@
 #include "Block.h"
 
-Block::Block(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, vec2 p_blockID) : ABlock(p_pPos, p_pColor, p_objectName, p_blockID)
+Block::Block(vec3* p_pPos, vec3* p_pColor, unsigned int p_blockType, std::string p_objectName, vec2 p_blockID) : ABlock(p_pPos, p_pColor, p_blockType, p_objectName, p_blockID)
 {
 	m_texturePath = new std::wstring(L"Picatures/block.png");
 	m_hp = 1;

@@ -151,6 +151,7 @@ void Direct3D::initApp()
 	D3D11_INPUT_ELEMENT_DESC blockInputdesc[] = 
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"BLOCKTYPE", 0, DXGI_FORMAT_R16_UINT,			0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 	m_blockShader.init(m_pDevice, m_pDeviceContext, 1);
 	
@@ -168,8 +169,10 @@ void Direct3D::initApp()
 	cBlockBufferDesc.usage = BUFFER_DEFAULT;
 	
 	m_cBlockBuffer.init(m_pDevice, m_pDeviceContext, cBlockBufferDesc);
-	m_blockTexture = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_blockTexture.createTexture(m_game.getActiveField()->getBlock(0)->getTexturePath(),  0);
+	m_blockTexture[BLOCK] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_blockTexture[BLOCK].createTexture(new std::wstring(L"Picatures/block.png"), 0);
+	m_blockTexture[EXPBLOCK] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_blockTexture[EXPBLOCK].createTexture(new std::wstring(L"Picatures/expBlock.png"), 0);
 
 	//## BLOCK END ##
 	//## BALL START ##
@@ -506,14 +509,14 @@ void Direct3D::drawScene()
 	cBlockBufferStruct.WVP = XMMatrixTranspose(m_WVP);
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 	m_blockShader.setShaders();
-	m_blockShader.setResource(PIXEL_SHADER, 0, 1, m_blockTexture.getResourceView());
+	m_blockShader.setResource(PIXEL_SHADER, 0, 1, m_blockTexture[BLOCK].getResourceView());
+	m_blockShader.setResource(PIXEL_SHADER, 1, 1, m_blockTexture[EXPBLOCK].getResourceView());
 	m_blockShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 	cBlockBufferStruct.sizeX = g_bvSize.x;
 	cBlockBufferStruct.sizeY = g_bvSize.y;
 	cBlockBufferStruct.sizeZ = g_bvSize.z;
 	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 	m_cBlockBuffer.apply(0);
-	unsigned int active = m_game.getActiveFieldNr();
 
 	for(int i = 0; i < 4; i++)
 	{
@@ -535,6 +538,7 @@ void Direct3D::drawScene()
 		{
 			PowerUp* pu;
 			pu = m_powerUps.at(i);
+			unsigned int active = m_game.getActiveFieldNr();
 			if (active == 0 || active == 2)
 				translatePadMatrix = XMMatrixTranslation(pu->getPos()->x, pu->getPos()->y, padPos.z); // Translate powerup
 			else

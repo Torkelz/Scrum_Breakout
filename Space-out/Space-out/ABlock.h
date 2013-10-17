@@ -8,9 +8,17 @@
 
 using namespace DirectX;
 
+enum BLOCKTYPE
+{
+	BLOCK,
+	EXPBLOCK,
+	SIZEOFBLOCKTYPE
+};
+
 struct BlockVertex
 {
 	vec3 pos;
+	unsigned int blockType;
 };
 
 struct cBlockBuffer
@@ -27,7 +35,7 @@ const vec3 g_bvSize(3.2f, 3.7f, 3.0f);
 class ABlock : public Object
 {
 public:
-	ABlock(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, vec2 p_blockID);
+	ABlock(vec3* p_pPos, vec3* p_pColor, unsigned int p_blockType, std::string p_objectName, vec2 p_blockID);
 	~ABlock();
 	
 	virtual void		init(mat4* p_pRotMat);

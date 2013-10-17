@@ -132,6 +132,7 @@
     <ClCompile Include="GameTimer.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="ExpBlock.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">
@@ -248,6 +249,7 @@
     <ClInclude Include="PUBiggerPad.h">
       <Filter>Powerups\Header</Filter>
     </ClInclude>
+    <ClInclude Include="ExpBlock.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

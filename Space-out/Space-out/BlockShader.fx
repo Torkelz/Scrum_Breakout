@@ -1,4 +1,5 @@
-Texture2D m_texture : register ( t0 );
+Texture2D m_blockTex : register ( t0 );
+Texture2D m_expBlockTex : register ( t1 );
 SamplerState m_textureSampler : register ( s0 );
 
 cbuffer BlockConstBuffer
@@ -13,18 +14,21 @@ cbuffer BlockConstBuffer
 
 struct VSInput
 {
-	float3 m_posL : POSITION;
+	float3			m_posL : POSITION;
+	unsigned int	m_blockType : BLOCKTYPE;
 };
 
 struct VSOutput
 {
 	float4 m_posH : SV_POSITION;
+	unsigned int m_blockType : BLOCKTYPE;
 };
 
 struct GSOutput
 {
 	float4 m_posH : SV_POSITION;
 	float2 m_tex  : TEXCOORD;
+	unsigned int m_blockType : BLOCKTYPE;
 };
 
 VSOutput VS(VSInput p_vIn)
@@ -151,7 +155,14 @@ void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStrea
 
 float4 PS(GSOutput p_input) : SV_Target
 {
-	float4 temp = m_texture.Sample(m_textureSampler, p_input.m_tex);
+	float4 temp;
+
+	if(p_input.m_blockType == 0)
+		temp = m_blockTex.Sample(m_textureSampler, p_input.m_tex);
+
+	if(p_input.m_blockType == 1)
+		temp = m_expBlockTex.Sample(m_textureSampler, p_input.m_tex);
+
 	return temp;
     //float4(1.0f, 1.0f, 1.0f, 1.0f);
 }
