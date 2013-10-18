@@ -217,7 +217,7 @@ void Direct3D::initApp()
 
 	m_ballBuffer.init(m_pDevice, m_pDeviceContext, bufferDesc);
 	m_ballTexture = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_ballTexture.createTexture(m_game.getBall()->getTexturePath(), 0);
+	m_ballTexture.createTexture(m_game.getBall(0)->getTexturePath(), 0);
 	
 	CBBall cbBall;
 
@@ -460,10 +460,10 @@ void Direct3D::updateScene(float p_dt)
 		
 		<< L"    MP:" << L" " << x << L"," << y  << L","
 
-		<< L"    BALL:"
+		/*<< L"    BALL:"
 		<< L" " << m_game.getBall()->getBoundingVolume()->getPosition()->x << L"," 
 		<< m_game.getBall()->getBoundingVolume()->getPosition()->y << L","
-		<< m_game.getBall()->getBoundingVolume()->getPosition()->z << L",";
+		<< m_game.getBall()->getBoundingVolume()->getPosition()->z << L","*/;
 
 		
 
@@ -648,23 +648,26 @@ void Direct3D::drawScene()
 	//## POWERUP DRAW END ##
 	m_ballShader.setBlendState(m_pPowerBlend);
 	//## BALL DRAW START ##
-	vec3 t_ballPos = ((Ball*)m_game.getBall())->getRealPosition();
+	for(int b = 0; b < m_game.getNrBalls();b++)
+	{
+		vec3 t_ballPos = ((Ball*)m_game.getBall(b))->getRealPosition();
 
-	m_cbBall.eyePosW = m_camPosition;
-	m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
-	m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos.x, t_ballPos.y, t_ballPos.z));
-	m_cbBall.size = XMFLOAT2(5.0f, 5.0f);
-	m_constantBallBuffer.apply(0);
+		m_cbBall.eyePosW = m_camPosition;
+		m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
+		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(t_ballPos.x, t_ballPos.y, t_ballPos.z));
+		m_cbBall.size = XMFLOAT2(5.0f, 5.0f);
+		m_constantBallBuffer.apply(0);
 
-	m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
-	m_ballShader.setShaders();
-	m_ballShader.setResource(PIXEL_SHADER, 0, 1, m_ballTexture.getResourceView());
-	m_ballShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
+		m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+		m_ballShader.setShaders();
+		m_ballShader.setResource(PIXEL_SHADER, 0, 1, m_ballTexture.getResourceView());
+		m_ballShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 	
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	m_ballBuffer.apply(0);
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		m_ballBuffer.apply(0);
 
-	m_pDeviceContext->Draw(1, 0);
+		m_pDeviceContext->Draw(1, 0);
+	}
 	//## BALL DRAW END ##
 	
 	m_pSwapChain->Present(0, 0);

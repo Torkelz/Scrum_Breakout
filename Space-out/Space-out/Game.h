@@ -78,7 +78,8 @@ public:
 	Observer*				getObserver();
 	Object*					getPad();
 	vector<ABlock*>*		getBlocks(int p_list);
-	Object*					getBall();
+	int						getNrBalls();
+	Object*					getBall(int p);
 	PlayField*				getField(int p_id);
 	PlayField*				getActiveField();
 	unsigned int			getActiveFieldNr();
@@ -104,7 +105,7 @@ private:
 	// ## POWER UP OBSERVABLE ##
 	PUObservable*			m_pPUObservable;
 	Object*					m_pPad;
-	Object*					m_pBall;
+	vector<Object*>			m_pBall;
 	vector<vector<ABlock*>>*m_pBlocks;
 	LevelGenerator			m_loadLevel;
 	vector<PowerUp*>		m_powerUps;
