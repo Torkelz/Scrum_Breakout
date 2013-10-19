@@ -69,6 +69,11 @@ unsigned int ABlock::getBlockType()
 	return m_vertex.blockType;
 }
 
+void ABlock::changeBlockType(unsigned int p_blockType)
+{
+	m_vertex.blockType = p_blockType;
+}
+
 void ABlock::init(mat4* p_pRotMat)
 {
 	vec4 temp = *p_pRotMat * vec4(g_bvSize, 0.0f);

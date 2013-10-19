@@ -161,6 +161,11 @@ void Game::update(float p_screenWidth, float p_dt)
 
 					m_playFields[m_activePlayField]->getBlock(i)->decreaseHP(1);
 					
+					if( ( (Pad*)m_pPad)->getIsExplosive() )
+					{
+						m_playFields[m_activePlayField]->getBlock(i)->changeBlockType(EXPBLOCK);
+					}
+
 					bv = NULL;
 					break;
 				}
@@ -195,6 +200,7 @@ void Game::update(float p_screenWidth, float p_dt)
 					{
 						resetBall(pf);
 						m_player.lives--;
+						( (Pad*)m_pPad)->setToExplosive(false);
 					}
 					vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 					tempSpeed.y = tempSpeed.y;
@@ -547,7 +553,7 @@ void Game::powerUpSpawn(vec3 pos)
 		// chance for powerups
 		if(r < chance * m_sDiffData.dropRate)
 		{
-			r = rand() % 5;
+			r = rand() % POWERUPTYPECOUNT;
 			switch (r)
 			{
 			case FASTERBALL:
@@ -592,7 +598,7 @@ void Game::powerUpSpawn(vec3 pos)
 		} // Drop chance for powerdowns!
 		else if(r < chance)
 		{
-			r = rand() % 2;
+			r = rand() % POWERUPTYPECOUNT;
 			switch(r)
 			{
 			case SLOWERBALL:

@@ -49,6 +49,7 @@ public:
 	vec2				getBlockID();
 	BlockVertex			getBlockVertex();
 	unsigned int		getBlockType();
+	void				changeBlockType(unsigned int p_blockType);
 	
 
 

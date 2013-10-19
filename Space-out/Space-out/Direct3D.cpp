@@ -275,17 +275,16 @@ void Direct3D::initApp()
 
 	m_powerTextures[FASTERBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_powerTextures[FASTERBALL].createTexture(new std::wstring(L"Picatures/fastAndFurious7.png"), 0);
+	m_powerTextures[SLOWERBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[SLOWERBALL].createTexture(new std::wstring(L"Picatures/slow.png"), 0);
 	m_powerTextures[BIGGERPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_powerTextures[BIGGERPAD].createTexture(new std::wstring(L"Picatures/biggerPad.png"), 0);
+	m_powerTextures[SMALLERPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[SMALLERPAD].createTexture(new std::wstring(L"Picatures/smallerPad.png"), 0);
 	m_powerTextures[STICKYPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_powerTextures[STICKYPAD].createTexture(m_game.getBall()->getTexturePath(), 0);
 	m_powerTextures[EXPLOSIVEBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_powerTextures[EXPLOSIVEBALL].createTexture(new std::wstring(L"Picatures/explosiveBall.png"), 0);
-
-	m_powerTextures[SLOWERBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_powerTextures[SLOWERBALL].createTexture(new std::wstring(L"Picatures/slow.png"), 0);
-	m_powerTextures[SMALLERPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_powerTextures[SMALLERPAD].createTexture(new std::wstring(L"Picatures/smallerPad.png"), 0);
 
 	D3D11_BLEND_DESC bd;
 	bd.AlphaToCoverageEnable = false;

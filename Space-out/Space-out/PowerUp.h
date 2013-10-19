@@ -10,7 +10,8 @@ enum PowerUpType
 	BIGGERPAD,
 	SMALLERPAD,
 	STICKYPAD,
-	EXPLOSIVEBALL
+	EXPLOSIVEBALL,
+	POWERUPTYPECOUNT // if adding new poweruptype, keep this at the bottom.
 };
 
 class PowerUp : public Object
