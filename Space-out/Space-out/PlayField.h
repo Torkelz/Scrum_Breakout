@@ -22,6 +22,7 @@ public:
 	int				getListSize();
 	mat4			getRotationMatrix();
 	ABlock*			getBlock(unsigned int p_id);
+	ABlock*			getLastBlock();
 	void			deleteBlock(unsigned int p_id);
 	
 	//The offset in y axis is done because the camera is shifted down ( pitch )
@@ -35,6 +36,7 @@ public:
 	vec2			getScreenPosition(mat4 viewproj);
 	vec3			getRightDir();
 	vec3			getDownDir();
+	vec3			getOrthoDir();
 	vec2			getSize();
 private:
 	vector<ABlock*> m_blockList;

@@ -10,7 +10,9 @@ enum PowerUpType
 	SLOWERBALL,
 	BIGGERPAD,
 	SMALLERPAD,
-	STICKYPAD
+	STICKYPAD,
+	SPLITBALL,
+	SCATTERBALL
 };
 
 class PowerUp : public Object

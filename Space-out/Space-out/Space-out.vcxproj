@@ -121,8 +121,10 @@
     <ClCompile Include="PUFasterBall.cpp" />
     <ClCompile Include="PUObservable.cpp" />
     <ClCompile Include="PUObserver.cpp" />
+    <ClCompile Include="PUScatterBall.cpp" />
     <ClCompile Include="PUSlowerBall.cpp" />
     <ClCompile Include="PUSmallerPad.cpp" />
+    <ClCompile Include="PUSplitBall.cpp" />
     <ClCompile Include="PUStickyPad.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -165,8 +167,10 @@
     <ClInclude Include="PUFasterBall.h" />
     <ClInclude Include="PUObservable.h" />
     <ClInclude Include="PUObserver.h" />
+    <ClInclude Include="PUScatterBall.h" />
     <ClInclude Include="PUSlowerBall.h" />
     <ClInclude Include="PUSmallerPad.h" />
+    <ClInclude Include="PUSplitBall.h" />
     <ClInclude Include="PUStickyPad.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="GameTimer.h" />

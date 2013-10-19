@@ -141,6 +141,12 @@
     </ClCompile>
     <ClCompile Include="D3DTextDevice.cpp" />
     <ClCompile Include="D3DFont.cpp" />
+    <ClCompile Include="PUSplitBall.cpp">
+      <Filter>Powerups</Filter>
+    </ClCompile>
+    <ClCompile Include="PUScatterBall.cpp">
+      <Filter>Powerups</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -260,6 +266,12 @@
     </ClInclude>
     <ClInclude Include="D3DTextDevice.h" />
     <ClInclude Include="D3DFont.h" />
+    <ClInclude Include="PUSplitBall.h">
+      <Filter>Powerups\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="PUScatterBall.h">
+      <Filter>Powerups\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

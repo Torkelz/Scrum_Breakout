@@ -178,8 +178,15 @@ void Game::update(float p_screenWidth, float p_dt)
 						if (i == 3)
 						{
 							if(m_pBall.size() == 1)
+							{
 								resetBall(pf);
-							m_sDiffData.lives--;
+								m_sDiffData.lives--;
+							}
+							else
+							{
+								m_pBall.erase(m_pBall.begin()+b);
+								break;
+							}
 						}
 						vec3 tempSpeed = bv->findNewDirection(*m_pBall.at(b)->getBoundingVolume()->getPosition(), ((Ball*)m_pBall.at(b))->getSpeed());
 						tempSpeed.y = tempSpeed.y;
@@ -302,57 +309,106 @@ void Game::keyEvent(unsigned short key)
 		((Ball*)m_pBall.front())->setSpeed(vec3(0.0f, 50.0f, 0.0f) * 3.0f);
 	}
 	//DEBUG BALL
-	if(key == 0x42) // B
-	{
-		vec3 pos, speed;
-		pos = ((Ball*)m_pBall.back())->getRealPosition();
-		speed = ((Ball*)m_pBall.back())->getSpeed();
-		speed.x *= -1;
-		speed.y *= -1;
-		m_pBall.push_back(new Ball(&pos, &vec3(0.56f, 0.56f, 0.56f), "Ball", speed));
-		((Ball*)m_pBall.back())->setInternalPosition(pos, m_playFields[m_activePlayField]->getOriginalPosition(), 
-										m_playFields[m_activePlayField]->getRightDir(), 
-										m_playFields[m_activePlayField]->getDownDir());
-		((Ball*)m_pBall.back())->init(m_playFields[m_activePlayField]->getOriginalPosition(), 
-										m_playFields[m_activePlayField]->getRightDir(), 
-										m_playFields[m_activePlayField]->getDownDir());
-	}
+	//if(key == 0x42) // B
+	//{
+	//	spawnBalls(-45,45,2);
+	//	/*vec3 pos, speed;
+	//	pos = ((Ball*)m_pBall.back())->getRealPosition();
+	//	speed = ((Ball*)m_pBall.back())->getSpeed();
+	//	speed.x *= -1;
+	//	speed.y *= -1;
+	//	m_pBall.push_back(new Ball(&pos, &vec3(0.56f, 0.56f, 0.56f), "Ball", speed));
+	//	((Ball*)m_pBall.back())->setInternalPosition(pos, m_playFields[m_activePlayField]->getOriginalPosition(), 
+	//									m_playFields[m_activePlayField]->getRightDir(), 
+	//									m_playFields[m_activePlayField]->getDownDir());
+	//	((Ball*)m_pBall.back())->init(m_playFields[m_activePlayField]->getOriginalPosition(), 
+	//									m_playFields[m_activePlayField]->getRightDir(), 
+	//									m_playFields[m_activePlayField]->getDownDir());*/
+	//}
 
 
 	if(key == 0x45) // E
 	{
 		if(!m_pCamera->isCinematic())
 		{
-			m_activePlayFieldNext--;
-			if(m_activePlayFieldNext < 0)
-				m_activePlayFieldNext = m_nrPlayFields - 1;
+			bool ballsCheck = true;
+			int apf = m_activePlayField;
+			unsigned int npf;
+			if(apf - 1 < 0)
+				npf = m_nrPlayFields - 1;
+			else
+				npf = apf - 1;
 
-			m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-									m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-									m_originWorld,
-									4);
-			m_pCamera->setYaw(m_activePlayFieldNext);
-			m_pCamera->startCinematic();
+			ABlock* block = m_playFields[npf]->getLastBlock();
+			if(block != nullptr)
+			{
+				for(int b = 0; b < m_pBall.size();b++)
+				{
+					if(((Ball*)m_pBall.at(b))->getRealPosition().y > ((Block*)block)->getBlockVertex().pos.y - 5)//5 offset
+					{
+						ballsCheck = false;
+						break;
+					}
+				}
+			}
+
+			if(ballsCheck)
+			{
+				m_activePlayFieldNext--;
+				if(m_activePlayFieldNext < 0)
+					m_activePlayFieldNext = m_nrPlayFields - 1;
+
+				m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
+										m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
+										m_originWorld,
+										4);
+				m_pCamera->setYaw(m_activePlayFieldNext);
+				m_pCamera->startCinematic();
 			
-			m_pCamera->setRunOnce(true);
+				m_pCamera->setRunOnce(true);
+			}
 		}
 	}
 	if(key == 0x51) // Q
 	{
 		if(!m_pCamera->isCinematic())
 		{
-			m_activePlayFieldNext++;
-			if(m_activePlayFieldNext >= m_nrPlayFields)
-				m_activePlayFieldNext = 0;
+			bool ballsCheck = true;
+			unsigned int npf;
+			if(m_activePlayField + 1 >= m_nrPlayFields)
+				npf = 0;
+			else
+				npf = m_activePlayField + 1;
 
-			m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-									m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-									m_originWorld,
-									4);
-			m_pCamera->setYaw(m_activePlayFieldNext);
-			m_pCamera->startCinematic();
+			ABlock* block = m_playFields[npf]->getLastBlock();
 
-			m_pCamera->setRunOnce(true);
+			if(block != nullptr)
+			{
+				for(int b = 0; b < m_pBall.size();b++)
+				{
+					if(((Ball*)m_pBall.at(b))->getRealPosition().y > ((Block*)block)->getBlockVertex().pos.y - 5)//5 offset
+					{
+						ballsCheck = false;
+						break;
+					}
+				}
+			}
+
+			if(ballsCheck)
+			{
+				m_activePlayFieldNext++;
+				if(m_activePlayFieldNext >= m_nrPlayFields)
+					m_activePlayFieldNext = 0;
+
+				m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
+										m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
+										m_originWorld,
+										4);
+				m_pCamera->setYaw(m_activePlayFieldNext);
+				m_pCamera->startCinematic();
+
+				m_pCamera->setRunOnce(true);
+			}
 		}
 	}
 	if(key == 0x1B) //ESC
@@ -467,6 +523,13 @@ void Game::powerUpCheck(int i)
 	case STICKYPAD:
 		((Pad*)m_pPad)->setSticky(true);
 		m_counter = 10.0f;
+		break;
+	case SPLITBALL:
+		spawnBalls(-45,45,2);
+		break;
+	case SCATTERBALL:
+		spawnBalls(-180,180,4);
+		break;
 	default:
 		break;
 	}
@@ -483,7 +546,7 @@ void Game::powerUpSpawn(vec3 pos)
 		// chance for powerups
 		if(r < chance * m_sDiffData.dropRate)
 		{
-			r = rand() % 5;
+			r = rand() % 8;
 			switch (r)
 			{
 			case FASTERBALL:
@@ -512,13 +575,32 @@ void Game::powerUpSpawn(vec3 pos)
 					m_pPUObservable->broadcastRebirth(powerUp);
 					m_powerUps.push_back(powerUp);
 				}
+				break;
+			case SPLITBALL:
+			{
+				PUSplitBall* powerUp = new PUSplitBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+				powerUp->setPos(pos);
+				((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
+				m_pPUObservable->broadcastRebirth(powerUp);
+				m_powerUps.push_back(powerUp);
+			}
+			break;
+			case SCATTERBALL:
+			{
+				PUScatterBall* powerUp = new PUScatterBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+				powerUp->setPos(pos);
+				((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
+				m_pPUObservable->broadcastRebirth(powerUp);
+				m_powerUps.push_back(powerUp);
+			}
+			break;
 			default:
 				break;
 			}
 		} // Drop chance for powerdowns!
 		else if(r < chance)
 		{
-			r = rand() % 2;
+			r = rand() % 5;
 			switch(r)
 			{
 			case SLOWERBALL:
@@ -641,4 +723,33 @@ int Game::getScore()
 vector<Borders>* Game::getBorders()
 {
         return &m_borderList;
+}
+
+void Game::spawnBalls(float p_sAngle, float p_eAngle, unsigned int p_numBalls)
+{
+	mat4 rot;
+	float stepAngle = (p_eAngle - p_sAngle)/(p_numBalls-1);
+	vec3 playfieldOrtho = m_playFields[m_activePlayField]->getOrthoDir();
+
+	vec3 pos, ospeed,speed;
+	pos = ((Ball*)m_pBall.back())->getRealPosition();
+	ospeed = ((Ball*)m_pBall.back())->getSpeed();
+
+	
+
+	for(int i = 0; i < p_numBalls; i++)
+	{
+		//rot = glm::rotate(mat4(1.0f),p_sAngle+(stepAngle*i),playfieldOrtho);
+
+		//speed = vec3(rot*vec4(speed,0));
+		speed = glm::rotate(ospeed, p_sAngle+(stepAngle*i),playfieldOrtho);
+
+		m_pBall.push_back(new Ball(&pos, &vec3(0.56f, 0.56f, 0.56f), "Ball", speed));
+		((Ball*)m_pBall.back())->setInternalPosition(pos, m_playFields[m_activePlayField]->getOriginalPosition(), 
+										m_playFields[m_activePlayField]->getRightDir(), 
+										m_playFields[m_activePlayField]->getDownDir());
+		((Ball*)m_pBall.back())->init(m_playFields[m_activePlayField]->getOriginalPosition(), 
+										m_playFields[m_activePlayField]->getRightDir(), 
+										m_playFields[m_activePlayField]->getDownDir());
+	}
 }

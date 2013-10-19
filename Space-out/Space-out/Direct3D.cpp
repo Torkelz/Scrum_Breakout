@@ -311,6 +311,10 @@ void Direct3D::initApp()
 	m_powerTextures[SMALLERPAD].createTexture(new std::wstring(L"Picatures/smallerPad.png"), 0);
 	m_powerTextures[STICKYPAD] = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_powerTextures[STICKYPAD].createTexture(new std::wstring(L"Picatures/stickyBall.png"), 0);
+	m_powerTextures[SPLITBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[SPLITBALL].createTexture(new std::wstring(L"Picatures/splitBall.png"), 0);
+	m_powerTextures[SCATTERBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[SCATTERBALL].createTexture(new std::wstring(L"Picatures/scatterBall.png"), 0);
 
 	D3D11_BLEND_DESC bd;
 	bd.AlphaToCoverageEnable = false;

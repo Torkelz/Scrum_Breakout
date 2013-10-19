@@ -215,3 +215,15 @@ vec2 PlayField::getSize()
 	return m_size;
 }
 
+vec3 PlayField::getOrthoDir()
+{
+	return cross( m_planeVectorX, m_planeVectorY );
+}
+
+ABlock*	PlayField::getLastBlock()
+{
+	if(m_blockList.size() > 0)
+		return m_blockList.back();
+	else
+		return nullptr;
+}

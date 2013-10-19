@@ -3,3 +3,5 @@
 #include "PUSmallerPad.h"
 #include "PUBiggerPad.h"
 #include "PUStickyPad.h"
+#include "PUSplitBall.h"
+#include "PUScatterBall.h"

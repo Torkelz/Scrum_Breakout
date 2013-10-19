@@ -6,6 +6,7 @@
 
 #include <glm.hpp>
 #include <gtc\matrix_transform.hpp>
+#include "..\glm\gtx\rotate_vector.hpp"
 #include <vector>
 #include "LevelGenerator.h"
 #include "PlayField.h"
@@ -100,6 +101,7 @@ private:
 	int					    random();
 	void					powerUpCheck(int i);
 	void					resetBall(PlayField* pf);
+	void					spawnBalls(float p_sAngle, float p_eAngle, unsigned int p_numBalls);
 
 	Observer*				m_pObserver;
 	// ## POWER UP OBSERVABLE ##
