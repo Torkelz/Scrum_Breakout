@@ -111,6 +111,7 @@
     <ClCompile Include="D3DFont.cpp" />
     <ClCompile Include="D3DTextDevice.cpp" />
     <ClCompile Include="D3DTexture.cpp" />
+    <ClCompile Include="DeathScreen.cpp" />
     <ClCompile Include="Difficulties.cpp" />
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="HighScore.cpp" />
@@ -142,6 +143,7 @@
     <ClCompile Include="WinHID.cpp" />
     <ClCompile Include="WinKeyboard.cpp" />
     <ClCompile Include="WinMouse.cpp" />
+    <ClCompile Include="WinScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ABlock.h" />
@@ -156,6 +158,7 @@
     <ClInclude Include="D3DTextDevice.h" />
     <ClInclude Include="D3DTexture.h" />
     <ClInclude Include="d3dUtil.h" />
+    <ClInclude Include="DeathScreen.h" />
     <ClInclude Include="Difficulties.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="FSound.h" />
@@ -189,6 +192,7 @@
     <ClInclude Include="WinHID.h" />
     <ClInclude Include="WinKeyboard.h" />
     <ClInclude Include="WinMouse.h" />
+    <ClInclude Include="WinScreen.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Ball.fx">

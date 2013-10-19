@@ -1,15 +1,17 @@
+#include "WinScreen.h"
 #include "Menu.h"
 #include "Observer.h"
 #include "D3DTextDevice.h"
 #include "Game.h"
 #include "HighScore.h"
+#include "Menu.h"
 
-Menu::Menu() : Scene()
+WinScreen::WinScreen() : Scene()
 {}
 
-Menu::~Menu(void){}
+WinScreen::~WinScreen(void){}
 
-void Menu::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, HWND p_hwnd, int screenWidth, int screenHeight)
+void WinScreen::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, HWND p_hwnd, int screenWidth, int screenHeight)
 {
 	m_active = false;
 	m_pDevice = p_pDevice;
@@ -19,21 +21,31 @@ void Menu::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, 
 
 	m_pTextDevice->Initialize(m_pDevice, m_pDeviceContext, p_hwnd, screenWidth, screenHeight);
 	
-	m_pTextDevice->addSentence("PRESS SPACE TO START NEW GAME", 0, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("CONGRATULATIONS! YOU HAVE SAVED THE EARTH!", 0, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("YOUR SCORE WAS: ", 1, m_pDevice, m_pDeviceContext);
+	
+	m_pTextDevice->addSentence("PRESS SPACE TO START NEW GAME", 2, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("PRESS BACKSPACE TO RETURN TO MAIN MENU", 3, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("PRESS H TO WATCH THE HIGHSCORE LIST", 4, m_pDevice, m_pDeviceContext);
 	update();
 }
 
-void Menu::update()
+void WinScreen::update()
 {
-	m_pTextDevice->updateSentenceAt(0, "PRESS SPACE TO START NEW GAME", 50, 50, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(0, "CONGRATULATIONS! YOU HAVE SAVED THE EARTH!", 250, 50, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	std::string message = "YOUR SCORE WAS: ";// + IntToString(m_pGame->getScore());
+	m_pTextDevice->updateSentenceAt(1, &message[0], 250, 50 + 20, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(2, "PRESS SPACE TO START NEW GAME", 250, 50 + 70, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(3, "PRESS BACKSPACE TO RETURN TO MAIN MENU", 250, 50 + 90, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(4, "PRESS H TO WATCH THE HIGHSCORE LIST", 250, 50 + 110, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
 }
 
-void Menu::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster)
+void WinScreen::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster)
 {
 	m_pTextDevice->Render(m_pDeviceContext, p_pWorld, p_pProjection, p_sampler, p_raster);
 }
 
-void Menu::keyEvent(unsigned short key)
+void WinScreen::keyEvent(unsigned short key)
 {	
 	if(m_active)
 	{
@@ -115,25 +127,25 @@ void Menu::keyEvent(unsigned short key)
 	}
 }
 
-void Menu::leftMouseClick( vec2 p_mousePosition ){}
+void WinScreen::leftMouseClick( vec2 p_mousePosition ){}
 
-void Menu::rightMouseClick( vec2 p_mousePosition ){}
+void WinScreen::rightMouseClick( vec2 p_mousePosition ){}
 
-void Menu::mouseMove( vec2 p_mousePosition )
+void WinScreen::mouseMove( vec2 p_mousePosition )
 {
 }
 
-Observer* Menu::getObserver()
+Observer* WinScreen::getObserver()
 {
 	return m_pObserver;
 }
 
-void Menu::setHighScore(HighScore* p_pHighScore)
+void WinScreen::setHighScore(HighScore* p_pHighScore)
 {
 	m_pHighScore = p_pHighScore;
 }
 
-void Menu::setGame(Game* p_pGame)
+void WinScreen::setGame(Game* p_pGame)
 {
 	m_pGame = p_pGame;
 }

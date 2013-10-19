@@ -396,11 +396,21 @@ void Direct3D::initApp()
 	m_highScore.init(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
 	m_HID.getObservable()->addSubscriber(m_highScore.getObserver());
 
+	m_winScreen = WinScreen();
+	m_winScreen.init(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
+	m_HID.getObservable()->addSubscriber(m_winScreen.getObserver());
+
+	m_deathScreen = DeathScreen();
+	m_deathScreen.init(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
+	m_HID.getObservable()->addSubscriber(m_deathScreen.getObserver());
+
 	m_menu.setGame(&m_game);
 	m_highScore.setGame(&m_game);
 
 	m_menu.setHighScore(&m_highScore);
 	m_highScore.setMenu(&m_menu);
+
+	m_highScore.addHighScore(100000);
 }
 
 void Direct3D::onResize()
@@ -476,7 +486,25 @@ void Direct3D::updateScene(float p_dt)
 
 	if(m_highScore.active())
 	{
-		m_menu.update();
+		m_highScore.update();
+
+		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
+		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
+		m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
+	}
+
+	if(m_winScreen.active())
+	{
+		m_winScreen.update();
+
+		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
+		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
+		m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
+	}
+
+	if(m_deathScreen.active())
+	{
+		m_deathScreen.update();
 
 		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
 		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
@@ -675,6 +703,72 @@ void Direct3D::drawScene()
 		XMMATRIX orthoMatrix;
 		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
 		m_highScore.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
+
+		// CURRENTLY BROKEN
+		// SKYBOX DRAW
+
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		vec3 camppos = m_game.getCamera()->getPosition();
+
+		m_cbBall.eyePosW = vec3ToXMVector(camppos);
+		m_cbBall.viewProj = XMMatrixTranspose( m_camProjection * m_camView);
+		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
+		m_constantBallBuffer.apply(0);
+
+		m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+	
+		m_skyBoxVbuffer->apply();
+		m_skyBoxIbuffer->apply();
+
+		m_skyBoxShader.setShaders();
+		m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
+		m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
+		m_pDeviceContext->RSSetState(m_pRasterState);
+	
+		m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
+		m_pDeviceContext->RSSetState(NULL);
+		//SKYBOX DRAW END
+	}
+
+	if(m_winScreen.active())
+	{
+		XMMATRIX orthoMatrix;
+		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+		m_winScreen.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
+
+		// CURRENTLY BROKEN
+		// SKYBOX DRAW
+
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		vec3 camppos = m_game.getCamera()->getPosition();
+
+		m_cbBall.eyePosW = vec3ToXMVector(camppos);
+		m_cbBall.viewProj = XMMatrixTranspose( m_camProjection * m_camView);
+		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
+		m_constantBallBuffer.apply(0);
+
+		m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+	
+		m_skyBoxVbuffer->apply();
+		m_skyBoxIbuffer->apply();
+
+		m_skyBoxShader.setShaders();
+		m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
+		m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
+		m_pDeviceContext->RSSetState(m_pRasterState);
+	
+		m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
+		m_pDeviceContext->RSSetState(NULL);
+		//SKYBOX DRAW END
+	}
+
+	if(m_deathScreen.active())
+	{
+		XMMATRIX orthoMatrix;
+		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+		m_deathScreen.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
 
 		// CURRENTLY BROKEN
 		// SKYBOX DRAW

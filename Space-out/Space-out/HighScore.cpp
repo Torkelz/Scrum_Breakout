@@ -5,7 +5,10 @@
 #include "Menu.h"
 
 HighScore::HighScore() : Scene()
-{}
+{
+	loadHighScoreListFromFile("highscores.txt");
+	m_spacing = 30;
+}
 
 HighScore::HighScore(Game* p_pGame, Menu* p_pMenu) : Scene()
 {
@@ -25,16 +28,27 @@ void HighScore::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceCont
 
 	m_pTextDevice->Initialize(m_pDevice, m_pDeviceContext, p_hwnd, screenWidth, screenHeight);
 	
-	m_pTextDevice->addSentence("PRESS SPACE TO START NEW GAME", 0, m_pDevice, m_pDeviceContext);
-	m_pTextDevice->addSentence("PRESS BACKSPACE TO RETURN TO MAIN MENU", 1, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("HIGHSCORES", 0, m_pDevice, m_pDeviceContext);
+	for(int i = 1; i < 11; i++)
+	{
+		m_pTextDevice->addSentence("", i, m_pDevice, m_pDeviceContext);
+	}
+	m_pTextDevice->addSentence("PRESS SPACE TO START NEW GAME", 11, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("PRESS BACKSPACE TO RETURN TO MAIN MENU", 12, m_pDevice, m_pDeviceContext);
 	update();
 }
 
 void HighScore::update()
 {
-	m_pTextDevice->updateSentenceAt(0, "PRESS SPACE TO START NEW GAME", 250, 50, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
-	
-	m_pTextDevice->updateSentenceAt(1, "PRESS BACKSPACE TO RETURN TO MAIN MENU", 250, 150, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	for(int i = 1; i < 11; i++)
+	{
+		std::string message = m_scores[i - 1].name + ": " + IntToString(m_scores[i - 1].score);
+		m_pTextDevice->updateSentenceAt(i, &message[0], 270, 60 + m_spacing * i, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	}
+	m_pTextDevice->updateSentenceAt(0, "HIGHSCORES", 250, 50, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+
+	m_pTextDevice->updateSentenceAt(11, "PRESS SPACE TO START NEW GAME", 250, 70 + m_spacing * 11, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(12, "PRESS BACKSPACE TO RETURN TO MAIN MENU", 250, 70 + m_spacing * 12, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
 }
 
 void HighScore::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster)
@@ -150,4 +164,69 @@ void HighScore::setMenu(Menu* p_pMenu)
 void HighScore::setGame(Game* p_pGame)
 {
 	m_pGame = p_pGame;
+}
+
+void HighScore::loadHighScoreListFromFile(std::string p_fileName)
+{
+	std::fstream file(p_fileName);
+
+	if(file)
+	{
+		std::string line;
+		std::string prefix;
+		int index = 0;
+
+		while(file.eof() == false)
+		{
+			prefix = "NULL"; //leave nothing from the previous iteration
+			std::stringstream lineStream;
+
+			std::getline(file, line);
+			lineStream << line;
+			lineStream >> prefix;
+
+			if(prefix == "s")
+			{
+				int entryScore;
+				lineStream >> entryScore;
+				m_scores[index].score = entryScore;
+			}
+			else if(prefix == "n")
+			{
+				std::string entrantName;
+				lineStream >> entrantName;
+				m_scores[index].name = entrantName;
+				index++;
+			}
+		}
+	}
+}
+
+bool HighScore::addHighScore(int p_score)
+{
+	HighScoreEntry newScore;
+	newScore.score = p_score;
+	newScore.name = "Mr.Nobody";
+	bool swapped = false;
+	for (int i = 0; i < 10; i++)
+	{
+		HighScoreEntry temp;
+		if(newScore.score > m_scores[i].score)
+		{
+			temp = m_scores[i];
+			m_scores[i] = newScore;
+			newScore = temp;
+			swapped = true;
+		}
+	}
+
+	if(swapped)
+		writeHighScoreToFile("highscores.txt");
+
+	return swapped;
+}
+
+void HighScore::writeHighScoreToFile(std::string p_fileName)
+{
+	//DO STUFF
 }

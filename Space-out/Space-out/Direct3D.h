@@ -73,12 +73,6 @@ inline mat4 XMMatrixTomat4(XMMATRIX* p)
 	return r;
 };
 
-inline std::string IntToString(int i)
-{
-	std::stringstream ss;
-	ss << i;
-	return ss.str();
-};
 inline XMVECTOR vec3ToXMVector(vec3 p)
 {
 	XMVECTOR r;
@@ -168,7 +162,7 @@ private:
 	D3DTextDevice*	 m_pTextDevice;
 	HighScore		 m_highScore;
 	Menu			 m_menu;
-	//WinScreen		 m_winScreen;
-	//DeathScreen	 m_deathScreen;
+	WinScreen		 m_winScreen;
+	DeathScreen		 m_deathScreen;
 };
 #endif
