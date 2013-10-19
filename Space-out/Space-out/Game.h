@@ -107,6 +107,7 @@ private:
 
 	// EXP BLOCK
 	vec2					m_nrOfBlocksXY;
+	vector<int>	      m_neighbourBlockIndex;
 
 	vec4					m_screenBorders;
 	

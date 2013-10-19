@@ -94,6 +94,16 @@ void Pad::setSticky(bool p_sticky)
 	m_sticky = p_sticky;
 }
 
+bool Pad::getIsExplosive()
+{
+	return m_isExplosive;
+}
+
+void Pad::setToExplosive(bool p_exp)
+{
+	m_isExplosive = p_exp;
+}
+
 vec3 Pad::getSavedVector()
 {
 	return m_savedVector;

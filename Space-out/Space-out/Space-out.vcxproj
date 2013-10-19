@@ -117,6 +117,7 @@
     <ClCompile Include="PlayField.cpp" />
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="PUBiggerPad.cpp" />
+    <ClCompile Include="PUExplosiveBall.cpp" />
     <ClCompile Include="PUFasterBall.cpp" />
     <ClCompile Include="PUObservable.cpp" />
     <ClCompile Include="PUObserver.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="PowerUp.h" />
     <ClInclude Include="PowerUpInclude.h" />
     <ClInclude Include="PUBiggerPad.h" />
+    <ClInclude Include="PUExplosiveBall.h" />
     <ClInclude Include="PUFasterBall.h" />
     <ClInclude Include="PUObservable.h" />
     <ClInclude Include="PUObserver.h" />

@@ -133,6 +133,7 @@
       <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="ExpBlock.cpp" />
+    <ClCompile Include="PUExplosiveBall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">
@@ -250,6 +251,7 @@
       <Filter>Powerups\Header</Filter>
     </ClInclude>
     <ClInclude Include="ExpBlock.h" />
+    <ClInclude Include="PUExplosiveBall.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">
