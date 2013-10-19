@@ -30,6 +30,7 @@ public:
 	void				walk( float p_f );
 	void				strafe( float p_f );
 	void				updateYaw( float p_d );
+	mat4				getViewMatrixSpecYaw(float p_yaw);
 	void				updatePitch( float p_d );
 
 	// Spline stuffies

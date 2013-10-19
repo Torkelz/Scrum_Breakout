@@ -479,7 +479,7 @@ void Direct3D::updateScene(float p_dt)
 	{
 		m_menu.update();
 
-		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
+		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrixSpecYaw(PI/2));
 		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
 		m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
 	}
@@ -488,7 +488,7 @@ void Direct3D::updateScene(float p_dt)
 	{
 		m_highScore.update();
 
-		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
+		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrixSpecYaw(PI/2));
 		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
 		m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
 	}
@@ -497,7 +497,7 @@ void Direct3D::updateScene(float p_dt)
 	{
 		m_winScreen.update();
 
-		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
+		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrixSpecYaw(PI/2));
 		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
 		m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
 	}
@@ -505,8 +505,7 @@ void Direct3D::updateScene(float p_dt)
 	if(m_deathScreen.active())
 	{
 		m_deathScreen.update();
-
-		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrix());
+		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrixSpecYaw(PI/2));
 		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
 		m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
 	}
@@ -679,7 +678,7 @@ void Direct3D::drawScene()
 		vec3 camppos = m_game.getCamera()->getPosition();
 
 		m_cbBall.eyePosW = vec3ToXMVector(camppos);
-		m_cbBall.viewProj = XMMatrixTranspose( m_camProjection * m_camView);
+		m_cbBall.viewProj = XMMatrixTranspose( m_camView * m_camProjection);
 		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
 		m_constantBallBuffer.apply(0);
 
@@ -712,7 +711,7 @@ void Direct3D::drawScene()
 		vec3 camppos = m_game.getCamera()->getPosition();
 
 		m_cbBall.eyePosW = vec3ToXMVector(camppos);
-		m_cbBall.viewProj = XMMatrixTranspose( m_camProjection * m_camView);
+		m_cbBall.viewProj = XMMatrixTranspose( m_camView * m_camProjection);
 		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
 		m_constantBallBuffer.apply(0);
 
@@ -745,7 +744,7 @@ void Direct3D::drawScene()
 		vec3 camppos = m_game.getCamera()->getPosition();
 
 		m_cbBall.eyePosW = vec3ToXMVector(camppos);
-		m_cbBall.viewProj = XMMatrixTranspose( m_camProjection * m_camView);
+		m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
 		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
 		m_constantBallBuffer.apply(0);
 
@@ -778,7 +777,7 @@ void Direct3D::drawScene()
 		vec3 camppos = m_game.getCamera()->getPosition();
 
 		m_cbBall.eyePosW = vec3ToXMVector(camppos);
-		m_cbBall.viewProj = XMMatrixTranspose( m_camProjection * m_camView);
+		m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
 		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
 		m_constantBallBuffer.apply(0);
 
