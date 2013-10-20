@@ -546,7 +546,7 @@ void Game::powerUpSpawn(vec3 pos)
 		// chance for powerups
 		if(r < chance * m_sDiffData.dropRate)
 		{
-			r = rand() % 8;
+			r = rand() % 7;
 			switch (r)
 			{
 			case FASTERBALL:
