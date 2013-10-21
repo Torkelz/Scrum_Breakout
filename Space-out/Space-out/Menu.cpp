@@ -11,7 +11,7 @@ Menu::~Menu(void){}
 
 void Menu::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, HWND p_hwnd, int screenWidth, int screenHeight)
 {
-	m_active = false;
+	m_active = true;
 	m_pDevice = p_pDevice;
 	m_pDeviceContext = p_pDeviceContext;
 	m_pObserver = new Observer(this);

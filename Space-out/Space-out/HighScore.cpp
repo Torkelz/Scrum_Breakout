@@ -131,7 +131,6 @@ void HighScore::keyEvent(unsigned short key)
 	{
 		if(m_active)
 		{
-			m_pGame->setActive(true);
 			m_active = false;
 		}
 	}
@@ -228,5 +227,15 @@ bool HighScore::addHighScore(int p_score)
 
 void HighScore::writeHighScoreToFile(std::string p_fileName)
 {
-	//DO STUFF
+	std::ofstream file;
+	file.open(p_fileName, ios::trunc);
+
+	if(file)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			file << "s " + IntToString(m_scores[i].score) + "\n";
+			file << "n " + m_scores[i].name + "\n";
+		}
+	}
 }

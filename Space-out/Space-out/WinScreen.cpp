@@ -121,7 +121,6 @@ void WinScreen::keyEvent(unsigned short key)
 
 		if(key == 0x20) // SPACE
 		{
-			m_pGame->setActive(true);
 			m_active = false;
 		}
 	}
@@ -148,4 +147,9 @@ void WinScreen::setHighScore(HighScore* p_pHighScore)
 void WinScreen::setGame(Game* p_pGame)
 {
 	m_pGame = p_pGame;
+}
+
+void WinScreen::setMenu(Menu* p_pMenu)
+{
+	m_pMenu = p_pMenu;
 }

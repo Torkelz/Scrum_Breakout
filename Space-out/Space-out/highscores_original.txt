@@ -1,7 +1,5 @@
 s 100000
-n Andre
-s 100000
-n Mr.Nobody
+n God
 s 50300
 n Jesus
 s 10030
@@ -15,6 +13,8 @@ n Mattias
 s 666
 n Satan
 s 500
-n Unnamed
+n Unnamned
 s 100
-n Unnamed
+n Unnamned
+s 0
+n Andre

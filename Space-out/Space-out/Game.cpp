@@ -3,6 +3,7 @@
 #include "Pad.h"
 #include "Ball.h"
 #include "Block.h"
+#include "SceneInclude.h"
 
 Game::Game(){}
 Game::~Game(){}
@@ -259,7 +260,8 @@ void Game::update(float p_screenWidth, float p_dt)
 		// TEST LIVES
 		if (m_sDiffData.lives <= 0)
 		{
-			PostQuitMessage(0);
+			m_active = false;
+			m_deathScene->setActive(true);
 		}
 
 		int nrOfRemainingBlocks = 0;
@@ -269,7 +271,8 @@ void Game::update(float p_screenWidth, float p_dt)
 		}
 		if(nrOfRemainingBlocks <= 0)
 		{
-			PostQuitMessage(1);
+			m_active = false;
+			m_winScene->setActive(true);
 		}
 	}
 
@@ -559,4 +562,15 @@ int Game::getRemainingLives()
 int Game::getScore()
 {
 	return m_player.highscore;
+}
+
+
+void Game::setWinScreen(WinScreen* p_winScene)
+{
+	m_winScene = p_winScene;
+}
+
+void Game::setDeathScreen(DeathScreen* p_deathScene)
+{
+	m_deathScene = p_deathScene;
 }

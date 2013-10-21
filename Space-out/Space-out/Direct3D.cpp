@@ -404,13 +404,25 @@ void Direct3D::initApp()
 	m_deathScreen.init(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
 	m_HID.getObservable()->addSubscriber(m_deathScreen.getObserver());
 
+	// Send game to all scenes that need it
 	m_menu.setGame(&m_game);
 	m_highScore.setGame(&m_game);
+	m_deathScreen.setGame(&m_game);
+	m_winScreen.setGame(&m_game);
 
+	// Send highscore to all scenes that need it
 	m_menu.setHighScore(&m_highScore);
-	m_highScore.setMenu(&m_menu);
+	m_winScreen.setHighScore(&m_highScore);
+	m_deathScreen.setHighScore(&m_highScore);
 
-	m_highScore.addHighScore(100000);
+	// Send menu to all scenes that need it
+	m_highScore.setMenu(&m_menu);
+	m_winScreen.setMenu(&m_menu);
+	m_deathScreen.setMenu(&m_menu);
+
+	// Finally give game the scenes it needs
+	m_game.setWinScreen(&m_winScreen);
+	m_game.setDeathScreen(&m_deathScreen);
 }
 
 void Direct3D::onResize()
@@ -421,6 +433,14 @@ void Direct3D::onResize()
 void Direct3D::updateScene(float p_dt)
 {
 	D3DApp::updateScene(p_dt);
+
+	if(!m_game.active() && !m_menu.active() && !m_highScore.active()
+		 && !m_winScreen.active() && !m_deathScreen.active())
+	{	
+		m_game = Game();
+		m_game.init(m_pPUObserver, NORMAL);
+		m_game.setActive(true);
+	}
 
 	if(m_game.active())
 	{

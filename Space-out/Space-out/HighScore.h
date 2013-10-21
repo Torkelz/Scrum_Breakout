@@ -4,6 +4,7 @@
 #include "d3dUtil.h"
 #include <string>
 #include <sstream>
+#include <iostream>
 
 class D3DTextDevice;
 class Game;

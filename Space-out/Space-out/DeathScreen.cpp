@@ -13,7 +13,7 @@ DeathScreen::~DeathScreen(void){}
 
 void DeathScreen::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, HWND p_hwnd, int screenWidth, int screenHeight)
 {
-	m_active = true;
+	m_active = false;
 	m_pDevice = p_pDevice;
 	m_pDeviceContext = p_pDeviceContext;
 	m_pObserver = new Observer(this);
@@ -121,7 +121,6 @@ void DeathScreen::keyEvent(unsigned short key)
 
 		if(key == 0x20) // SPACE
 		{
-			m_pGame->setActive(true);
 			m_active = false;
 		}
 	}
@@ -148,4 +147,9 @@ void DeathScreen::setHighScore(HighScore* p_pHighScore)
 void DeathScreen::setGame(Game* p_pGame)
 {
 	m_pGame = p_pGame;
+}
+
+void DeathScreen::setMenu(Menu* p_pMenu)
+{
+	m_pMenu = p_pMenu;
 }

@@ -20,6 +20,8 @@
 using namespace glm;
 
 class Object;
+class WinScreen;
+class DeathScreen;
 
 enum DIFFICULTIES
 {
@@ -78,6 +80,8 @@ public:
 	void					setScreenBorders(vec4 p_screenBorder);
 	int						getRemainingLives();
 	int						getScore();
+	void					setWinScreen(WinScreen* p_winScene);
+	void					setDeathScreen(DeathScreen* p_deathScene);
 private:
 	void					loadSounds();
 	void					powerUpSpawn(vec3 pos);
@@ -115,6 +119,10 @@ private:
 
 	SInitDataDifficulties	m_sDiffData;
 	SPlayer					m_player;
+
+	// Scenes
+	WinScreen*				m_winScene;
+	DeathScreen*			m_deathScene;
 };
 
 #endif	GAME_H
