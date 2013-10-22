@@ -159,10 +159,12 @@ private:
 	ID3D11BlendState* m_pPowerBlend;
 
 	//Scene stuff
+	D3DTextDevice*	 m_pauseText;
 	D3DTextDevice*	 m_pTextDevice;
 	HighScore		 m_highScore;
 	Menu			 m_menu;
 	WinScreen		 m_winScreen;
 	DeathScreen		 m_deathScreen;
+	InstructionScreen m_instructionScreen;
 };
 #endif

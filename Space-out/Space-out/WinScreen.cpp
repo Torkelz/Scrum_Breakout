@@ -21,23 +21,22 @@ void WinScreen::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceCont
 
 	m_pTextDevice->Initialize(m_pDevice, m_pDeviceContext, p_hwnd, screenWidth, screenHeight);
 	
-	m_pTextDevice->addSentence("CONGRATULATIONS! YOU HAVE SAVED THE EARTH!", 0, m_pDevice, m_pDeviceContext);
-	m_pTextDevice->addSentence("YOUR SCORE WAS: ", 1, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("Congratulations! You have saved the Earth from the evil invaders!", 0, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("Your score was: ", 1, m_pDevice, m_pDeviceContext);
 	
-	m_pTextDevice->addSentence("PRESS SPACE TO START NEW GAME", 2, m_pDevice, m_pDeviceContext);
-	m_pTextDevice->addSentence("PRESS BACKSPACE TO RETURN TO MAIN MENU", 3, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("Press SPACE to try again", 2, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("Press BACKSPACE to return to the main menu", 3, m_pDevice, m_pDeviceContext);
 	m_pTextDevice->addSentence("PRESS H TO WATCH THE HIGHSCORE LIST", 4, m_pDevice, m_pDeviceContext);
-	update();
 }
 
 void WinScreen::update()
 {
-	m_pTextDevice->updateSentenceAt(0, "CONGRATULATIONS! YOU HAVE SAVED THE EARTH!", 250, 50, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
-	std::string message = "YOUR SCORE WAS: ";// + IntToString(m_pGame->getScore());
-	m_pTextDevice->updateSentenceAt(1, &message[0], 250, 50 + 20, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
-	m_pTextDevice->updateSentenceAt(2, "PRESS SPACE TO START NEW GAME", 250, 50 + 70, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
-	m_pTextDevice->updateSentenceAt(3, "PRESS BACKSPACE TO RETURN TO MAIN MENU", 250, 50 + 90, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
-	m_pTextDevice->updateSentenceAt(4, "PRESS H TO WATCH THE HIGHSCORE LIST", 250, 50 + 110, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(0, "Congratulations! You have saved the Earth from the evil invaders!", 245, 200, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
+	std::string message = "Your score was: ";// + IntToString(m_pGame->getScore());
+	m_pTextDevice->updateSentenceAt(1, &message[0], 330, 220, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(2, "Press SPACE to try again", 320, 280,  0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(3, "Press BACKSPACE to return to the main menu", 275, 300,  0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(4, "Press H to see if you managed to enter the high score list, Mr. Nobody", 235, 320,  0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
 }
 
 void WinScreen::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster)
@@ -54,73 +53,18 @@ void WinScreen::keyEvent(unsigned short key)
 			m_pHighScore->setActive(true);
 			m_active = false;
 		}
-		//if(key == 0x44) // D
-		//{
-		//	((Ball*)m_pBall)->setSpeed(vec3(50.0f, 0.0f, 0.0f) * 3.0f);
-		//}
-		//if(key == 0x57) // W
-		//{
-		//	((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f) * 3.0f);
-		//}
-		//if(key == 0x53) // S
-		//{
-		//	((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f) * 3.0f);
-		//}
-		//if(key == 0x45) // E
-		//{
-		//	if(!m_pCamera->isCinematic())
-		//	{
-		//		m_activePlayFieldNext--;
-		//		if(m_activePlayFieldNext < 0)
-		//			m_activePlayFieldNext = m_nrPlayFields - 1;
 
-		//		m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-		//								m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-		//								m_originWorld,
-		//								4);
-		//		m_pCamera->setYaw(m_activePlayFieldNext);
-		//		m_pCamera->startCinematic();
-		//	}
-		//}
-		//if(key == 0x51) // Q
-		//{
-		//	if(!m_pCamera->isCinematic())
-		//	{
-		//		m_activePlayFieldNext++;
-		//		if(m_activePlayFieldNext >= m_nrPlayFields)
-		//			m_activePlayFieldNext = 0;
-
-		//		m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-		//								m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-		//								m_originWorld,
-		//								4);
-		//		m_pCamera->setYaw(m_activePlayFieldNext);
-		//		m_pCamera->startCinematic();
-		//	}
-		//}
 		if(key == 0x1B) //ESC
 			PostQuitMessage(0);
 
-		//if(key == 0x52) // R
-		//{
-		//	PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-		//	powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-		//	m_pPUObservable->broadcastRebirth(powerUp);
-		//	m_powerUps.push_back(powerUp);
-		//}
-		//if( key == 0x46) // F
-		//{
-		//	//PUBiggerPad* powerUp = new PUBiggerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-		//	//powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-		//	//m_pPUObservable->broadcastRebirth(powerUp);
-		//	//m_powerUps.push_back(powerUp);
-		//}
-		//if(key == 0x4C) // L
-		//{
-		//}
-
 		if(key == 0x20) // SPACE
 		{
+			m_active = false;
+		}
+
+		if(key == 0x08) //BACKSPACE
+		{
+			m_pMenu->setActive(true);
 			m_active = false;
 		}
 	}

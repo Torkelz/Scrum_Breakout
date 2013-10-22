@@ -33,8 +33,8 @@ void HighScore::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceCont
 	{
 		m_pTextDevice->addSentence("", i, m_pDevice, m_pDeviceContext);
 	}
-	m_pTextDevice->addSentence("PRESS SPACE TO START NEW GAME", 11, m_pDevice, m_pDeviceContext);
-	m_pTextDevice->addSentence("PRESS BACKSPACE TO RETURN TO MAIN MENU", 12, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("Press SPACE to start a new game", 11, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("Press BACKSPACE to return to the main menu", 12, m_pDevice, m_pDeviceContext);
 	update();
 }
 
@@ -43,12 +43,12 @@ void HighScore::update()
 	for(int i = 1; i < 11; i++)
 	{
 		std::string message = m_scores[i - 1].name + ": " + IntToString(m_scores[i - 1].score);
-		m_pTextDevice->updateSentenceAt(i, &message[0], 270, 60 + m_spacing * i, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+		m_pTextDevice->updateSentenceAt(i, &message[0], 390, 60 + m_spacing * i, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
 	}
-	m_pTextDevice->updateSentenceAt(0, "HIGHSCORES", 250, 50, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(0, "HIGHSCORES", 360, 50, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
 
-	m_pTextDevice->updateSentenceAt(11, "PRESS SPACE TO START NEW GAME", 250, 70 + m_spacing * 11, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
-	m_pTextDevice->updateSentenceAt(12, "PRESS BACKSPACE TO RETURN TO MAIN MENU", 250, 70 + m_spacing * 12, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(11, "Press SPACE to start a new game", 320, 70 + m_spacing * 12, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(12, "Press BACKSPACE to return to the main menu", 300, 70 + m_spacing * 13, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
 }
 
 void HighScore::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster)
@@ -57,86 +57,17 @@ void HighScore::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerS
 }
 
 void HighScore::keyEvent(unsigned short key)
-{
-	//if(key == 0x41) // A
-	//{
-	//	((Ball*)m_pBall)->setSpeed(vec3(-50.0f, 0.0f, 0.0f) * 3.0f);
-	//}
-	//if(key == 0x44) // D
-	//{
-	//	((Ball*)m_pBall)->setSpeed(vec3(50.0f, 0.0f, 0.0f) * 3.0f);
-	//}
-	//if(key == 0x57) // W
-	//{
-	//	((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f) * 3.0f);
-	//}
-	//if(key == 0x53) // S
-	//{
-	//	((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f) * 3.0f);
-	//}
-	//if(key == 0x45) // E
-	//{
-	//	if(!m_pCamera->isCinematic())
-	//	{
-	//		m_activePlayFieldNext--;
-	//		if(m_activePlayFieldNext < 0)
-	//			m_activePlayFieldNext = m_nrPlayFields - 1;
-
-	//		m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-	//								m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-	//								m_originWorld,
-	//								4);
-	//		m_pCamera->setYaw(m_activePlayFieldNext);
-	//		m_pCamera->startCinematic();
-	//	}
-	//}
-	//if(key == 0x51) // Q
-	//{
-	//	if(!m_pCamera->isCinematic())
-	//	{
-	//		m_activePlayFieldNext++;
-	//		if(m_activePlayFieldNext >= m_nrPlayFields)
-	//			m_activePlayFieldNext = 0;
-
-	//		m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-	//								m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-	//								m_originWorld,
-	//								4);
-	//		m_pCamera->setYaw(m_activePlayFieldNext);
-	//		m_pCamera->startCinematic();
-	//	}
-	//}
-	if(key == 0x1B) //ESC
-		PostQuitMessage(0);
-
-	//if(key == 0x52) // R
-	//{
-	//	PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-	//	powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-	//	m_pPUObservable->broadcastRebirth(powerUp);
-	//	m_powerUps.push_back(powerUp);
-	//}
-	//if( key == 0x46) // F
-	//{
-	//	//PUBiggerPad* powerUp = new PUBiggerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-	//	//powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-	//	//m_pPUObservable->broadcastRebirth(powerUp);
-	//	//m_powerUps.push_back(powerUp);
-	//}
-	//if(key == 0x4C) // L
-	//{
-	//}
-
-	if(key == 0x20) // SPACE
+{	
+	if(m_active)
 	{
-		if(m_active)
+		if(key == 0x1B) //ESC
+			PostQuitMessage(0);
+
+		if(key == 0x20) // SPACE
 		{
 			m_active = false;
 		}
-	}
-	if(key == 0x08) //BACKSPACE
-	{
-		if(m_active)
+		if(key == 0x08) //BACKSPACE
 		{
 			m_pMenu->setActive(true);
 			m_active = false;

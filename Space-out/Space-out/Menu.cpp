@@ -3,6 +3,7 @@
 #include "D3DTextDevice.h"
 #include "Game.h"
 #include "HighScore.h"
+#include "InstructionScreen.h"
 
 Menu::Menu() : Scene()
 {}
@@ -19,13 +20,19 @@ void Menu::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, 
 
 	m_pTextDevice->Initialize(m_pDevice, m_pDeviceContext, p_hwnd, screenWidth, screenHeight);
 	
-	m_pTextDevice->addSentence("PRESS SPACE TO START NEW GAME", 0, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("Press SPACE to start a new game", 0, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("Press H to look at the high score list", 1, m_pDevice, m_pDeviceContext);
+	m_pTextDevice->addSentence("Press I for control information", 2, m_pDevice, m_pDeviceContext);
+	//m_pTextDevice->addSentence("Press C to see credits", 3, m_pDevice, m_pDeviceContext);
 	update();
 }
 
 void Menu::update()
 {
-	m_pTextDevice->updateSentenceAt(0, "PRESS SPACE TO START NEW GAME", 50, 50, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(0, "Press SPACE to start a new game", 302, 240, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(1, "Press H to look at the high score list", 300, 270, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
+	m_pTextDevice->updateSentenceAt(2, "Press I for control information", 315, 300, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
+	//m_pTextDevice->updateSentenceAt(3, "Press C to see credits", 330, 330, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
 }
 
 void Menu::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster)
@@ -37,79 +44,24 @@ void Menu::keyEvent(unsigned short key)
 {	
 	if(m_active)
 	{
-		if(key == 0x41) // A
-		{
-			m_pHighScore->setActive(true);
-			m_active = false;
-		}
-		//if(key == 0x44) // D
-		//{
-		//	((Ball*)m_pBall)->setSpeed(vec3(50.0f, 0.0f, 0.0f) * 3.0f);
-		//}
-		//if(key == 0x57) // W
-		//{
-		//	((Ball*)m_pBall)->setSpeed(vec3(0.0f, -50.0f, 0.0f) * 3.0f);
-		//}
-		//if(key == 0x53) // S
-		//{
-		//	((Ball*)m_pBall)->setSpeed(vec3(0.0f, 50.0f, 0.0f) * 3.0f);
-		//}
-		//if(key == 0x45) // E
-		//{
-		//	if(!m_pCamera->isCinematic())
-		//	{
-		//		m_activePlayFieldNext--;
-		//		if(m_activePlayFieldNext < 0)
-		//			m_activePlayFieldNext = m_nrPlayFields - 1;
-
-		//		m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-		//								m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-		//								m_originWorld,
-		//								4);
-		//		m_pCamera->setYaw(m_activePlayFieldNext);
-		//		m_pCamera->startCinematic();
-		//	}
-		//}
-		//if(key == 0x51) // Q
-		//{
-		//	if(!m_pCamera->isCinematic())
-		//	{
-		//		m_activePlayFieldNext++;
-		//		if(m_activePlayFieldNext >= m_nrPlayFields)
-		//			m_activePlayFieldNext = 0;
-
-		//		m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-		//								m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-		//								m_originWorld,
-		//								4);
-		//		m_pCamera->setYaw(m_activePlayFieldNext);
-		//		m_pCamera->startCinematic();
-		//	}
-		//}
 		if(key == 0x1B) //ESC
 			PostQuitMessage(0);
-
-		//if(key == 0x52) // R
-		//{
-		//	PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-		//	powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-		//	m_pPUObservable->broadcastRebirth(powerUp);
-		//	m_powerUps.push_back(powerUp);
-		//}
-		//if( key == 0x46) // F
-		//{
-		//	//PUBiggerPad* powerUp = new PUBiggerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-		//	//powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-		//	//m_pPUObservable->broadcastRebirth(powerUp);
-		//	//m_powerUps.push_back(powerUp);
-		//}
-		//if(key == 0x4C) // L
-		//{
-		//}
 
 		if(key == 0x20) // SPACE
 		{
 			m_pGame->setActive(true);
+			m_active = false;
+		}
+
+		if(key == 0x48) // H
+		{
+			m_pHighScore->setActive(true);
+			m_active = false;
+		}
+
+		if(key == 0x49) // I
+		{
+			m_pInstruction->setActive(true);
 			m_active = false;
 		}
 	}
@@ -136,4 +88,9 @@ void Menu::setHighScore(HighScore* p_pHighScore)
 void Menu::setGame(Game* p_pGame)
 {
 	m_pGame = p_pGame;
+}
+
+void Menu::setInstruction(InstructionScreen* p_pInstr)
+{
+	m_pInstruction = p_pInstr;
 }

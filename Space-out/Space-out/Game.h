@@ -82,6 +82,7 @@ public:
 	int						getScore();
 	void					setWinScreen(WinScreen* p_winScene);
 	void					setDeathScreen(DeathScreen* p_deathScene);
+	bool					paused();
 private:
 	void					loadSounds();
 	void					powerUpSpawn(vec3 pos);
@@ -121,6 +122,7 @@ private:
 	SPlayer					m_player;
 
 	// Scenes
+	bool					m_paused;
 	WinScreen*				m_winScene;
 	DeathScreen*			m_deathScene;
 };

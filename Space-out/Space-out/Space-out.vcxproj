@@ -115,6 +115,7 @@
     <ClCompile Include="Difficulties.cpp" />
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="HighScore.cpp" />
+    <ClCompile Include="InstructionScreen.cpp" />
     <ClCompile Include="LevelGenerator.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Object.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="FSound.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="HighScore.h" />
+    <ClInclude Include="InstructionScreen.h" />
     <ClInclude Include="LevelGenerator.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Object.h" />

@@ -53,7 +53,6 @@ void Direct3D::initApp()
 	m_pPUObserver		= new PUObserver(this);
 	m_game = Game();
 	m_game.init(m_pPUObserver, NORMAL);
-	
 
 	m_pCamera = m_game.getCamera();
 	m_pCamera->createOrthoMatrix((float)m_ClientWidth,(float)m_ClientHeight,1.0f, 500.0f);
@@ -387,6 +386,11 @@ void Direct3D::initApp()
 	std::string message2 = "Score: " + IntToString(m_game.getScore());
 	m_pTextDevice->addSentence(&message2[0], 1, m_pDevice, m_pDeviceContext);
 
+	m_pauseText = new D3DTextDevice();
+	m_pauseText->Initialize(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
+	std::string pauseMessage = "PAUSED";
+	m_pauseText->addSentence(&pauseMessage[0], 0, m_pDevice, m_pDeviceContext);
+
 	//## SCENES ##
 	m_menu = Menu();
 	m_menu.init(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
@@ -404,6 +408,10 @@ void Direct3D::initApp()
 	m_deathScreen.init(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
 	m_HID.getObservable()->addSubscriber(m_deathScreen.getObserver());
 
+	m_instructionScreen = InstructionScreen();
+	m_instructionScreen.init(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600);
+	m_HID.getObservable()->addSubscriber(m_instructionScreen.getObserver());
+
 	// Send game to all scenes that need it
 	m_menu.setGame(&m_game);
 	m_highScore.setGame(&m_game);
@@ -419,10 +427,13 @@ void Direct3D::initApp()
 	m_highScore.setMenu(&m_menu);
 	m_winScreen.setMenu(&m_menu);
 	m_deathScreen.setMenu(&m_menu);
+	m_instructionScreen.setMenu(&m_menu);
 
 	// Finally give game the scenes it needs
 	m_game.setWinScreen(&m_winScreen);
 	m_game.setDeathScreen(&m_deathScreen);
+
+	m_menu.setInstruction(&m_instructionScreen);
 }
 
 void Direct3D::onResize()
@@ -435,11 +446,40 @@ void Direct3D::updateScene(float p_dt)
 	D3DApp::updateScene(p_dt);
 
 	if(!m_game.active() && !m_menu.active() && !m_highScore.active()
-		 && !m_winScreen.active() && !m_deathScreen.active())
+		&& !m_winScreen.active() && !m_deathScreen.active() 
+		&& !m_instructionScreen.active() )
 	{	
-		m_game = Game();
+		for(int i = 0; i < 4; i++)
+			m_blockBuffers[i]	= Buffer();
+		//m_game = Game();
 		m_game.init(m_pPUObserver, NORMAL);
 		m_game.setActive(true);
+
+		RECT r;
+		GetClientRect(m_hMainWnd, &r);
+		vec2 playFieldScreen;
+		playFieldScreen.x = (m_game.getActiveField()->getScreenPosition(XMMatrixTomat4(&(m_camView*m_camProjection))).x + 1)/2 * r.right;
+		((Pad*)(m_game.getPad()))->setMouseOffset(m_game.getActiveField()->getSize().x / r.right);
+
+		m_game.setScreenBorders(vec4(r.top,r.right,r.left,r.bottom));
+
+		for(int i = 0; i < 4; i++)
+		{
+			BufferInitDesc blockBufferDesc;
+			blockBufferDesc.elementSize		= sizeof(BlockVertex);
+			blockBufferDesc.initData		= m_game.getField(i)->getBufferData();
+			blockBufferDesc.numElements		= m_game.getField(i)->getListSize();
+			blockBufferDesc.type			= VERTEX_BUFFER;
+			blockBufferDesc.usage			= BUFFER_CPU_WRITE_DISCARD;
+
+			m_blockBuffers[i].init(m_pDevice, m_pDeviceContext, blockBufferDesc);
+		}
+
+		//## PLAYFIELD FINAL SETUP ##
+		for (int i = 0; i  < 4; i ++)
+		{
+			m_game.getField(i)->transBorders(i % 2);
+		}
 	}
 
 	if(m_game.active())
@@ -493,6 +533,9 @@ void Direct3D::updateScene(float p_dt)
 		m_pTextDevice->updateSentenceAt(0, &message[0], 50, 150, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
 		std::string message2 = "Score: " + IntToString(m_game.getScore());
 		m_pTextDevice->updateSentenceAt(1, &message2[0], 50, 100, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
+
+		std::string pauseMessage = "PAUSED";
+		m_pauseText->updateSentenceAt(0, &pauseMessage[0], 370, 300, 0.0f, 1.0f, 0.0f, m_pDeviceContext);
 	}
 
 	if(m_menu.active())
@@ -525,6 +568,14 @@ void Direct3D::updateScene(float p_dt)
 	if(m_deathScreen.active())
 	{
 		m_deathScreen.update();
+		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrixSpecYaw(PI/2));
+		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
+		m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
+	}
+
+	if(m_instructionScreen.active())
+	{
+		m_instructionScreen.update();
 		m_camView = mat4ToXMMatrix(m_pCamera->getViewMatrixSpecYaw(PI/2));
 		m_camProjection = mat4ToXMMatrix(m_pCamera->getProjectionMatrix());
 		m_camPosition = vec3ToXMVector(m_pCamera->getPosition());
@@ -584,6 +635,8 @@ void Direct3D::drawScene()
 		XMMATRIX orthoMatrix;
 		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
 		m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
+		if(m_game.paused())
+			m_pauseText->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
 		//## DRAW TEXT END ##
 	
 		//## PAD DRAW START ##
@@ -788,6 +841,39 @@ void Direct3D::drawScene()
 		XMMATRIX orthoMatrix;
 		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
 		m_deathScreen.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
+
+		// CURRENTLY BROKEN
+		// SKYBOX DRAW
+
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		vec3 camppos = m_game.getCamera()->getPosition();
+
+		m_cbBall.eyePosW = vec3ToXMVector(camppos);
+		m_cbBall.viewProj = XMMatrixTranspose(m_camView * m_camProjection);
+		m_cbBall.translation = XMMatrixTranspose(XMMatrixTranslation(camppos.x, camppos.y, camppos.z));
+		m_constantBallBuffer.apply(0);
+
+		m_pDeviceContext->UpdateSubresource(m_constantBallBuffer.getBufferPointer(), 0, NULL, &m_cbBall, 0, 0);
+	
+		m_skyBoxVbuffer->apply();
+		m_skyBoxIbuffer->apply();
+
+		m_skyBoxShader.setShaders();
+		m_skyBoxShader.setResource(PIXEL_SHADER, 0, 1, m_skysrv);
+		m_skyBoxShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pSkySampler);
+		m_pDeviceContext->RSSetState(m_pRasterState);
+	
+		m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
+		m_pDeviceContext->RSSetState(NULL);
+		//SKYBOX DRAW END
+	}
+
+	if(m_instructionScreen.active())
+	{
+		XMMATRIX orthoMatrix;
+		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+		m_instructionScreen.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
 
 		// CURRENTLY BROKEN
 		// SKYBOX DRAW

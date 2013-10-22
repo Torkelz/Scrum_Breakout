@@ -4,17 +4,15 @@
 #include "d3dUtil.h"
 
 class D3DTextDevice;
-class Game;
-class HighScore;
-class InstructionScreen;
+class Menu;
 
 using namespace DirectX;
 
-class Menu : public Scene
+class InstructionScreen : public Scene
 {
 public:
-	Menu();
-	~Menu(void);
+	InstructionScreen();
+	~InstructionScreen(void);
 
 	void init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceContext, HWND p_hwnd, int screenWidth, int screenHeight);
 	void update();
@@ -27,9 +25,7 @@ public:
 	Observer*				getObserver();
 
 	// Set pointers to scenes in Direct3D.
-	void setHighScore(HighScore* p_pHighScore);
-	void setGame(Game* p_pGame);
-	void setInstruction(InstructionScreen* p_pInstr);
+	void setMenu(Menu* p_pMenu);
 
 private:
 	ID3D11Device*			m_pDevice;
@@ -37,8 +33,6 @@ private:
 	D3DTextDevice*			m_pTextDevice;
 
 	// Pointers to scenes in Direct3D.
-	Game*					m_pGame;
-	HighScore*				m_pHighScore;
-	InstructionScreen*		m_pInstruction;
+	Menu*					m_pMenu;
 };
 
