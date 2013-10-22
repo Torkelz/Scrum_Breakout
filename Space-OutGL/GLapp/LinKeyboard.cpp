@@ -22,6 +22,18 @@ unsigned short Keyboard::KeyDown(unsigned short p_key)
 	case GLFW_KEY_D:
 		ushort = 0x44;
 		break;
+	case GLFW_KEY_W:
+		ushort = 0x57;
+		break;
+	case GLFW_KEY_S:
+		ushort = 0x53;
+		break;
+	case GLFW_KEY_Q:
+		ushort = 0x51;
+		break;
+	case GLFW_KEY_E:
+		ushort = 0x45;
+		break;
 	case GLFW_KEY_SPACE:
 		ushort = 0x20;
 		break;

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item value="277" key="DIALOG_WIDTH"/>
+		<item value="283" key="DIALOG_WIDTH"/>
 		<item value="249" key="DIALOG_Y_ORIGIN"/>
 		<item value="1427" key="DIALOG_X_ORIGIN"/>
-		<item value="417" key="DIALOG_HEIGHT"/>
+		<item value="419" key="DIALOG_HEIGHT"/>
 		<item value="1|Sans|9.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
@@ -13,18 +13,20 @@
 		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="glGet" key="selection"/>
+		<item value="setMouseOffset" key="selection"/>
 		<list key="findhistory">
-			<item value="glget"/>
-			<item value="p_mouse_x"/>
-			<item value="m"/>
-			<item value="m.m"/>
-			<item value="World"/>
-			<item value="coldesc"/>
-			<item value="m_pProgram"/>
-			<item value="std::string VertexShaderCode;"/>
+			<item value="setMouseOffset"/>
+			<item value="m_mouseOffset"/>
+			<item value="m_pPad"/>
+			<item value="m_uniBuffer"/>
+			<item value="colValue"/>
+			<item value="m_pTexBlock"/>
+			<item value="m_pTexTest"/>
+			<item value="m_ballBuffer"/>
 		</list>
 		<list key="replacehistory">
+			<item value="m_uniBlockBuffer"/>
+			<item value="m_pTexBlock"/>
 			<item value="view"/>
 			<item value="World"/>
 			<item value="ry"/>

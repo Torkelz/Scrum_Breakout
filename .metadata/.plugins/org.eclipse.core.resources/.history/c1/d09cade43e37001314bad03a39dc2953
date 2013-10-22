@@ -1,0 +1,244 @@
+#include "Header/OpenGL.h"
+#include "glm/gtc/matrix_transform.hpp"
+
+struct vertexColor
+{
+	//vec4 pos;
+	//vec4 tex;
+	mat4 proj;
+	//0.78f, 0.651f, 0.8f
+};
+vertexColor col[1];
+float colValue;
+
+int main(void)
+{
+	OpenGL theApp;
+	theApp.initApp();
+    return theApp.run();
+}
+
+OpenGL::OpenGL() : GLApp()
+{
+	m_pCamera = 0;
+	m_keyValue = 0x00;
+	m_pHID = 0;
+	m_ratio = 0;
+	m_rotation = 0;
+	m_pTexTest = NULL;
+	m_pTexture = 0;
+	m_scale = 1.f;
+	m_game = NULL;
+}
+
+OpenGL::~OpenGL()
+{
+	m_blockBuffer[0].~Buffer();
+	m_blockBuffer[1].~Buffer();
+	m_blockBuffer[2].~Buffer();
+	m_blockBuffer[3].~Buffer();
+	m_uniBuffer.~Buffer();
+	m_triShader.~Shader();
+}
+
+void OpenGL::initApp()
+{
+	GLApp::initApp();
+	m_pTexTest->init();
+//	col[0].pos = vec4(0.0f, 0.0f, 0.f,1.0f); //Uniform performs a padding on the buffer that can make
+//	col[0].tex = vec4(0.f, 0.f, 0.f, 0.f);   //the result look really odd. Always use vec4 or mat4x4;
+	m_pTexTest->createTexture("./GLapp/Textures/i.jpg", m_pTexture);
+	m_scale = 0;
+	m_game = Game(m_hMainWnd);
+	m_game.init();
+	m_pCamera = m_game.getCamera();
+
+	bool returnValue;
+	//##BLOCKSTART##//
+	for(int i = 0; i < 4; i++)
+	{
+		BufferInputDesc* blockBufferDesc = new BufferInputDesc[1];
+		blockBufferDesc->size		= 3;
+		blockBufferDesc->type		= GL_FLOAT;
+		blockBufferDesc->normalized	= GL_FALSE;
+		blockBufferDesc->pointer	= sizeof(vec3);
+
+		returnValue = m_blockBuffer[i].init(GL_ARRAY_BUFFER, m_game.getField(i)->getBufferData(), sizeof(BlockVertex), m_game.getField(i)->getListSize(), GL_STATIC_DRAW, blockBufferDesc, 1);
+		if(!returnValue)
+		{
+			glfwSetWindowShouldClose(m_hMainWnd,1);
+		}
+	}
+
+	//m_blockTexture = D3DTexture(m_pDevice, m_pDeviceContext);
+	//m_blockTexture.createTexture(m_game.getActiveField()->getBlock(0)->getTexturePath(),  0);
+	// ##BLOCK END ## //
+
+//	BufferInputDesc* desc = new BufferInputDesc[1];
+//	desc->size = 3;
+//	desc->type = GL_FLOAT;
+//	desc->normalized = GL_FALSE;
+//	desc->pointer = sizeof(vec3);
+
+	// ##PAD START## //
+	//unsigned int const nrVertices = 4;
+	//Vertex data[nrVertices];
+	// ##PAD END## //
+	// ##BALL START## //
+	vec3 tempVec = vec3(0.f,0.f,0.f);
+	BufferInputDesc* ballBufferDesc = new BufferInputDesc[1];
+	ballBufferDesc->size = 3;
+	ballBufferDesc->type = GL_ARRAY_BUFFER;
+	ballBufferDesc->normalized = GL_FALSE;
+	ballBufferDesc->pointer = sizeof(vec3);
+
+	returnValue = m_ballBuffer.init(GL_ARRAY_BUFFER, tempVec, sizeof(vec3), 1, GL_STATIC_DRAW, ballBufferDesc, 1);
+	// ##BALL END## //
+
+	returnValue =	m_uniBuffer.init(GL_UNIFORM_BUFFER, col, sizeof(vertexColor), 1, GL_DYNAMIC_DRAW, NULL, 0);
+	if(!returnValue)
+		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+
+	GLuint bindingPoint = 0; // Different data to be sent need to be different bindingPoint
+
+	m_triShader.init();
+
+	returnValue = m_triShader.createAndCompile(VERTEX_SHADER, "GLUtility/GLSL/triVertex.glsl");
+	if(!returnValue)
+				glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+
+	returnValue = m_triShader.createAndCompile(GEOMETRY_SHADER, "GLUtility/GLSL/triGeometry.glsl");
+	if(!returnValue)
+				glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+
+	returnValue = m_triShader.createAndCompile(FRAGMENT_SHADER, "GLUtility/GLSL/triFragment.glsl");
+	if(!returnValue)
+				glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+	m_triShader.attachAndLink();
+
+
+	// Fetch bindingPoint for uniform buffering.
+	m_triShader.uniformBlockBinding(bindingPoint, "ColorBlock");
+	// Bind the bindingPoint to the right buffer.
+	m_uniBuffer.bindBufferBase(bindingPoint);
+
+	//m_pGame = new Game();
+	//m_pGame->init();
+
+	m_pHID = new HID(m_hMainWnd);
+
+//	glfwSetCursorPos(m_hMainWnd, 1024/2, 768/2);
+//	GLint texUnitLoc = glGetUniformLocation(m_triShader.getProgram(),(char*)("textest"));
+	m_pTexTest->bindTextureResource(m_triShader.getProgram(), (char*)("texUnit"), m_pTexture);
+	m_pHID->getObservable()->addSubscriber(m_game.getObserver());
+}
+
+void OpenGL::updateScene(float p_dt)
+{
+	GLApp::updateScene(p_dt);
+	m_game.update(800, p_dt);
+	int width, height;
+	glfwGetFramebufferSize(m_hMainWnd, &width, &height);
+	m_ratio = width / (float) height;
+	glViewport(0, 0, width, height);
+	m_rotation += p_dt;
+	updateFPSCounter();
+	generatingKeyValue();
+}
+
+void OpenGL::drawScene()
+{
+	GLApp::drawScene();
+
+	m_triShader.apply();
+
+	m_scale += 0.01f;
+
+	col[0].proj = m_pCamera->getProjectionMatrix() * m_pCamera->getViewMatrix();
+
+	//Update buffer here!
+
+	m_uniBuffer.setSubData(0, sizeof(col), col);
+
+	// stop updating here!
+	glDisable(GL_CULL_FACE);
+	for(int i = 0; i < 4; i++)
+	{
+		m_blockBuffer[i].apply();
+	// Draw the triangle !
+		glDrawArrays(GL_POINTS, 0, m_game.getField(i)->getListSize()); // Starting from vertex 0; 3 vertices total -> 1 triangle
+		m_blockBuffer[i].deApply();
+	}
+	m_uniBuffer.deApply();
+}
+
+void  OpenGL::messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods)
+{
+	if(p_action == GLFW_PRESS){
+		keyValueStatic = p_key;
+
+	}
+	else
+		keyValueStatic = 0x00;
+}
+
+//void OpenGL::mousePosCallback(GLFWwindow* p_pMainWnd, double p_mouse_x, double p_mouse_y)
+//{
+//	mouseStatic_x = p_mouse_x;
+//	mouseStatic_y = p_mouse_y;
+//}
+
+void OpenGL::updateFPSCounter()
+{
+	 static double previous_seconds = glfwGetTime ();
+	 static int frame_count;
+	 double current_seconds = glfwGetTime ();
+	 double elapsed_seconds = current_seconds - previous_seconds;
+	 if (elapsed_seconds > 0.25)
+	 {
+		 previous_seconds = current_seconds;
+		 double fps = (double)frame_count / elapsed_seconds;
+		 char tmp[128];
+	     sprintf (tmp, " @ fps: %.2lf", fps);
+	     string strTemp = m_MainWndTitle;
+	     strTemp.append(tmp);
+	     glfwSetWindowTitle (m_hMainWnd, strTemp.c_str());
+	     frame_count = 0;
+	 }
+	 frame_count++;
+}
+
+void OpenGL::generatingKeyValue()
+{
+	switch(keyValueStatic)
+	{
+	case GLFW_KEY_A:
+		m_keyValue = GLFW_KEY_A;
+		break;
+	case GLFW_KEY_D:
+		m_keyValue = GLFW_KEY_D;
+		break;
+	case GLFW_KEY_Q:
+			m_keyValue = GLFW_KEY_Q;
+			break;
+	case GLFW_KEY_E:
+			m_keyValue = GLFW_KEY_E;
+			break;
+	case GLFW_KEY_SPACE:
+		m_keyValue = GLFW_KEY_SPACE;
+		break;
+	case GLFW_KEY_LEFT:
+		m_keyValue = GLFW_KEY_LEFT;
+		break;
+	case GLFW_KEY_RIGHT:
+		m_keyValue = GLFW_KEY_RIGHT;
+		break;
+	case GLFW_KEY_ESCAPE:
+		m_keyValue = GLFW_KEY_ESCAPE;
+		break;
+	default:
+		m_keyValue = 0x00;
+		break;
+	}
+	m_pHID->update(m_keyValue);
+}

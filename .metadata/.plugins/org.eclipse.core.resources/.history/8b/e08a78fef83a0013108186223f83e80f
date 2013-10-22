@@ -1,0 +1,13 @@
+#version 400
+
+uniform sampler2D texUnit;
+
+
+out vec4 fragColor;
+
+void main()
+{
+	fragColor = vec4(1,0,0,1);//texture(texUnit, gl_texCoord[0].st);
+}
+
+//http://www.lighthouse3d.com/tutorials/glsl-core-tutorial/glsl-core-tutorial-texturing-with-images/

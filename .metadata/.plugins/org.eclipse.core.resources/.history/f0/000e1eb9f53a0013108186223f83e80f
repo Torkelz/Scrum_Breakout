@@ -1,0 +1,46 @@
+#version 400
+
+layout (points) in;
+layout (triangle_strip, max_vertices = 4) out;
+
+out vec2 texCoord;
+
+uniform uniBall
+{
+	mat4 uniTrans;
+	mat4 projView;
+	vec3 eyePos;
+	vec2 size;
+};
+
+void main()
+{
+	vec3 Pos = gl_in[0].gl_Position.xyz;
+	
+	vec3 toCamera = normalize(eyePos - Pos);
+	vec3 up = vec3(0.0f, 1.0f, 0.0f);
+	vec3 right = cross(toCamera, up);
+	
+	Pos -= (right * 0.5f);
+    gl_Position = projView * vec4(Pos, 1.0f);
+    texCoord = vec2(0.0f, 0.0f);
+    EmitVertex();
+
+    Pos.y += size.y;
+    gl_Position = projView * vec4(Pos, 1.0f);
+    texCoord = vec2(0.0f, 1.0f);
+    EmitVertex();
+
+    Pos.y -= size.y;
+    Pos += right*size.x;
+    gl_Position = projView * vec4(Pos, 1.0f);
+    texCoord = vec2(1.0f, 0.0f);
+    EmitVertex();
+
+    Pos.y += size.y;
+    gl_Position = projView * vec4(Pos, 1.0f);
+    texCoord = vec2(1.0f, 1.0f);
+    EmitVertex();
+
+    EndPrimitive();
+}

@@ -1,0 +1,10 @@
+#version 400
+in vec2 texCoord;
+out vec4 fragColor;
+
+uniform sampler2D texPad;
+
+void main()
+{
+	fragColor = vec4(1,0,0,1);//texture2D(texPad,texCoord);
+}

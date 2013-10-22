@@ -10,8 +10,8 @@ GLApp::GLApp()
 	m_resizing   = false;
 
 	m_MainWndTitle = "Space-out";
-	m_ClientWidth    = 1024;
-	m_ClientHeight   = 768;
+	m_ClientWidth    = 800;
+	m_ClientHeight   = 600;
 }
 GLApp::~GLApp()
 {
@@ -86,6 +86,9 @@ void GLApp::drawScene()
 {
 	/* Swap front and back buffers */
 	glfwSwapBuffers(m_hMainWnd);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.0f, 1.0f, 0.5f);
 

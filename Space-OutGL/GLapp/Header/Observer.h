@@ -6,12 +6,12 @@
 
 using namespace glm;
 
-//class Game;
+class Game;
 
 class Observer
 {
 public:
-	//Observer(Game* p_pGame);
+	Observer(Game* p_pGame);
 	
 	void		broadcastLeftClick( vec2 p_mousePosition );
 	void		broadcastRightClick( vec2 p_mousePosition );
@@ -23,7 +23,7 @@ public:
 private:
 	int			m_index;
 protected:
-	//Game*		m_pGame;
+	Game*		m_pGame;
 };
 
 #endif

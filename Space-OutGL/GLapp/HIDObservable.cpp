@@ -5,29 +5,6 @@
 HIDObservable::HIDObservable(){}
 HIDObservable::~HIDObservable(){}
 
-void HIDObservable::broadcastLeftClick( vec2 p_mousePosition )
-{
-	for ( unsigned int i = 0; i < m_subscribers.size(); i++ )
-	{
-		m_subscribers.at(i)->broadcastLeftClick( p_mousePosition );
-	}
-}
-void HIDObservable::broadcastRightClick( vec2 p_mousePosition )
-{
-	for ( unsigned int i = 0; i < m_subscribers.size(); i++ )
-	{
-		m_subscribers.at(i)->broadcastRightClick( p_mousePosition );
-	}
-}
-
-void HIDObservable::broadcastMousePos( vec2 p_mousePosition )
-{
-	for ( unsigned int i = 0; i < m_subscribers.size(); i++ )
-	{
-		m_subscribers.at(i)->broadcastMousePos( p_mousePosition );
-	}
-}
-
 void HIDObservable::broadcastKeyPress( unsigned short p_key )
 {
 	for ( unsigned int i = 0; i < m_subscribers.size(); i++ )
@@ -51,5 +28,4 @@ void HIDObservable::removeSubscriber( Observer* p_pObserver )
 			break;
 		}
 	}
-	//m_subscribers.shrink_to_fit(); // WILL PROBABLY NOT BE NEEDED
 }

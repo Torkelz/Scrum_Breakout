@@ -1,0 +1,67 @@
+#version 400
+
+layout (points) in;
+layout (triangle_strip, max_vertices = 4) out;
+out vec2 texCoord;
+
+uniform uniBall
+{
+	mat4 uniTrans;
+	mat4 projView;
+	vec3 eyePos;
+	vec2 size;
+};
+
+void main()
+{
+	vec3 t_pos;
+	t_pos = gl_in[0].gl_Position.xyz;
+	
+	/*
+	t_pos.x = gl_in[0].gl_Position.x;
+	t_pos.y = gl_in[0].gl_Position.y;
+	t_pos.z = gl_in[0].gl_Position.z;
+	*/
+	
+	vec3 look = normalize(eyePos.xyz - t_pos);
+	vec3 right = normalize(cross(vec3(0,1,0), look));
+	vec3 up = vec3( 0.0f, 1.0f, 0.0f ); // to make the particles turn around the y-axis
+	
+	mat4x4 world;
+	world[0] = vec4(right, 0.0f);
+	world[1] = vec4(up, 0.0f);
+	world[2] = vec4(look, 0.0f);
+	world[3] = vec4(t_pos, 1.0f);
+
+	mat4x4 PVW = uniTrans * world ; //Might need to switch order on mul
+	PVW = projView * PVW;
+
+    float halfsize = size.x * 0.5;
+	
+
+    // Vertex 1
+    texCoord = vec2(-1.0,-1.0);
+    gl_Position.xy += vec2(-halfsize, -halfsize);
+    gl_Position = t_pos *PVW;
+    EmitVertex();
+
+    // Vertex 2
+    texCoord = vec2(-1.0,1.0);
+    gl_Position.xy += vec2(-halfsize, halfsize);
+    gl_Position = t_pos * PVW ;
+    EmitVertex();
+
+    // Vertex 3
+    texCoord = vec2(1.0,-1.0);
+    gl_Position.xy += vec2(halfsize, -halfsize);
+    gl_Position = t_pos *PVW;
+    EmitVertex();
+
+    // Vertex 4
+    texCoord = vec2(1.0,1.0);
+    gl_Position.xy += vec2(halfsize, halfsize);
+    gl_Position = t_pos *PVW;
+    EmitVertex();
+
+    EndPrimitive();
+}

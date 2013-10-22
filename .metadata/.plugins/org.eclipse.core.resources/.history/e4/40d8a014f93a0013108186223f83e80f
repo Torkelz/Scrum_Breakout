@@ -1,0 +1,79 @@
+#ifndef OPENGL_H_
+#define OPENGL_H_
+
+#include "GLApp.h"
+#include "LinHid.h"
+#include "Game.h"
+#include "GLTexture.h"
+#include "../../GLUtility/Header/Buffer.h"
+#include "../../GLUtility/Header/Shader.h"
+#include "Camera.h"
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct vertexColor
+{
+	//vec4 pos;
+	//vec4 tex;
+	mat4 proj;
+	//0.78f, 0.651f, 0.8f
+};
+
+struct SuniBall
+{
+	mat4 Trans;
+	mat4 projView;
+	vec4 eyepos;
+	vec4 size;
+};
+
+
+static int keyValueStatic;
+
+
+class OpenGL : public GLApp{
+	public:
+	OpenGL();
+	~OpenGL();
+
+	void 			initApp();
+	void 			updateScene(float p_dt);
+	void 			drawScene();
+	void			generatingKeyValue();
+	void			copyMousePos();
+	static void 	messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods);
+
+private:
+	void			updateFPSCounter();
+
+private:
+	vertexColor m_col[1];
+	SuniBall m_uniBall[1];
+	float colValue;
+	mat4x4 			m_camView;
+	float			m_rotation;
+	float			m_ratio;
+	Buffer			m_uniBuffer;
+	Shader			m_triShader;
+	HID*			m_pHID;
+	Game			m_game;
+	int 			m_keyValue;
+	GLTexture*		m_pTexBlock;
+	GLuint			m_pBlockPic;
+
+	Camera*         m_pCamera;
+	float m_scale;
+	Buffer			m_blockBuffer[4];
+
+	//BALL
+	Buffer			m_ballBuffer;
+	Buffer			m_uniBallbuffer;
+	Shader			m_ballShader;
+	GLTexture*		m_pTexBall;
+	GLuint			m_pBallPic;
+
+};
+
+#endif /* OPENGL_H_ */

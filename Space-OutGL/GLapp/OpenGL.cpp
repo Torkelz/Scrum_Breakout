@@ -1,21 +1,7 @@
 #include "Header/OpenGL.h"
 #include "glm/gtc/matrix_transform.hpp"
-//struct triangleVertex
-//{
-//	vec3 pos;
-//	vec3 col;
-//};
-//triangleVertex tri[1];
-
-struct vertexColor
-{
-	vec4 pos;
-	vec4 tex;
-	mat4 proj;
-	//0.78f, 0.651f, 0.8f
-};
-vertexColor col[1];
-float colValue;
+#include "Header/Ball.h"
+#include "Header/Pad.h"
 
 int main(void)
 {
@@ -26,45 +12,70 @@ int main(void)
 
 OpenGL::OpenGL() : GLApp()
 {
+	m_pCamera = 0;
 	m_keyValue = 0x00;
 	m_pHID = 0;
 	m_ratio = 0;
 	m_rotation = 0;
-	m_pTexTest = NULL;
-	m_pTexture = 0;
+	m_pTexBlock = NULL;
+	m_pTexBall = NULL;
+	m_pBlockPic = 0;
+	m_pBallPic = 0;
 	m_scale = 1.f;
+	m_game = NULL;
+
+	m_pTexPad = NULL;
+	m_pPadPic = 0;
 }
 
 OpenGL::~OpenGL()
 {
-	triBuffer.~Buffer();
-	m_uniBuffer.~Buffer();
+	m_blockBuffer[0].~Buffer();
+	m_blockBuffer[1].~Buffer();
+	m_blockBuffer[2].~Buffer();
+	m_blockBuffer[3].~Buffer();
+	m_uniBlockBuffer.~Buffer();
 	m_triShader.~Shader();
+
+	m_ballBuffer.~Buffer();
+	m_uniBallbuffer.~Buffer();
+	m_ballShader.~Shader();
 }
 
 void OpenGL::initApp()
 {
 	GLApp::initApp();
-	m_pTexTest->init();
-	col[0].pos = vec4(0.0f, 0.0f, 0.f,1.0f); //Uniform performs a padding on the buffer that can make
-	col[0].tex = vec4(0.f, 0.f, 0.f, 0.f);   //the result look really odd. Always use vec4 or mat4x4;
-	m_pTexTest->createTexture("./GLapp/Textures/cat.png", m_pTexture);
-	m_scale = 0;
-//	BufferInputDesc* desc = new BufferInputDesc[2];
-//	desc[0].size = 3;
-//	desc[0].type = GL_FLOAT;
-//	desc[0].normalized = GL_FALSE;
-//	desc[0].pointer = sizeof(vec3);
-//	desc[1].size = 3;
-//	desc[1].type = GL_FLOAT;
-//	desc[1].normalized = GL_FALSE;
-//	desc[1].pointer = sizeof(vec3);
-//
-	bool returnValue;// =	triBuffer.init(GL_ARRAY_BUFFER, tri, sizeof(triangleVertex),1, GL_STATIC_DRAW, desc, 2);
-//	if(!returnValue)
-//		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+	m_pTexBlock->init();
 
-	returnValue =	m_uniBuffer.init(GL_UNIFORM_BUFFER, col, sizeof(vertexColor), 1, GL_DYNAMIC_DRAW, NULL, 0);
+
+	//Uniform performs a padding on the buffer that can make
+	//the result look really odd. Always use vec4 or mat4x4
+
+	m_pTexBlock->createTexture("./GLapp/Picatures/block.png", m_pBlockPic);
+	m_scale = 0;
+	m_game = Game(m_hMainWnd);
+	m_pPUObserver                = new PUObserver(this);
+	m_game.init(m_pPUObserver, NORMAL);
+	m_pCamera = m_game.getCamera();
+
+	bool returnValue;
+	//##BLOCKSTART##//
+	for(int i = 0; i < 4; i++)
+	{
+		BufferInputDesc* blockBufferDesc = new BufferInputDesc[1];
+		blockBufferDesc->size		= 3;
+		blockBufferDesc->type		= GL_FLOAT;
+		blockBufferDesc->normalized	= GL_FALSE;
+		blockBufferDesc->pointer	= sizeof(vec3);
+
+		returnValue = m_blockBuffer[i].init(GL_ARRAY_BUFFER, m_game.getField(i)->getBufferData(), sizeof(BlockVertex), m_game.getField(i)->getBlockListSize(), GL_STATIC_DRAW, blockBufferDesc, 1);
+		if(!returnValue)
+		{
+			glfwSetWindowShouldClose(m_hMainWnd,1);
+		}
+	}
+
+	returnValue =	m_uniBlockBuffer.init(GL_UNIFORM_BUFFER, m_uniBlock, sizeof(SuniBlock), 1, GL_DYNAMIC_DRAW, NULL, 0);
 	if(!returnValue)
 		glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 
@@ -72,122 +83,200 @@ void OpenGL::initApp()
 
 	m_triShader.init();
 
-	returnValue = m_triShader.createAndCompile(VERTEX_SHADER, "GLUtility/GLSL/triVertex.glsl");
+	returnValue = m_triShader.createAndCompile(VERTEX_SHADER, "GLUtility/GLSL/BlockVertex.glsl");
 	if(!returnValue)
 				glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 
-	returnValue = m_triShader.createAndCompile(GEOMETRY_SHADER, "GLUtility/GLSL/triGeometry.glsl");
+	returnValue = m_triShader.createAndCompile(GEOMETRY_SHADER, "GLUtility/GLSL/BlockGeometry.glsl");
 	if(!returnValue)
 				glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 
-	returnValue = m_triShader.createAndCompile(FRAGMENT_SHADER, "GLUtility/GLSL/triFragment.glsl");
+	returnValue = m_triShader.createAndCompile(FRAGMENT_SHADER, "GLUtility/GLSL/BlockFragment.glsl");
 	if(!returnValue)
 				glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
 	m_triShader.attachAndLink();
 
 
 	// Fetch bindingPoint for uniform buffering.
-	m_triShader.uniformBlockBinding(bindingPoint, "ColorBlock");
+	m_triShader.uniformBlockBinding(bindingPoint, "uniBlock");
 	// Bind the bindingPoint to the right buffer.
-	m_uniBuffer.bindBufferBase(bindingPoint);
+	m_uniBlockBuffer.bindBufferBase(bindingPoint);
+	bindingPoint++;
+	// ##BLOCK END ## //
 
-	//m_pGame = new Game();
-	//m_pGame->init();
+	// ##PAD START## //
+	m_pTexPad->init();
+	m_pTexPad->createTexture("./GLapp/Picatures/PadTexture.png", m_pPadPic);
+
+
+	unsigned int const nrVertices = 4;
+	padVertex data[nrVertices];
+	std::vector<vec3>* t_positions = m_game.getPad()->getVertices();
+
+	for(unsigned int i = 0; i < nrVertices; i++)
+	{
+		data[i].m_position = t_positions->at(i);
+	}
+
+	data[0].m_texCoord = vec2(0.0f, 0.0f);
+	data[1].m_texCoord = vec2(0.0f, 1.0f);
+	data[2].m_texCoord = vec2(1.0f, 0.0f);
+	data[3].m_texCoord = vec2(1.0f, 1.0f);
+
+	BufferInputDesc* padBufferDesc = new BufferInputDesc[2];
+	padBufferDesc[0].size = 3;
+	padBufferDesc[0].type = GL_FLOAT;
+	padBufferDesc[0].normalized = GL_FALSE;
+	padBufferDesc[0].pointer = sizeof(vec3);
+	padBufferDesc[1].size = 2;
+	padBufferDesc[1].type = GL_FLOAT;
+	padBufferDesc[1].normalized = GL_FALSE;
+	padBufferDesc[1].pointer = sizeof(vec2);
+
+	returnValue = m_padBuffer.init(GL_ARRAY_BUFFER, &data, sizeof(padVertex), 4, GL_STATIC_DRAW, padBufferDesc, 2);
+
+	returnValue = m_uniPadbuffer.init(GL_UNIFORM_BUFFER, &m_uniPad, sizeof(SuniPad), 1, GL_STATIC_DRAW, NULL, 0);
+
+	m_padShader.init();
+	returnValue = m_padShader.createAndCompile(VERTEX_SHADER, "GLUtility/GLSL/PadVertex.glsl");
+		if(!returnValue)
+						glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+	returnValue = m_padShader.createAndCompile(FRAGMENT_SHADER, "GLUtility/GLSL/PadFragment.glsl");
+		if(!returnValue)
+						glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+	m_padShader.attachAndLink();
+
+	m_padShader.uniformBlockBinding(bindingPoint,"uniPad");
+	m_uniPadbuffer.bindBufferBase(bindingPoint);
+	bindingPoint++;
+	// ##PAD END## //
+
+
+	// ##BALL START## //
+	m_pTexBall->init();
+	m_pTexBall->createTexture("./GLapp/Picatures/BallTexture.png", m_pBallPic);
+
+	vec3 tempVec = vec3(0.f,0.f,0.f);
+	BufferInputDesc* ballBufferDesc = new BufferInputDesc[1];
+	ballBufferDesc->size = 3;
+	ballBufferDesc->type = GL_FLOAT;
+	ballBufferDesc->normalized = GL_FALSE;
+	ballBufferDesc->pointer = sizeof(vec3);
+
+	returnValue = m_ballBuffer.init(GL_ARRAY_BUFFER, &tempVec, sizeof(vec3), 1, GL_STATIC_DRAW, ballBufferDesc, 1);
+
+	returnValue =	m_uniBallbuffer.init(GL_UNIFORM_BUFFER, m_uniBall, sizeof(SuniBall), 1, GL_DYNAMIC_DRAW, NULL, 0);
+
+	m_ballShader.init();
+	returnValue = m_ballShader.createAndCompile(VERTEX_SHADER, "GLUtility/GLSL/BallVertex.glsl");
+	if(!returnValue)
+					glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+	returnValue = m_ballShader.createAndCompile(GEOMETRY_SHADER, "GLUtility/GLSL/BallGeometry.glsl");
+	if(!returnValue)
+					glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+	returnValue = m_ballShader.createAndCompile(FRAGMENT_SHADER, "GLUtility/GLSL/BallFragment.glsl");
+	if(!returnValue)
+					glfwSetWindowShouldClose(m_hMainWnd, GL_TRUE);
+	m_ballShader.attachAndLink();
+
+	m_ballShader.uniformBlockBinding(bindingPoint, "uniBall");
+	m_uniBallbuffer.bindBufferBase(bindingPoint);
+	bindingPoint++;
+	// ##BALL END## //
 
 	m_pHID = new HID(m_hMainWnd);
 
 //	glfwSetCursorPos(m_hMainWnd, 1024/2, 768/2);
 //	GLint texUnitLoc = glGetUniformLocation(m_triShader.getProgram(),(char*)("textest"));
-	m_pTexTest->bindTextureResource(m_triShader.getProgram(), (char*)("texUnit"), m_pTexture);
-	//m_pHID->getObservable()->addSubscriber(m_pGame->getObserver());
+
+
+
+	m_pHID->getObservable()->addSubscriber(m_game.getObserver());
 }
 
 void OpenGL::updateScene(float p_dt)
 {
 	GLApp::updateScene(p_dt);
-	generatingKeyValue();
+	m_game.update(800, p_dt);
 	int width, height;
 	glfwGetFramebufferSize(m_hMainWnd, &width, &height);
 	m_ratio = width / (float) height;
 	glViewport(0, 0, width, height);
 	m_rotation += p_dt;
 	updateFPSCounter();
+	generatingKeyValue();
 }
 
 void OpenGL::drawScene()
 {
 	GLApp::drawScene();
+	mat4 playFieldRotation = m_game.getActiveField()->getRotationMatrix();
 
-	m_triShader.apply();
 
 	m_scale += 0.01f;
-
-	mat4 view;
-
-	vec4 target = vec4(0.0f, 0.0f, 1.0f, 1.0f);
-	vec4 up = vec4(0.0f, 1.0f, 0.0f, 1.0f);
-
-    vec4 N = target;
-    N = normalize(N);
-
-    vec4 U = up;
-    U = normalize(U);
-
-    vec3 R = glm::cross(vec3(U.x, U.y, U.z), vec3(target.x, target.y, target.z));
-
-    view[0][0] = U.x; view[0][1] = U.y; view[0][2] = U.z; view[0][3] = 0.0f;
-    view[1][0] = R.x; view[1][1] = R.y; view[1][2] = R.z; view[1][3] = 0.0f;
-    view[2][0] = N.x; view[2][1] = N.y; view[2][2] = N.z; view[2][3] = 0.0f;
-    view[3][0] = 0.0f; view[3][1] = 0.0f; view[3][2] = -2.0f; view[3][3] = 1.0f;
-
-	mat4 proj;
-
-//    const float ar         = m_ClientWidth / m_ClientHeight;
-//    const float zNear      = 1.0f;
-//    const float zFar       = 100.0f;
-//    const float zRange     = zNear - zFar;
-//    const float tanHalfFOV = tanf((30.0f / 2.0f)*M_PI/180.0f);
-
-
-    mat4 World;
-
-    World[0][0] = 1.0f; World[0][1] = 0.0f; World[0][2] = 0.0f; World[0][3] = 0.0f;
-    World[1][0] = 0.0f; World[1][1] = 1.0f; World[1][2] = 0.0f; World[1][3] = 0.0f;
-    World[2][0] = 0.0f; World[2][1] = 0.0f; World[2][2] = 1.0f; World[2][3] = 0.0f;
-    World[3][0] = 0.0f; World[3][1] = 0.0f; World[3][2] = 0.0f; World[3][3] = 1.0f;
-
-	mat4 ry;
-	mat4 rx;
-
-	    ry[0][0] = cosf(m_scale);	ry[0][1] = 0.0f; 	ry[0][2] = -sinf(m_scale); ry[0][3] = 0.0f;
-	    ry[1][0] = 0.0f;			ry[1][1] = 1.0f;  	ry[1][2] = 0.0f; 		ry[1][3] = 0.0f;
-	    ry[2][0] = sinf(m_scale);	ry[2][1] = 0.0f;     ry[2][2] = cosf(m_scale); 	ry[2][3] = 0.0f;
-	    ry[3][0] = 0.0f;        	ry[3][1] = 0.0f;     ry[3][2] = 0.0f; 		ry[3][3] = 1.0f;
-
-	    rx[0][0] = 1.0f; rx[0][1] = 0.0f   ; rx[0][2] = 0.0f    ; rx[0][3] = 0.0f;
-	    rx[1][0] = 0.0f; rx[1][1] = cosf(m_scale); rx[1][2] = -sinf(m_scale); rx[1][3] = 0.0f;
-	    rx[2][0] = 0.0f; rx[2][1] = sinf(m_scale); rx[2][2] = cosf(m_scale) ; rx[2][3] = 0.0f;
-	    rx[3][0] = 0.0f; rx[3][1] = 0.0f   ; rx[3][2] = 0.0f    ; rx[3][3] = 1.0f;
-	    proj = glm::perspective(45.f, 1.f, 1.0f, 100.f);
-	    col[0].proj = proj * view * glm::transpose(ry * rx);
-	    //glUniformMatrix4fv(glGetUniformLocation(m_triShader.getProgram(), "gWorld"), 1, GL_TRUE, &World.m[0][0]);
+	//Box Update #################
+	m_uniBlock[0].proj = m_pCamera->getProjectionMatrix() * m_pCamera->getViewMatrix();
+	m_pTexBlock->bindTextureResource(m_triShader.getProgram(), (char*)("texBlock"), m_pBlockPic);
 	//Update buffer here!
 
-	m_uniBuffer.setSubData(0, sizeof(col), col);
-
-	// stop updating here!
+	m_uniBlockBuffer.setSubData(0, sizeof(m_uniBlock), m_uniBlock);
+	m_triShader.apply();
+//	// stop updating here!
 	glDisable(GL_CULL_FACE);
-	triBuffer.apply();
+	for(int i = 0; i < 4; i++)
+	{
+		m_blockBuffer[i].apply();
+	// Draw the triangle !
+		glDrawArrays(GL_POINTS, 0, m_game.getField(i)->getBlockListSize()); // Starting from vertex 0; 3 vertices total -> 1 triangle
+		m_blockBuffer[i].deApply();
+	}
+	m_uniBlockBuffer.deApply();
+	//##############################
+
+	//## BALL ##
+	m_pTexBall->bindTextureResource(m_ballShader.getProgram(), (char*)("texBall"), m_pBallPic);
+	m_ballShader.apply();
+	vec3 t_ballPos = ((Ball*)m_game.getBall(0))->getRealPosition();
+	m_uniBall[0].Trans = glm::translate(t_ballPos.x, t_ballPos.y, t_ballPos.z);
+	m_uniBall[0].projView = m_pCamera->getProjectionMatrix() * m_pCamera->getViewMatrix();
+	m_uniBall[0].eyepos = vec4(m_pCamera->getPosition(),1.0f);
+	m_uniBall[0].size = vec4(5.0f,5.0f,0,0);
+
+	m_uniBallbuffer.setSubData(0,sizeof(m_uniBall), m_uniBall);
+
+	m_ballBuffer.apply();
 	// Draw the triangle !
 	glDrawArrays(GL_POINTS, 0, 1); // Starting from vertex 0; 3 vertices total -> 1 triangle
-	m_uniBuffer.deApply();
-	triBuffer.deApply();
+	m_ballBuffer.deApply();
+	m_uniBallbuffer.deApply();
+	//#############################
+
+	//## PAD ##
+	m_pTexPad->bindTextureResource(m_padShader.getProgram(), (char*)("texPad"), m_pPadPic);
+	m_padShader.apply();
+	mat4 translatePadMatrix;
+
+	vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
+	translatePadMatrix = glm::translate(padPos.x, padPos.y, padPos.z);
+
+	mat4 t_scaleMatrix = mat4(1.0f) * ((Pad*)(m_game.getPad()))->getScale();
+	t_scaleMatrix[3][3] = 1.0f;
+	mat4 PVW =  m_pCamera->getProjectionMatrix() * m_pCamera->getViewMatrix() * translatePadMatrix * playFieldRotation * t_scaleMatrix;
+	m_uniPad[0].PVW = PVW;
+	m_uniPadbuffer.setSubData(0,sizeof(m_uniPad), m_uniPad);
+	m_padBuffer.apply();
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	m_padBuffer.apply();
+	m_uniPadbuffer.deApply();
+
+	//#############################
 
 }
 
 void  OpenGL::messageCallback(GLFWwindow* p_pMainWnd, int p_key, int p_scanCode, int p_action, int p_mods)
 {
-	if(p_action == GLFW_PRESS){
+	if(p_action == GLFW_PRESS || p_action == GLFW_REPEAT){
 		keyValueStatic = p_key;
 
 	}
@@ -231,6 +320,18 @@ void OpenGL::generatingKeyValue()
 	case GLFW_KEY_D:
 		m_keyValue = GLFW_KEY_D;
 		break;
+	case GLFW_KEY_W:
+		m_keyValue = GLFW_KEY_W;
+		break;
+	case GLFW_KEY_S:
+		m_keyValue = GLFW_KEY_S;
+		break;
+	case GLFW_KEY_Q:
+			m_keyValue = GLFW_KEY_Q;
+			break;
+	case GLFW_KEY_E:
+			m_keyValue = GLFW_KEY_E;
+			break;
 	case GLFW_KEY_SPACE:
 		m_keyValue = GLFW_KEY_SPACE;
 		break;
@@ -248,4 +349,14 @@ void OpenGL::generatingKeyValue()
 		break;
 	}
 	m_pHID->update(m_keyValue);
+}
+void OpenGL::addPowerUp(PowerUp* p_pPowerUp)
+{
+        m_powerUps.push_back(p_pPowerUp);
+        //Update buffer
+}
+
+void OpenGL::removePowerUp(int i)
+{
+        m_powerUps.erase(m_powerUps.begin() + i);
 }
