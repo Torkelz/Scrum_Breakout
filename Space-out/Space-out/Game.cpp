@@ -1,14 +1,18 @@
 #include "Game.h"
 #include "Observer.h"
 #include "Pad.h"
-#include "Ball.h"
+
 #include "Block.h"
+#include <time.h> 
 
 Game::Game(){}
 Game::~Game(){}
 
 void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 {
+	//Set random seed for powerups
+	srand (time(NULL));
+
 	Difficulties diff = Difficulties();
 	diff.setInitValues(p_diff);
 	m_sDiffData = diff.getDifficultyValues();
@@ -87,27 +91,14 @@ void Game::update(float p_screenWidth, float p_dt)
 
 	if(!m_pCamera->isCinematic() || (m_pCamera->timeToChange() && m_pCamera->getRunOnce()))
 	{
+		m_pCamera->setRunOnce(false);
 		if(m_counter > 0.0f)
 		{
 			m_counter -= p_dt;
 		}
 		else
 			((Pad*)m_pPad)->setSticky(false);
-
-		if(m_padCounter > 0)
-		{
-			m_padCounter--;
-		}
-		else
-			m_padCrash = false;
-
-		if(m_wallCounter > 0)
-		{
-			m_wallCounter--;
-		}
-		else
-			m_wallCrash = false;
-
+		
 		vec3 padPos = *m_pPad->getPos();
 		PlayField* pf = m_playFields[m_activePlayField];
 		vec3 t_pos = pf->getOriginalPosition();
@@ -132,7 +123,7 @@ void Game::update(float p_screenWidth, float p_dt)
 				((Ball*)m_pBall.at(b))->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 
 				//Pad vs Ball
-				if(((Pad*)m_pPad)->collide(m_pBall.at(b)->getBoundingVolume()) && !m_padCrash)
+				if(((Pad*)m_pPad)->collide(m_pBall.at(b)->getBoundingVolume()) && !((Ball*)m_pBall.at(b))->getPadCrash())
 				{
 					if(!((Pad*)m_pPad)->getSticky())
 					{
@@ -140,8 +131,7 @@ void Game::update(float p_screenWidth, float p_dt)
 					
 						tempSpeed.y = -abs(tempSpeed.y);
 						((Ball*)m_pBall.at(b))->setSpeed( tempSpeed );
-						m_padCrash = true;
-						m_padCounter = 4;
+						((Ball*)m_pBall.at(b))->resetPadCrash();
 					}
 					else
 					{
@@ -173,7 +163,7 @@ void Game::update(float p_screenWidth, float p_dt)
 				{
 					AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
 
-					if(  bv->collide(m_pBall.at(b)->getBoundingVolume()) && !m_wallCrash)
+					if(  bv->collide(m_pBall.at(b)->getBoundingVolume()) && !((Ball*)m_pBall.at(b))->getWallCrash())
 					{
 						if (i == 3)
 						{
@@ -189,10 +179,8 @@ void Game::update(float p_screenWidth, float p_dt)
 							}
 						}
 						vec3 tempSpeed = bv->findNewDirection(*m_pBall.at(b)->getBoundingVolume()->getPosition(), ((Ball*)m_pBall.at(b))->getSpeed());
-						tempSpeed.y = tempSpeed.y;
 						((Ball*)m_pBall.at(b))->setSpeed( tempSpeed );
-						m_wallCrash = true;
-						m_wallCounter = 6;
+						((Ball*)m_pBall.at(b))->resetWallCrash();
 						break;
 					}
 				}
@@ -311,19 +299,7 @@ void Game::keyEvent(unsigned short key)
 	//DEBUG BALL
 	//if(key == 0x42) // B
 	//{
-	//	spawnBalls(-45,45,2);
-	//	/*vec3 pos, speed;
-	//	pos = ((Ball*)m_pBall.back())->getRealPosition();
-	//	speed = ((Ball*)m_pBall.back())->getSpeed();
-	//	speed.x *= -1;
-	//	speed.y *= -1;
-	//	m_pBall.push_back(new Ball(&pos, &vec3(0.56f, 0.56f, 0.56f), "Ball", speed));
-	//	((Ball*)m_pBall.back())->setInternalPosition(pos, m_playFields[m_activePlayField]->getOriginalPosition(), 
-	//									m_playFields[m_activePlayField]->getRightDir(), 
-	//									m_playFields[m_activePlayField]->getDownDir());
-	//	((Ball*)m_pBall.back())->init(m_playFields[m_activePlayField]->getOriginalPosition(), 
-	//									m_playFields[m_activePlayField]->getRightDir(), 
-	//									m_playFields[m_activePlayField]->getDownDir());*/
+	//	spawnBalls(-180,180,8, (Ball*)m_pBall.front());
 	//}
 
 
@@ -525,10 +501,13 @@ void Game::powerUpCheck(int i)
 		m_counter = 10.0f;
 		break;
 	case SPLITBALL:
-		spawnBalls(-45,45,2);
+		spawnBalls(-45,45,2, (Ball*)m_pBall.front());
 		break;
 	case SCATTERBALL:
-		spawnBalls(-180,180,4);
+		if(((Ball*)m_pBall.front())->getStuck())
+			spawnBalls(-85,85,8,(Ball*)m_pBall.front());
+		else
+			spawnBalls(-180,180,8,(Ball*)m_pBall.front());
 		break;
 	default:
 		break;
@@ -660,13 +639,17 @@ void Game::setScreenBorders(vec4 p_screenBorders)
 
 void Game::resetBall(PlayField* pf)
 {
-	((Ball*)m_pBall.front())->setStuck(true);
-	((Pad*)m_pPad)->setSavedVector(vec3(0.0f, 4.0f, 0.0f) * ((Pad*)m_pPad)->getScale());
+	for(int i = 0; i < m_pBall.size(); i++)
+	{
 
-	((Ball*)m_pBall.front())->setInternalPosition( *m_pPad->getBoundingVolume()->getPosition() + 
-		((Pad*)m_pPad)->getSavedVector(),
-		pf->getOriginalPosition(), pf->getRightDir(), pf->getDownDir() );
-	((Ball*)m_pBall.front())->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
+		((Ball*)m_pBall.at(i))->setStuck(true);
+		((Pad*)m_pPad)->setSavedVector(vec3(0.0f, 4.0f, 0.0f) * ((Pad*)m_pPad)->getScale());
+
+		((Ball*)m_pBall.at(i))->setInternalPosition( *m_pPad->getBoundingVolume()->getPosition() + 
+			((Pad*)m_pPad)->getSavedVector(),
+			pf->getOriginalPosition(), pf->getRightDir(), pf->getDownDir() );
+		((Ball*)m_pBall.at(i))->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
+	}
 }
 
 void Game::addBorders()
@@ -725,24 +708,19 @@ vector<Borders>* Game::getBorders()
         return &m_borderList;
 }
 
-void Game::spawnBalls(float p_sAngle, float p_eAngle, unsigned int p_numBalls)
+void Game::spawnBalls(float p_sAngle, float p_eAngle, unsigned int p_numBalls, Ball* p_ball)
 {
 	mat4 rot;
 	float stepAngle = (p_eAngle - p_sAngle)/(p_numBalls-1);
 	vec3 playfieldOrtho = m_playFields[m_activePlayField]->getOrthoDir();
 
 	vec3 pos, ospeed,speed;
-	pos = ((Ball*)m_pBall.back())->getRealPosition();
-	ospeed = ((Ball*)m_pBall.back())->getSpeed();
-
-	
+	pos = p_ball->getRealPosition();
+	ospeed = p_ball->getSpeed();
 
 	for(int i = 0; i < p_numBalls; i++)
 	{
-		//rot = glm::rotate(mat4(1.0f),p_sAngle+(stepAngle*i),playfieldOrtho);
-
-		//speed = vec3(rot*vec4(speed,0));
-		speed = glm::rotate(ospeed, p_sAngle+(stepAngle*i),playfieldOrtho);
+		speed = glm::rotate(ospeed, p_sAngle+(stepAngle*i),vec3(0,0,1));
 
 		m_pBall.push_back(new Ball(&pos, &vec3(0.56f, 0.56f, 0.56f), "Ball", speed));
 		((Ball*)m_pBall.back())->setInternalPosition(pos, m_playFields[m_activePlayField]->getOriginalPosition(), 

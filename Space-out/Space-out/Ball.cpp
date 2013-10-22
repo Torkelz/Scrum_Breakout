@@ -9,6 +9,11 @@ Ball::Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, vec3 p_speed)
 	m_stuck = false;
 	m_maxSpeedUps = 4;
 	m_nrOfSpeedUps = 0;
+	
+	m_wallCrash = false;
+	m_wallCounter = 6;
+	m_padCrash = false;
+	m_padCounter = 4;
 }
 
 Ball::~Ball(){}
@@ -25,6 +30,20 @@ void Ball::init(vec3 p_origPos, vec3 p_right, vec3 p_down)
 void Ball::update(float p_dt)
 {
 	updatePosition(p_dt);
+
+	if(m_wallCounter > 0)
+	{
+		m_wallCounter--;
+	}
+	else
+		m_wallCrash = false;
+
+	if(m_padCounter > 0)
+	{
+		m_padCounter--;
+	}
+	else
+		m_padCrash = false;
 }
 
 void Ball::updatePosition(float p_dt)
@@ -87,9 +106,34 @@ void Ball::setInternalPosition(vec3 p_position, vec3 p_origPos, vec3 p_right, ve
 	t.x = abs(dot(temp,p_right));
 	t.y = abs(dot(temp,p_down));
 	m_internPosition = t;
+
 }
 
 vec3 Ball::getRealPosition()
 {
 	return m_realPosition;
+}
+
+void Ball::resetWallCrash()
+{
+	m_wallCrash = true;
+	m_wallCounter = 6;
+
+}
+
+bool Ball::getWallCrash()
+{
+	return m_wallCrash;
+}
+
+void Ball::resetPadCrash()
+{
+	m_padCrash = true;
+	m_padCounter = 4;
+
+}
+
+bool Ball::getPadCrash()
+{
+	return m_padCrash;
 }

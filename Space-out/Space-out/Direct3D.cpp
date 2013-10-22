@@ -415,6 +415,8 @@ void Direct3D::initApp()
 	// TEXT TEST
 	m_pTextDevice = new D3DTextDevice();
 	m_pTextDevice->Initialize(m_pDevice, m_pDeviceContext, m_hMainWnd, 800, 600, &m_camView);
+	std::string message3 = "Balls in the air: " + IntToString(m_game.getNrBalls());
+	m_pTextDevice->addSentence(&message3[0], 2,m_pDevice, m_pDeviceContext);
 	std::string message = "Remaining lives: " + IntToString(m_game.getRemainingLives());
 	m_pTextDevice->addSentence(&message[0], 0, m_pDevice, m_pDeviceContext);
 	std::string message2 = "Score: " + IntToString(m_game.getScore());
@@ -474,7 +476,8 @@ void Direct3D::updateScene(float p_dt)
 	SetWindowTextW(m_hMainWnd,outs.str().c_str());
 
 	m_winTitle = outs.str();
-	
+	std::string message3 = "Balls in the air: " + IntToString(m_game.getNrBalls());
+	m_pTextDevice->updateSentenceAt(2, &message3[0], 50, 200, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
 	std::string message = "Remaining lives: " + IntToString(m_game.getRemainingLives());
 	m_pTextDevice->updateSentenceAt(0, &message[0], 50, 150, 1.0f, 1.0f, 1.0f, m_pDeviceContext);
 	std::string message2 = "Score: " + IntToString(m_game.getScore());

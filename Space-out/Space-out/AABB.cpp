@@ -263,6 +263,25 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 		default:
 			break;
 	};
+	vec3 compareVec1 = vec3(1,0,0);
+	vec3 compareVec2 = vec3(-1,0,0);
+	vec3 normalizedReturnVec = normalize(returnVector);
+	float angleLimit = 1.0f;
+	float angle = acosf(dot(compareVec1,normalizedReturnVec));
+	angle *= (180.0f/PI);
+	if(angle < angleLimit && angle >= 0.0f)
+		returnVector = glm::rotate(returnVector, angleLimit,vec3(0,0,1));
+	else if(angle > -angleLimit && angle < 0.0f)
+		returnVector = glm::rotate(returnVector, -angleLimit,vec3(0,0,1));
+	else{}
+	angle = acosf(dot(compareVec2,normalizedReturnVec));
+	angle *= (180.0f/PI);
+
+	if(angle < angleLimit && angle >= 0.0f)
+		returnVector = glm::rotate(returnVector, angleLimit,vec3(0,0,1));
+	else if(angle > -angleLimit && angle < 0.0f)
+		returnVector = glm::rotate(returnVector, -angleLimit,vec3(0,0,1));
+	else{}
 
 	return returnVector;
 }

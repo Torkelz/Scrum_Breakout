@@ -7,6 +7,8 @@
 #include "Shader.h"
 #include <vector>
 
+#include "..\glm\gtx\rotate_vector.hpp"
+
 //DEBUGGING
 struct CB
 {

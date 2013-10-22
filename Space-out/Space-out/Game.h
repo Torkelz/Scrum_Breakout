@@ -15,6 +15,7 @@
 #include "FSound.h"
 #include "Camera.h"
 #include "Difficulties.h"
+#include "Ball.h"
 
 using namespace glm;
 
@@ -101,7 +102,7 @@ private:
 	int					    random();
 	void					powerUpCheck(int i);
 	void					resetBall(PlayField* pf);
-	void					spawnBalls(float p_sAngle, float p_eAngle, unsigned int p_numBalls);
+	void					spawnBalls(float p_sAngle, float p_eAngle, unsigned int p_numBalls, Ball* p_ball);
 
 	Observer*				m_pObserver;
 	// ## POWER UP OBSERVABLE ##
@@ -119,10 +120,6 @@ private:
 	int						m_activePlayFieldNext;
 	PlayField*				m_playFields[m_nrPlayFields];
 	float					m_counter;
-	int						m_padCounter;
-	int						m_wallCounter;
-	bool					m_padCrash;
-	bool					m_wallCrash;
 
 	vec4					m_screenBorders;
 	
