@@ -186,6 +186,7 @@
     <ClCompile Include="D3DTextDevice.cpp">
       <Filter>Text</Filter>
     </ClCompile>
+    <ClCompile Include="HardBlock.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">
@@ -353,6 +354,7 @@
     <ClInclude Include="D3DTextDevice.h">
       <Filter>Text\header</Filter>
     </ClInclude>
+    <ClInclude Include="HardBlock.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">

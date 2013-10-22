@@ -117,6 +117,10 @@ void LevelGenerator::createBlocks(FACE p_face)
 				addExpBlockToList(i, row, p_face, EXPBLOCK);
 				break;
 
+			case 3:
+				addHardBlockToList(i, row, p_face, HARDBLOCK);
+				break;
+
 			default:
 				break;
 			}
@@ -187,6 +191,37 @@ void LevelGenerator::addExpBlockToList(int i, int row, FACE p_face, unsigned int
 			break;		
 		case RIGHT:		
 			m_blockLists.at(3).push_back(new ExpBlock(&vec3(	m_posXOffsetR,
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
+																		m_posZOffsetLR+row*(g_bvSize.x*2.1f)),
+																		&vec3(0.115f*i, 0.0f, 0.37f), p_blockType, "ExpBlock", vec2(row, i)));
+			break;
+	}
+};
+
+void LevelGenerator::addHardBlockToList(int i, int row, FACE p_face, unsigned int p_blockType)
+{
+	switch(p_face)
+	{
+		case FRONT:
+			m_blockLists.at(0).push_back(new HardBlock(&vec3(	m_posXOffsetFB+row*(g_bvSize.x*2.1f),	
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
+																		m_posZOffsetF),
+																		&vec3(0.115f*i, 0.0f, 0.37f), p_blockType, "ExpBlock", vec2(row, i)));
+			break;		
+		case BACK:		
+			m_blockLists.at(1).push_back(new HardBlock(&vec3(		m_posXOffsetFB+row*(g_bvSize.x*2.1f),
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
+																		m_posZOffsetB),
+																		&vec3(0.115f*i, 0.0f, 0.37f), p_blockType, "ExpBlock", vec2(row, i)));
+			break;		
+		case LEFT:		
+			m_blockLists.at(2).push_back(new HardBlock(&vec3(		m_posXOffsetL,
+																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
+																		m_posZOffsetLR+row*(g_bvSize.x*2.1f)),
+																		&vec3(0.115f*i, 0.0f, 0.37f), p_blockType, "ExpBlock", vec2(row, i)));
+			break;		
+		case RIGHT:		
+			m_blockLists.at(3).push_back(new HardBlock(&vec3(	m_posXOffsetR,
 																		m_posYOffset+((-1)*(-5.0f+i*(g_bvSize.y*2.2f))),
 																		m_posZOffsetLR+row*(g_bvSize.x*2.1f)),
 																		&vec3(0.115f*i, 0.0f, 0.37f), p_blockType, "ExpBlock", vec2(row, i)));

@@ -727,6 +727,7 @@ void Direct3D::drawScene()
 		for(int i = 0; i < 4; i++)
 		{
 			cBlockBufferStruct.rotation = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()));
+
 			m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 			m_blockBuffers[i].apply(0);
 			m_pDeviceContext->Draw(m_game.getField(i)->getBlockListSize(), 0);

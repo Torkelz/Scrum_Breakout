@@ -62,7 +62,12 @@ void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStrea
 
 	GSOutput outVertex = (GSOutput)0;
 	outVertex.m_blockType = p_input[0].m_blockType;
+
+	
 	outVertex.m_backColor = float3(1,1,1);
+	if(p_input[0].m_blockType == 2)
+		outVertex.m_backColor = float3(1,1,1) * 0.3f; // HAXX FOR REALZ
+
 	// Back
 	outVertex.m_posH = vert5;
 	outVertex.m_tex = float2(1.0f, 1.0f);
@@ -160,12 +165,14 @@ float4 PS(GSOutput p_input) : SV_Target
 {
 	float4 temp;
 
-	if(p_input.m_blockType == 0)
+	if(p_input.m_blockType == 0 || p_input.m_blockType == 2)
 		temp = m_blockTex.Sample(m_textureSampler, p_input.m_tex);
 
 	if(p_input.m_blockType == 1)
 		temp = m_expBlockTex.Sample(m_textureSampler, p_input.m_tex);
+
 	temp *= float4(p_input.m_backColor,1);
+
 	return temp;
     //float4(1.0f, 1.0f, 1.0f, 1.0f);
 }

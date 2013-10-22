@@ -170,6 +170,7 @@ void Game::update(float p_screenWidth, float p_dt)
 					
 							if( ( (Ball*)m_pBall.at(b))->getIsExplosive() )
 							{
+								m_playFields[m_activePlayField]->getBlock(i)->decreaseHP(10);
 								m_playFields[m_activePlayField]->getBlock(i)->changeBlockType(EXPBLOCK);
 							}
 
@@ -224,7 +225,7 @@ void Game::update(float p_screenWidth, float p_dt)
 						m_neighbourBlockIndex = findBlockWhoWILLDIEByExplosion(i);
 						for(int exp = m_neighbourBlockIndex.size() - 1; exp >= 0; exp--)
 						{
-							m_playFields[m_activePlayField]->getBlock(m_neighbourBlockIndex.at(exp))->decreaseHP(1);
+							m_playFields[m_activePlayField]->getBlock(m_neighbourBlockIndex.at(exp))->decreaseHP(10);
 						}
 					}
 					m_playFields[m_activePlayField]->deleteBlock(i);
