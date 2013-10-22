@@ -121,6 +121,8 @@
     <ClCompile Include="PUFasterBall.cpp" />
     <ClCompile Include="PUObservable.cpp" />
     <ClCompile Include="PUObserver.cpp" />
+    <ClCompile Include="PUOneDown.cpp" />
+    <ClCompile Include="PUOneUp.cpp" />
     <ClCompile Include="PUSlowerBall.cpp" />
     <ClCompile Include="PUSmallerPad.cpp" />
     <ClCompile Include="PUStickyPad.cpp" />
@@ -165,6 +167,8 @@
     <ClInclude Include="PUFasterBall.h" />
     <ClInclude Include="PUObservable.h" />
     <ClInclude Include="PUObserver.h" />
+    <ClInclude Include="PUOneDown.h" />
+    <ClInclude Include="PUOneUp.h" />
     <ClInclude Include="PUSlowerBall.h" />
     <ClInclude Include="PUSmallerPad.h" />
     <ClInclude Include="PUStickyPad.h" />

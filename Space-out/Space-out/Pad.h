@@ -13,7 +13,6 @@ private:
 	vec3	m_realPosition;
 	float	m_scale;
 	bool	m_sticky;
-	bool	m_isExplosive;
 	vec3	m_savedVector;
 	int		m_nrOfScales;
 	int		m_maxScales;
@@ -34,8 +33,6 @@ public:
 	float	getScale();
 	bool	getSticky();
 	void	setSticky(bool p_sticky);
-	bool	getIsExplosive();
-	void	setToExplosive(bool p_explosive);
 	vec3	getSavedVector();
 	void	setSavedVector(vec3 p_savedVector);
 };

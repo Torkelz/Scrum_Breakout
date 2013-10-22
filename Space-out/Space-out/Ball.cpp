@@ -9,6 +9,8 @@ Ball::Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, vec3 p_speed)
 	m_stuck = false;
 	m_maxSpeedUps = 4;
 	m_nrOfSpeedUps = 0;
+
+	m_isExplosive = false;
 }
 
 Ball::~Ball(){}
@@ -77,6 +79,16 @@ void Ball::setStuck(bool p_stuck)
 bool Ball::getStuck()
 {
 	return m_stuck;
+}
+
+void Ball::setExplosive(bool p_b)
+{
+	m_isExplosive = p_b;
+}
+
+bool Ball::getIsExplosive()
+{
+	return m_isExplosive;
 }
 
 void Ball::setInternalPosition(vec3 p_position, vec3 p_origPos, vec3 p_right, vec3 p_down)

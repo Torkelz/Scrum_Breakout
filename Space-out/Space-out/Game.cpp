@@ -161,7 +161,7 @@ void Game::update(float p_screenWidth, float p_dt)
 
 					m_playFields[m_activePlayField]->getBlock(i)->decreaseHP(1);
 					
-					if( ( (Pad*)m_pPad)->getIsExplosive() )
+					if( ( (Ball*)m_pBall)->getIsExplosive() )
 					{
 						m_playFields[m_activePlayField]->getBlock(i)->changeBlockType(EXPBLOCK);
 					}
@@ -189,6 +189,8 @@ void Game::update(float p_screenWidth, float p_dt)
 				}	
 			}
 
+			// ## END BLOCKS ##
+
 			// ## WALLS ##
 			for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
 			{
@@ -200,7 +202,7 @@ void Game::update(float p_screenWidth, float p_dt)
 					{
 						resetBall(pf);
 						m_player.lives--;
-						( (Pad*)m_pPad)->setToExplosive(false);
+						( (Ball*)m_pBall)->setExplosive(false);
 					}
 					vec3 tempSpeed = bv->findNewDirection(*m_pBall->getBoundingVolume()->getPosition(), ((Ball*)m_pBall)->getSpeed());
 					tempSpeed.y = tempSpeed.y;
@@ -535,7 +537,13 @@ void Game::powerUpCheck(int i)
 		((Pad*)m_pPad)->setSticky(true);
 		m_counter = 10.0f;
 	case EXPLOSIVEBALL:
-		((Pad*)m_pPad)->setToExplosive(true);
+		((Ball*)m_pBall)->setExplosive(true);
+		break;
+	case ONEUP:
+		m_player.lives++;
+		break;
+	case ONEDOWN:
+		m_player.lives--;
 		break;
 	default:
 		break;
@@ -592,13 +600,22 @@ void Game::powerUpSpawn(vec3 pos)
 					m_powerUps.push_back(powerUp);
 				}
 				break;
+			case ONEUP:
+				{
+					PUOneUp* powerUp = new PUOneUp(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
+					m_pPUObservable->broadcastRebirth(powerUp);
+					m_powerUps.push_back(powerUp);
+				}
+				break;
 			default:
 				break;
 			}
 		} // Drop chance for powerdowns!
 		else if(r < chance)
 		{
-			r = rand() % POWERUPTYPECOUNT;
+			r = rand() % (POWERDOWNTYPECOUNT - (POWERUPTYPECOUNT+1)) + POWERUPTYPECOUNT+1 ;
 			switch(r)
 			{
 			case SLOWERBALL:
@@ -619,7 +636,15 @@ void Game::powerUpSpawn(vec3 pos)
 					m_powerUps.push_back(powerUp);
 				}
 				break;
-
+			case ONEDOWN:
+				{
+					PUOneDown* powerUp = new PUOneDown(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
+					m_pPUObservable->broadcastRebirth(powerUp);
+					m_powerUps.push_back(powerUp);
+				}
+				break;
 			default:
 				break;
 			}

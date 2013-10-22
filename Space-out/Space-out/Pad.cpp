@@ -15,7 +15,6 @@ Pad::Pad(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, float p_size) :
 	m_mouseOffset = 0.f;
 	m_scale = p_size;
 	m_sticky = false;
-	m_isExplosive = false;
 	m_nrOfScales = 0;
 	m_maxScales = 4;
 }
@@ -93,16 +92,6 @@ bool Pad::getSticky()
 void Pad::setSticky(bool p_sticky)
 {
 	m_sticky = p_sticky;
-}
-
-bool Pad::getIsExplosive()
-{
-	return m_isExplosive;
-}
-
-void Pad::setToExplosive(bool p_exp)
-{
-	m_isExplosive = p_exp;
 }
 
 vec3 Pad::getSavedVector()

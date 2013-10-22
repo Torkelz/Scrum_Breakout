@@ -285,6 +285,10 @@ void Direct3D::initApp()
 	m_powerTextures[STICKYPAD].createTexture(m_game.getBall()->getTexturePath(), 0);
 	m_powerTextures[EXPLOSIVEBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_powerTextures[EXPLOSIVEBALL].createTexture(new std::wstring(L"Picatures/explosiveBall.png"), 0);
+	m_powerTextures[ONEUP] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[ONEUP].createTexture(new std::wstring(L"Picatures/pluset.png"), 0);
+	m_powerTextures[ONEDOWN] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[ONEDOWN].createTexture(new std::wstring(L"Picatures/minuset.png"), 0);
 
 	D3D11_BLEND_DESC bd;
 	bd.AlphaToCoverageEnable = false;

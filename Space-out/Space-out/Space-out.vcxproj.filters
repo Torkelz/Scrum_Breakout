@@ -134,6 +134,8 @@
     </ClCompile>
     <ClCompile Include="ExpBlock.cpp" />
     <ClCompile Include="PUExplosiveBall.cpp" />
+    <ClCompile Include="PUOneUp.cpp" />
+    <ClCompile Include="PUOneDown.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">
@@ -252,6 +254,8 @@
     </ClInclude>
     <ClInclude Include="ExpBlock.h" />
     <ClInclude Include="PUExplosiveBall.h" />
+    <ClInclude Include="PUOneUp.h" />
+    <ClInclude Include="PUOneDown.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="D3D">
