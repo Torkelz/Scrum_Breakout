@@ -446,3 +446,60 @@ float Camera::getFarPlane()
 {
 	return m_farPlane;
 }
+
+mat4 Camera::getViewMatrixSpecYaw(float p_yaw)
+{
+	m_up = vec3(0.0f,1.0f,0.0f);
+	m_lookAt = vec3(0.0f,0.0f,1.0f);
+	m_right = vec3(1.0f,0.0f,0.0f);
+
+	mat4 ret;
+
+	//setYaw(3);
+	mat4 R;
+	R[1].y = cos(m_pitch);
+	R[1].z = sin(m_pitch);
+	R[2].y = -sin(m_pitch);
+	R[2].z = cos(m_pitch);
+	
+	vec4 temp;
+	temp = vec4(m_up, 0.0f) * R;
+	m_up = temp.xyz();
+	
+	temp = vec4(m_lookAt, 0.0f) * R;
+	m_lookAt = temp.xyz();
+	
+
+	R = mat4(1.0f);
+	R[0].x = cos(p_yaw);
+	R[0].z = -sin(p_yaw);
+	R[2].x = sin(p_yaw);
+	R[2].z = cos(p_yaw);
+	
+
+	temp = vec4(m_up, 0.0f) * R;
+	m_up = temp.xyz();
+
+	temp = vec4(m_right, 0.0f) * R;
+	m_right = temp.xyz();
+	
+	temp = vec4(m_lookAt, 0.0f) * R;
+	m_lookAt = temp.xyz();
+
+
+	// Update view matrix.
+	ret[0].x = m_right.x; ret[0].y = m_up.x; ret[0].z = m_lookAt.x;
+	ret[1].x = m_right.y; ret[1].y = m_up.y; ret[1].z = m_lookAt.y;
+	ret[2].x = m_right.z; ret[2].y = m_up.z; ret[2].z = m_lookAt.z;
+	 
+	ret[3].x = - dot(m_cameraPos, m_right );
+	ret[3].y = - dot(m_cameraPos, m_up );
+	ret[3].z = - dot(m_cameraPos, m_lookAt );
+	 
+	ret[0].w = 0.0f;
+	ret[1].w = 0.0f;
+	ret[2].w = 0.0f;
+	ret[3].w = 1.0f;
+
+	return ret;
+}

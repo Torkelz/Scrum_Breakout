@@ -30,7 +30,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="Buffer.cpp">
       <Filter>D3D</Filter>
     </ClCompile>
@@ -139,8 +138,6 @@
     <ClCompile Include="GameTimer.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="D3DTextDevice.cpp" />
-    <ClCompile Include="D3DFont.cpp" />
     <ClCompile Include="PUSplitBall.cpp">
       <Filter>Powerups</Filter>
     </ClCompile>
@@ -159,9 +156,38 @@
     <ClCompile Include="ExpBlock.cpp">
       <Filter>Object</Filter>
     </ClCompile>
+    <ClCompile Include="InstructionScreen.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneObserver.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="WinScreen.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="DeathScreen.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTimer.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="HighScore.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DFont.cpp">
+      <Filter>Text</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DTextDevice.cpp">
+      <Filter>Text</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameTimer.h" />
     <ClInclude Include="Buffer.h">
       <Filter>D3D\Header</Filter>
     </ClInclude>
@@ -276,8 +302,6 @@
     <ClInclude Include="PUBiggerPad.h">
       <Filter>Powerups\Header</Filter>
     </ClInclude>
-    <ClInclude Include="D3DTextDevice.h" />
-    <ClInclude Include="D3DFont.h" />
     <ClInclude Include="PUSplitBall.h">
       <Filter>Powerups\Header</Filter>
     </ClInclude>
@@ -295,6 +319,39 @@
     </ClInclude>
     <ClInclude Include="ExpBlock.h">
       <Filter>Object\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="DeathScreen.h">
+      <Filter>Scene\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="InstructionScreen.h">
+      <Filter>Scene\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.h">
+      <Filter>Scene\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Scene\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneInclude.h">
+      <Filter>Scene\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneObserver.h">
+      <Filter>Scene\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="WinScreen.h">
+      <Filter>Scene\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="HighScore.h">
+      <Filter>Scene\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DFont.h">
+      <Filter>Text\header</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DTextDevice.h">
+      <Filter>Text\header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -363,6 +420,18 @@
     </Filter>
     <Filter Include="Skybox">
       <UniqueIdentifier>{b668d91f-a70e-415e-8b6b-f1344b7da20f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{b6c972f7-22ce-4a48-a468-e954e5fe28ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Header">
+      <UniqueIdentifier>{a4283d87-8dde-408f-b7db-695f2f66b84f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text">
+      <UniqueIdentifier>{aaf0cfb3-9765-4700-baac-448de130604f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text\header">
+      <UniqueIdentifier>{243aa03c-163c-41d6-81a4-f1341ee6db2c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

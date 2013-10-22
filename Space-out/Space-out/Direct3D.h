@@ -19,6 +19,7 @@
 #include "SkyBox.h"
 
 #include "D3DTextDevice.h"
+#include "SceneInclude.h"
 
 class Object;
 
@@ -72,12 +73,6 @@ inline mat4 XMMatrixTomat4(XMMATRIX* p)
 	return r;
 };
 
-inline std::string IntToString(int i)
-{
-	std::stringstream ss;
-	ss << i;
-	return ss.str();
-};
 inline XMVECTOR vec3ToXMVector(vec3 p)
 {
 	XMVECTOR r;
@@ -168,10 +163,14 @@ private:
 	D3DTexture		 m_powerTextures[20];
 	Shader			 m_powerShader;
 	ID3D11BlendState* m_pPowerBlend;
-	// DEBUGGING DRAW
 
-	// TEXT TEST
+	//Scene stuff
+	D3DTextDevice*	 m_pauseText;
 	D3DTextDevice*	 m_pTextDevice;
-
+	HighScore		 m_highScore;
+	Menu			 m_menu;
+	WinScreen		 m_winScreen;
+	DeathScreen		 m_deathScreen;
+	InstructionScreen m_instructionScreen;
 };
 #endif

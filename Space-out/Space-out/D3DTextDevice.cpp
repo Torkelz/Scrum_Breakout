@@ -9,8 +9,7 @@ D3DTextDevice::D3DTextDevice()
 D3DTextDevice::~D3DTextDevice(){}
 
 
-bool D3DTextDevice::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, HWND hwnd, int screenWidth, int screenHeight, 
-						   XMMATRIX* baseViewMatrix)
+bool D3DTextDevice::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, HWND hwnd, int screenWidth, int screenHeight)
 {
 	bool result;
 
@@ -30,9 +29,6 @@ bool D3DTextDevice::Initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	// Store the screen width and height.
 	m_screenWidth = screenWidth;
 	m_screenHeight = screenHeight;
-
-	// Store the base view matrix.
-	m_baseViewMatrix = *baseViewMatrix;
 
 	// Create the font object.
 	m_Font = new D3DFont();
@@ -336,7 +332,7 @@ void D3DTextDevice::addSentence(char* message, int id, ID3D11Device* device, ID3
 {
 	// Initialize the first sentence.
 	SentenceType* tempSentence;
-	InitializeSentence(&tempSentence, 30, device);
+	InitializeSentence(&tempSentence, 70, device);
 
 	// Now update the sentence vertex buffer with the new string information.
 	//UpdateSentence(tempSentence, message, 100, 200, 1.0f, 1.0f, 1.0f, deviceContext);

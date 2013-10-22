@@ -35,7 +35,7 @@ public:
 	D3DTextDevice();
 	~D3DTextDevice();
 
-	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, HWND hwnd, int screenWidth, int screenHeight, XMMATRIX* baseViewMatrix);
+	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, HWND hwnd, int screenWidth, int screenHeight);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, XMMATRIX*, XMMATRIX*, ID3D11SamplerState*, ID3D11RasterizerState*);
 	void addSentence(char* message, int id, ID3D11Device*, ID3D11DeviceContext*);

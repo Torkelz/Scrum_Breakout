@@ -3,7 +3,8 @@
 #include "Pad.h"
 
 #include "Block.h"
-#include <time.h> 
+#include <time.h>
+#include "SceneInclude.h"
 
 Game::Game(){}
 Game::~Game(){}
@@ -12,6 +13,9 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 {
 	//Set random seed for powerups
 	srand (time(NULL));
+	
+	m_active = false;
+	m_paused = false;
 
 	Difficulties diff = Difficulties();
 	diff.setInitValues(p_diff);
@@ -72,232 +76,243 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 	m_soundManager.setVolume(0.0f, 0);
 	
 	addBorders();
+	int tempPowerUpSize = m_powerUps.size() - 1;
+	for(int i = tempPowerUpSize; i >= 0; i--)
+	{
+		m_pPUObservable->broadcastDeath(i);
+		m_powerUps.erase(m_powerUps.begin() + i);
+	}
 }
 
 void Game::update(float p_screenWidth, float p_dt)
 {
 	m_soundManager.update();
 
-	m_pCamera->updateCameraPos(p_dt);
-
-	if(m_pCamera->timeToChange())
+	if(!m_paused)
 	{
-		m_activePlayField = m_activePlayFieldNext;
-		int tempPowerUpSize = m_powerUps.size() - 1;
-		for(int i = tempPowerUpSize; i >= 0; i--)
+		m_pCamera->updateCameraPos(p_dt);
+
+		if(m_pCamera->timeToChange())
 		{
-			m_pPUObservable->broadcastDeath(i);
-			m_powerUps.erase(m_powerUps.begin() + i);
-		}
-	}
-
-	if(!m_pCamera->isCinematic() || (m_pCamera->timeToChange() && m_pCamera->getRunOnce()))
-	{
-		m_pCamera->setRunOnce(false);
-		if(m_counter > 0.0f)
-		{
-			m_counter -= p_dt;
-		}
-		else
-			((Pad*)m_pPad)->setSticky(false);
-		
-		vec3 padPos = *m_pPad->getPos();
-		PlayField* pf = m_playFields[m_activePlayField];
-		vec3 t_pos = pf->getOriginalPosition();
-		t_pos -= pf->getRightDir() * padPos.x;
-		t_pos += pf->getDownDir() * padPos.y;
-
-		mat4 padTranslation = translate(mat4(1.0f), t_pos);
-		mat4 padRotation;
-		if(m_activePlayField == 0 || m_activePlayField == 2)
-			padRotation = m_playFields[0]->getRotationMatrix();
-		else
-			padRotation = m_playFields[3]->getRotationMatrix();
-
-		((Pad*)m_pPad)->update(padTranslation, padRotation);
-
-		for(unsigned int b = 0; b < m_pBall.size();b++)
-		{
-
-			if(!((Ball*)m_pBall.at(b))->getStuck())
+			m_activePlayField = m_activePlayFieldNext;
+			int tempPowerUpSize = m_powerUps.size() - 1;
+			for(int i = tempPowerUpSize; i >= 0; i--)
 			{
-				((Ball*)m_pBall.at(b))->update(p_dt);
-				((Ball*)m_pBall.at(b))->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
-
-				//Pad vs Ball
-				if(((Pad*)m_pPad)->collide(m_pBall.at(b)->getBoundingVolume()) && !((Ball*)m_pBall.at(b))->getPadCrash())
-				{
-					if(!((Pad*)m_pPad)->getSticky())
-					{
-						vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall.at(b)->getBoundingVolume()->getPosition(), ((Ball*)m_pBall.at(b))->getSpeed());
-					
-						tempSpeed.y = -abs(tempSpeed.y);
-						((Ball*)m_pBall.at(b))->setSpeed( tempSpeed );
-						((Ball*)m_pBall.at(b))->resetPadCrash();
-					}
-					else
-					{
-						((Ball*)m_pBall.at(b))->setStuck(true);
-						((Pad*)m_pPad)->setSavedVector( ((Ball*)m_pBall.at(b))->getRealPosition()- *m_pPad->getBoundingVolume()->getPosition() );
-					}
-				}
-
-				// ## BLOCKS ##
-				for(int i = 0; i < m_playFields[m_activePlayField]->getBlockListSize();i++)
-				{
-					AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
-					if(bv->collide(m_pBall.at(b)->getBoundingVolume()))
-					{
-						m_soundManager.play(m_pSoundList[COLLISION], 1);
-						m_soundManager.setVolume(0.35f, 1);
-						vec3 s = ((Ball*)m_pBall.at(b))->getSpeed();
-						vec3 tempSpeed = bv->findNewDirection(*m_pBall.at(b)->getBoundingVolume()->getPosition(), s);
-						((Ball*)m_pBall.at(b))->setSpeed( tempSpeed );
-
-						m_playFields[m_activePlayField]->getBlock(i)->decreaseHP(1);
-					
-						if( ( (Ball*)m_pBall.at(b))->getIsExplosive() )
-						{
-							m_playFields[m_activePlayField]->getBlock(i)->changeBlockType(EXPBLOCK);
-						}
-
-						bv = NULL;
-						break;
-					}
-				}
-				// ## END BLOCKS ##
-
-				// ## WALLS ##
-				for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
-				{
-					AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
-
-					if(  bv->collide(m_pBall.at(b)->getBoundingVolume()) && !((Ball*)m_pBall.at(b))->getWallCrash())
-					{
-						if (i == 3)
-						{
-							if(m_pBall.size() == 1)
-							{
-								resetBall(pf);
-								m_player.lives--;
-								( (Ball*)m_pBall.at(b))->setExplosive(false);
-							}
-							else
-							{
-								m_pBall.erase(m_pBall.begin()+b);
-								break;
-							}
-						}
-						vec3 tempSpeed = bv->findNewDirection(*m_pBall.at(b)->getBoundingVolume()->getPosition(), ((Ball*)m_pBall.at(b))->getSpeed());
-						((Ball*)m_pBall.at(b))->setSpeed( tempSpeed );
-						((Ball*)m_pBall.at(b))->resetWallCrash();
-						break;
-					}
-				}
-			}
-			else
-			{
-				((Ball*)m_pBall.at(b))->setInternalPosition( *m_pPad->getBoundingVolume()->getPosition() + ((Pad*)m_pPad)->getSavedVector(),pf->getOriginalPosition(),pf->getRightDir(), pf->getDownDir() );
-				((Ball*)m_pBall.at(b))->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
-			}		
-		}//BALL LOOP END
-		for(int i = 0; i < m_playFields[m_activePlayField]->getBlockListSize();i++)
-		{
-			if(m_playFields[m_activePlayField]->getBlock(i)->isDead())
-			{
-				powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
-					
-				if(m_playFields[m_activePlayField]->getBlock(i)->getBlockType() == EXPBLOCK)
-				{
-					m_neighbourBlockIndex = findBlockWhoWILLDIEByExplosion(i);
-					for(int exp = m_neighbourBlockIndex.size() - 1; exp >= 0; exp--)
-					{
-						m_playFields[m_activePlayField]->getBlock(m_neighbourBlockIndex.at(exp))->decreaseHP(1);
-					}
-				}
-				m_playFields[m_activePlayField]->deleteBlock(i);
-				break;
-			}	
-		}
-		//Pad vs Borders NEEDS FINE TUNING
-		for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders()-2; i++)
-		{
-			AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
-
-			if(  bv->collide(m_pPad->getBoundingVolume()))
-			{
-				vec3 Bcenter = *bv->getPosition();
-				vec3 Pcenter = *m_pPad->getBoundingVolume()->getPosition();
-				Bcenter.y = Pcenter.y;
-
-				vec3 dir = Pcenter - Bcenter;
-				if(length(dir) > 0.0f)
-					dir = normalize(dir);
-
-				float x = dot(dir, m_playFields[m_activePlayField]->getRightDir());
-				x *= -1.f;
-				if(i == 0) //Hit Left side
-				{
-					((Pad*)(m_pPad))->changeXCoordXAmount(x*2); // NEEDS FINE TUNING
-				}
-				else //Hit Right side
-				{
-					((Pad*)(m_pPad))->changeXCoordXAmount(x*2);
-				}
-				break;
-			}
-		}
-
-		padPos = ((Pad*)m_pPad)->getRealPosition();
-		for(unsigned int i = 0; i < m_powerUps.size(); i++)
-		{
-			// Update position for power ups.
-			mat4 powTranslation;// = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, t_pos.z));
-			if (m_activePlayField == 0 || m_activePlayField == 2)
-				powTranslation = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, padPos.z)); // Translate powerup
-			else
-				powTranslation = translate(mat4(1.0f), vec3(padPos.x, m_powerUps.at(i)->getPos()->y, m_powerUps.at(i)->getPos()->z));
-
-			m_powerUps.at(i)->update(p_dt, powTranslation);
-			AABB* bv = (AABB*)(m_powerUps.at(i)->getBoundingVolume());
-
-			if( bv->collide(m_pPad->getBoundingVolume()) )
-			{
-				//Power Up catch.
-				powerUpCheck(m_powerUps.at(i)->getType());
-				m_pPUObservable->broadcastDeath(i);
-				m_powerUps.erase(m_powerUps.begin() + i);
-			}
-			if( bv->collide(m_playFields[m_activePlayField]->getCollisionBorder(3)))
-			{
-				//Power Up missed.
 				m_pPUObservable->broadcastDeath(i);
 				m_powerUps.erase(m_powerUps.begin() + i);
 			}
 		}
-		// ## COLLISION STUFF END ##
 
-		if(pf->getBlockListSize() <= 0) // If playfield is empty move the ball to the pad.
+		if(!m_pCamera->isCinematic() || (m_pCamera->timeToChange() && m_pCamera->getRunOnce()))
 		{
-			resetBall(pf);
-		}
+			m_pCamera->setRunOnce(false);
+			if(m_counter > 0.0f)
+			{
+				m_counter -= p_dt;
+			}
+			else
+				((Pad*)m_pPad)->setSticky(false);
 
-		pf = NULL;
+			vec3 padPos = *m_pPad->getPos();
+			PlayField* pf = m_playFields[m_activePlayField];
+			vec3 t_pos = pf->getOriginalPosition();
+			t_pos -= pf->getRightDir() * padPos.x;
+			t_pos += pf->getDownDir() * padPos.y;
 
-		// TEST LIVES
-		if (m_player.lives <= 0)
-		{
-			PostQuitMessage(0);
-		}
+			mat4 padTranslation = translate(mat4(1.0f), t_pos);
+			mat4 padRotation;
+			if(m_activePlayField == 0 || m_activePlayField == 2)
+				padRotation = m_playFields[0]->getRotationMatrix();
+			else
+				padRotation = m_playFields[3]->getRotationMatrix();
 
-		int nrOfRemainingBlocks = 0;
-		for (int pl = 0; pl < 4; pl++)
-		{
-			nrOfRemainingBlocks += m_playFields[pl]->getBlockListSize();
-		}
-		if(nrOfRemainingBlocks <= 0)
-		{
-			PostQuitMessage(1);
+			((Pad*)m_pPad)->update(padTranslation, padRotation);
+
+			for(unsigned int b = 0; b < m_pBall.size();b++)
+			{
+
+				if(!((Ball*)m_pBall.at(b))->getStuck())
+				{
+					((Ball*)m_pBall.at(b))->update(p_dt);
+					((Ball*)m_pBall.at(b))->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
+
+					//Pad vs Ball
+					if(((Pad*)m_pPad)->collide(m_pBall.at(b)->getBoundingVolume()) && !((Ball*)m_pBall.at(b))->getPadCrash())
+					{
+						if(!((Pad*)m_pPad)->getSticky())
+						{
+							vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall.at(b)->getBoundingVolume()->getPosition(), ((Ball*)m_pBall.at(b))->getSpeed());
+					
+							tempSpeed.y = -abs(tempSpeed.y);
+							((Ball*)m_pBall.at(b))->setSpeed( tempSpeed );
+							((Ball*)m_pBall.at(b))->resetPadCrash();
+						}
+						else
+						{
+							((Ball*)m_pBall.at(b))->setStuck(true);
+							((Pad*)m_pPad)->setSavedVector( ((Ball*)m_pBall.at(b))->getRealPosition()- *m_pPad->getBoundingVolume()->getPosition() );
+						}
+					}
+
+					// ## BLOCKS ##
+					for(int i = 0; i < m_playFields[m_activePlayField]->getBlockListSize();i++)
+					{
+						AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
+						if(bv->collide(m_pBall.at(b)->getBoundingVolume()))
+						{
+							m_soundManager.play(m_pSoundList[COLLISION], 1);
+							m_soundManager.setVolume(0.35f, 1);
+							vec3 s = ((Ball*)m_pBall.at(b))->getSpeed();
+							vec3 tempSpeed = bv->findNewDirection(*m_pBall.at(b)->getBoundingVolume()->getPosition(), s);
+							((Ball*)m_pBall.at(b))->setSpeed( tempSpeed );
+
+							m_playFields[m_activePlayField]->getBlock(i)->decreaseHP(1);
+					
+							if( ( (Ball*)m_pBall.at(b))->getIsExplosive() )
+							{
+								m_playFields[m_activePlayField]->getBlock(i)->changeBlockType(EXPBLOCK);
+							}
+
+							bv = NULL;
+							break;
+						}
+					}
+					// ## END BLOCKS ##
+
+					// ## WALLS ##
+					for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
+					{
+						AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
+
+						if(  bv->collide(m_pBall.at(b)->getBoundingVolume()) && !((Ball*)m_pBall.at(b))->getWallCrash())
+						{
+							if (i == 3)
+							{
+								if(m_pBall.size() == 1)
+								{
+									resetBall(pf);
+									m_player.lives--;
+									( (Ball*)m_pBall.at(b))->setExplosive(false);
+								}
+								else
+								{
+									m_pBall.erase(m_pBall.begin()+b);
+									break;
+								}
+							}
+							vec3 tempSpeed = bv->findNewDirection(*m_pBall.at(b)->getBoundingVolume()->getPosition(), ((Ball*)m_pBall.at(b))->getSpeed());
+							((Ball*)m_pBall.at(b))->setSpeed( tempSpeed );
+							((Ball*)m_pBall.at(b))->resetWallCrash();
+							break;
+						}
+					}
+				}
+				else
+				{
+					((Ball*)m_pBall.at(b))->setInternalPosition( *m_pPad->getBoundingVolume()->getPosition() + ((Pad*)m_pPad)->getSavedVector(),pf->getOriginalPosition(),pf->getRightDir(), pf->getDownDir() );
+					((Ball*)m_pBall.at(b))->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
+				}		
+			}//BALL LOOP END
+			for(int i = 0; i < m_playFields[m_activePlayField]->getBlockListSize();i++)
+			{
+				if(m_playFields[m_activePlayField]->getBlock(i)->isDead())
+				{
+					powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
+					
+					if(m_playFields[m_activePlayField]->getBlock(i)->getBlockType() == EXPBLOCK)
+					{
+						m_neighbourBlockIndex = findBlockWhoWILLDIEByExplosion(i);
+						for(int exp = m_neighbourBlockIndex.size() - 1; exp >= 0; exp--)
+						{
+							m_playFields[m_activePlayField]->getBlock(m_neighbourBlockIndex.at(exp))->decreaseHP(1);
+						}
+					}
+					m_playFields[m_activePlayField]->deleteBlock(i);
+					break;
+				}	
+			}
+			//Pad vs Borders NEEDS FINE TUNING
+			for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders()-2; i++)
+			{
+				AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
+
+				if(  bv->collide(m_pPad->getBoundingVolume()))
+				{
+					vec3 Bcenter = *bv->getPosition();
+					vec3 Pcenter = *m_pPad->getBoundingVolume()->getPosition();
+					Bcenter.y = Pcenter.y;
+
+					vec3 dir = Pcenter - Bcenter;
+					if(length(dir) > 0.0f)
+						dir = normalize(dir);
+
+					float x = dot(dir, m_playFields[m_activePlayField]->getRightDir());
+					x *= -1.f;
+					if(i == 0) //Hit Left side
+					{
+						((Pad*)(m_pPad))->changeXCoordXAmount(x*2); // NEEDS FINE TUNING
+					}
+					else //Hit Right side
+					{
+						((Pad*)(m_pPad))->changeXCoordXAmount(x*2);
+					}
+					break;
+				}
+			}
+
+			padPos = ((Pad*)m_pPad)->getRealPosition();
+			for(unsigned int i = 0; i < m_powerUps.size(); i++)
+			{
+				// Update position for power ups.
+				mat4 powTranslation;// = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, t_pos.z));
+				if (m_activePlayField == 0 || m_activePlayField == 2)
+					powTranslation = translate(mat4(1.0f), vec3(m_powerUps.at(i)->getPos()->x, m_powerUps.at(i)->getPos()->y, padPos.z)); // Translate powerup
+				else
+					powTranslation = translate(mat4(1.0f), vec3(padPos.x, m_powerUps.at(i)->getPos()->y, m_powerUps.at(i)->getPos()->z));
+
+				m_powerUps.at(i)->update(p_dt, powTranslation);
+				AABB* bv = (AABB*)(m_powerUps.at(i)->getBoundingVolume());
+
+				if( bv->collide(m_pPad->getBoundingVolume()) )
+				{
+					//Power Up catch.
+					powerUpCheck(m_powerUps.at(i)->getType());
+					m_pPUObservable->broadcastDeath(i);
+					m_powerUps.erase(m_powerUps.begin() + i);
+				}
+				if( bv->collide(m_playFields[m_activePlayField]->getCollisionBorder(3)))
+				{
+					//Power Up missed.
+					m_pPUObservable->broadcastDeath(i);
+					m_powerUps.erase(m_powerUps.begin() + i);
+				}
+			}
+			// ## COLLISION STUFF END ##
+
+			if(pf->getBlockListSize() <= 0) // If playfield is empty move the ball to the pad.
+			{
+				resetBall(pf);
+			}
+
+			pf = NULL;
+
+			// TEST LIVES
+			if (m_player.lives <= 0)
+			{
+					m_active = false;
+					m_deathScene->setActive(true);
+			}
+
+			int nrOfRemainingBlocks = 0;
+			for (int pl = 0; pl < 4; pl++)
+			{
+				nrOfRemainingBlocks += m_playFields[pl]->getBlockListSize();
+			}
+			if(nrOfRemainingBlocks <= 0)
+			{
+					m_active = false;
+					m_winScene->setActive(true);
+			}
 		}
 	}
 
@@ -393,145 +408,157 @@ vector<int> Game::findBlockWhoWILLDIEByExplosion(int i)
 
 void Game::keyEvent(unsigned short key)
 {
-	if(key == 0x41) // A
+	if(m_active)
 	{
-		((Ball*)m_pBall.front())->setSpeed(vec3(-50.0f, 0.0f, 0.0f) * 3.0f);
-	}
-	if(key == 0x44) // D
-	{
-		((Ball*)m_pBall.front())->setSpeed(vec3(50.0f, 0.0f, 0.0f) * 3.0f);
-	}
-	if(key == 0x57) // W
-	{
-		((Ball*)m_pBall.front())->setSpeed(vec3(0.0f, -50.0f, 0.0f) * 3.0f);
-	}
-	if(key == 0x53) // S
-	{
-		((Ball*)m_pBall.front())->setSpeed(vec3(0.0f, 50.0f, 0.0f) * 3.0f);
-	}
-	//DEBUG BALL
-	//if(key == 0x42) // B
-	//{
-	//	spawnBalls(-180,180,8, (Ball*)m_pBall.front());
-	//}
-
-
-	if(key == 0x45) // E
-	{
-		if(!m_pCamera->isCinematic())
+		if(key == 0x41) // A
 		{
-			bool ballsCheck = true;
-			int apf = m_activePlayField;
-			unsigned int npf;
-			if(apf - 1 < 0)
-				npf = m_nrPlayFields - 1;
-			else
-				npf = apf - 1;
+			((Ball*)m_pBall.front())->setSpeed(vec3(-50.0f, 0.0f, 0.0f) * 3.0f);
+		}
+		if(key == 0x44) // D
+		{
+			((Ball*)m_pBall.front())->setSpeed(vec3(50.0f, 0.0f, 0.0f) * 3.0f);
+		}
+		if(key == 0x57) // W
+		{
+			((Ball*)m_pBall.front())->setSpeed(vec3(0.0f, -50.0f, 0.0f) * 3.0f);
+		}
+		if(key == 0x53) // S
+		{
+			((Ball*)m_pBall.front())->setSpeed(vec3(0.0f, 50.0f, 0.0f) * 3.0f);
+		}
+		//DEBUG BALL
+		//if(key == 0x42) // B
+		//{
+		//	spawnBalls(-180,180,8, (Ball*)m_pBall.front());
+		//}
 
-			ABlock* block = m_playFields[npf]->getLastBlock();
-			if(block != nullptr)
+
+		if(key == 0x45) // E
+		{
+			if(!m_pCamera->isCinematic())
 			{
-				for(unsigned int b = 0; b < m_pBall.size();b++)
+				bool ballsCheck = true;
+				int apf = m_activePlayField;
+				unsigned int npf;
+				if(apf - 1 < 0)
+					npf = m_nrPlayFields - 1;
+				else
+					npf = apf - 1;
+
+				ABlock* block = m_playFields[npf]->getLastBlock();
+				if(block != nullptr)
 				{
-					if(((Ball*)m_pBall.at(b))->getRealPosition().y > ((Block*)block)->getBlockVertex().pos.y - 5)//5 offset
+					for(unsigned int b = 0; b < m_pBall.size();b++)
 					{
-						ballsCheck = false;
-						break;
+						if(((Ball*)m_pBall.at(b))->getRealPosition().y > ((Block*)block)->getBlockVertex().pos.y - 5)//5 offset
+						{
+							ballsCheck = false;
+							break;
+						}
 					}
 				}
-			}
 
-			if(ballsCheck)
-			{
-				m_activePlayFieldNext--;
-				if(m_activePlayFieldNext < 0)
-					m_activePlayFieldNext = m_nrPlayFields - 1;
+				if(ballsCheck)
+				{
+					m_activePlayFieldNext--;
+					if(m_activePlayFieldNext < 0)
+						m_activePlayFieldNext = m_nrPlayFields - 1;
 
-				m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-										m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-										m_originWorld,
-										4);
-				m_pCamera->setYaw(m_activePlayFieldNext);
-				m_pCamera->startCinematic();
+					m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
+											m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
+											m_originWorld,
+											4);
+					m_pCamera->setYaw(m_activePlayFieldNext);
+					m_pCamera->startCinematic();
 			
-				m_pCamera->setRunOnce(true);
-			}
-		}
-	}
-	if(key == 0x51) // Q
-	{
-		if(!m_pCamera->isCinematic())
-		{
-			bool ballsCheck = true;
-			unsigned int npf;
-			if(m_activePlayField + 1 >= m_nrPlayFields)
-				npf = 0;
-			else
-				npf = m_activePlayField + 1;
-
-			ABlock* block = m_playFields[npf]->getLastBlock();
-
-			if(block != nullptr)
-			{
-				for(unsigned int b = 0; b < m_pBall.size();b++)
-				{
-					if(((Ball*)m_pBall.at(b))->getRealPosition().y > ((Block*)block)->getBlockVertex().pos.y - 5)//5 offset
-					{
-						ballsCheck = false;
-						break;
-					}
+					m_pCamera->setRunOnce(true);
+				}
 				}
 			}
-
-			if(ballsCheck)
+			
+			if(key == 0x51) // Q
 			{
-				m_activePlayFieldNext++;
-				if(m_activePlayFieldNext >= m_nrPlayFields)
-					m_activePlayFieldNext = 0;
+				if(!m_pCamera->isCinematic())
+			{
+				bool ballsCheck = true;
+				unsigned int npf;
+				if(m_activePlayField + 1 >= m_nrPlayFields)
+					npf = 0;
+				else
+					npf = m_activePlayField + 1;
 
-				m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
-										m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
-										m_originWorld,
-										4);
-				m_pCamera->setYaw(m_activePlayFieldNext);
-				m_pCamera->startCinematic();
+				ABlock* block = m_playFields[npf]->getLastBlock();
 
-				m_pCamera->setRunOnce(true);
+				if(block != nullptr)
+				{
+					for(unsigned int b = 0; b < m_pBall.size();b++)
+					{
+						if(((Ball*)m_pBall.at(b))->getRealPosition().y > ((Block*)block)->getBlockVertex().pos.y - 5)//5 offset
+						{
+							ballsCheck = false;
+							break;
+						}
+					}
+				}
+
+				if(ballsCheck)
+				{
+					m_activePlayFieldNext++;
+					if(m_activePlayFieldNext >= m_nrPlayFields)
+						m_activePlayFieldNext = 0;
+
+					m_pCamera->buildPath(	m_playFields[m_activePlayField]->calculateCameraCenterPos(), 
+											m_playFields[m_activePlayFieldNext]->calculateCameraCenterPos(),
+											m_originWorld,
+											4);
+					m_pCamera->setYaw(m_activePlayFieldNext);
+					m_pCamera->startCinematic();
+
+					m_pCamera->setRunOnce(true);
+				}
+				}
 			}
+		if(key == 0x1B) //ESC
+			PostQuitMessage(0);
+
+		if(key == 0x52) // R
+		{
+			PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+			powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
+			m_pPUObservable->broadcastRebirth(powerUp);
+			m_powerUps.push_back(powerUp);
+		}
+		if( key == 0x46) // F
+		{
+			PUExplosiveBall* powerUp = new PUExplosiveBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+			powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
+			m_pPUObservable->broadcastRebirth(powerUp);
+			m_powerUps.push_back(powerUp);
+		}
+			//if(key == 0x4C) // L
+			//{
+			//}
+
+		if(key == 0x20) // SPACE
+		{
+			m_paused = (m_paused + 1) % 2;
 		}
 	}
-	if(key == 0x1B) //ESC
-		PostQuitMessage(0);
-
-	if(key == 0x52) // R
-	{
-		PUStickyPad* powerUp = new PUStickyPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-		powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-		m_pPUObservable->broadcastRebirth(powerUp);
-		m_powerUps.push_back(powerUp);
-	}
-	if( key == 0x46) // F
-	{
-		PUExplosiveBall* powerUp = new PUExplosiveBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-		powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-		m_pPUObservable->broadcastRebirth(powerUp);
-		m_powerUps.push_back(powerUp);
-	}
-	//if(key == 0x4C) // L
-	//{
-	//}
 }
 
 void Game::leftMouseClick( vec2 p_mousePosition )
 {
-	for(unsigned int i = 0; i < m_pBall.size();i++)
+	if(m_active)
 	{
-		if(((Ball*)m_pBall.at(i))->getStuck())
+		for(unsigned int i = 0; i < m_pBall.size();i++)
 		{
-			((Ball*)m_pBall.at(i))->setStuck(false);
-			vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall.at(i)->getBoundingVolume()->getPosition(), ((Ball*)m_pBall.at(i))->getSpeed());
-			tempSpeed.y = -abs(tempSpeed.y);
-			((Ball*)m_pBall.at(i))->setSpeed( tempSpeed );
+			if(((Ball*)m_pBall.at(i))->getStuck())
+			{
+				((Ball*)m_pBall.at(i))->setStuck(false);
+				vec3 tempSpeed = ((AABB*)m_pPad->getBoundingVolume())->findNewDirection(*m_pBall.at(i)->getBoundingVolume()->getPosition(), ((Ball*)m_pBall.at(i))->getSpeed());
+				tempSpeed.y = -abs(tempSpeed.y);
+				((Ball*)m_pBall.at(i))->setSpeed( tempSpeed );
+			}
 		}
 	}
 }
@@ -540,11 +567,14 @@ void Game::rightMouseClick( vec2 p_mousePosition ){}
 
 void Game::mouseMove( vec2 p_mousePosition )
 {
-	if(p_mousePosition.x >= m_screenBorders.x &&
-		p_mousePosition.x <= m_screenBorders.y &&
-		p_mousePosition.y >= m_screenBorders.z &&
-		p_mousePosition.y <= m_screenBorders.w)
-	((Pad*)m_pPad)->setPos( vec2(-p_mousePosition.x, p_mousePosition.y) );
+	if(m_active)
+	{
+		if(p_mousePosition.x >= m_screenBorders.x &&
+			p_mousePosition.x <= m_screenBorders.y &&
+			p_mousePosition.y >= m_screenBorders.z &&
+			p_mousePosition.y <= m_screenBorders.w)
+		((Pad*)m_pPad)->setPos( vec2(-p_mousePosition.x, p_mousePosition.y) );
+	}
 }
 
 Observer* Game::getObserver()
@@ -857,24 +887,43 @@ vector<Borders>* Game::getBorders()
 
 void Game::spawnBalls(float p_sAngle, float p_eAngle, unsigned int p_numBalls, Ball* p_ball)
 {
-	mat4 rot;
-	float stepAngle = (p_eAngle - p_sAngle)/(p_numBalls-1);
-	vec3 playfieldOrtho = m_playFields[m_activePlayField]->getOrthoDir();
+        mat4 rot;
+        float stepAngle = (p_eAngle - p_sAngle)/(p_numBalls-1);
+        vec3 playfieldOrtho = m_playFields[m_activePlayField]->getOrthoDir();
 
-	vec3 pos, ospeed,speed;
-	pos = p_ball->getRealPosition();
-	ospeed = p_ball->getSpeed();
 
-	for(unsigned int i = 0; i < p_numBalls; i++)
-	{
-		speed = glm::rotate(ospeed, p_sAngle+(stepAngle*i),vec3(0,0,1));
+        vec3 pos, ospeed,speed;
+        pos = p_ball->getRealPosition();
+        ospeed = p_ball->getSpeed();
 
-		m_pBall.push_back(new Ball(&pos, &vec3(0.56f, 0.56f, 0.56f), "Ball", speed));
-		((Ball*)m_pBall.back())->setInternalPosition(pos, m_playFields[m_activePlayField]->getOriginalPosition(), 
-										m_playFields[m_activePlayField]->getRightDir(), 
-										m_playFields[m_activePlayField]->getDownDir());
-		((Ball*)m_pBall.back())->init(m_playFields[m_activePlayField]->getOriginalPosition(), 
-										m_playFields[m_activePlayField]->getRightDir(), 
-										m_playFields[m_activePlayField]->getDownDir());
-	}
+
+        for(unsigned int i = 0; i < p_numBalls; i++)
+        {
+                speed = glm::rotate(ospeed, p_sAngle+(stepAngle*i),vec3(0,0,1));
+
+
+                m_pBall.push_back(new Ball(&pos, &vec3(0.56f, 0.56f, 0.56f), "Ball", speed));
+                ((Ball*)m_pBall.back())->setInternalPosition(pos, m_playFields[m_activePlayField]->getOriginalPosition(), 
+                                                                                m_playFields[m_activePlayField]->getRightDir(), 
+                                                                                m_playFields[m_activePlayField]->getDownDir());
+                ((Ball*)m_pBall.back())->init(m_playFields[m_activePlayField]->getOriginalPosition(), 
+                                                                                m_playFields[m_activePlayField]->getRightDir(), 
+                                                                                m_playFields[m_activePlayField]->getDownDir());
+        }
+}
+
+
+void Game::setWinScreen(WinScreen* p_winScene)
+{
+	m_winScene = p_winScene;
+}
+
+void Game::setDeathScreen(DeathScreen* p_deathScene)
+{
+	m_deathScene = p_deathScene;
+}
+
+bool Game::paused()
+{
+	return m_paused;
 }

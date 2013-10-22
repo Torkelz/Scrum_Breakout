@@ -4,6 +4,7 @@
 #define CLIENTWIDTH		800
 #define CLIENTHEIGHT	600
 
+#include "Scene.h"
 #include <glm.hpp>
 #include <gtc\matrix_transform.hpp>
 #include "..\glm\gtx\rotate_vector.hpp"
@@ -19,8 +20,9 @@
 
 using namespace glm;
 
-class Observer;
 class Object;
+class WinScreen;
+class DeathScreen;
 
 enum DIFFICULTIES
 {
@@ -64,7 +66,7 @@ struct Borders
 };
 
 
-class Game
+class Game : public Scene
 {
 public:
 	Game();
@@ -94,6 +96,10 @@ public:
 	
 	//borders
 	void					addBorders();
+	
+	void					setWinScreen(WinScreen* p_winScene);
+	void					setDeathScreen(DeathScreen* p_deathScene);
+	bool					paused();
 private:
 	vector<int>				findBlockWhoWILLDIEByExplosion(int i);
 	vector<Borders>			m_borderList;
@@ -105,6 +111,7 @@ private:
 	void					spawnBalls(float p_sAngle, float p_eAngle, unsigned int p_numBalls, Ball* p_ball);
 
 	Observer*				m_pObserver;
+
 	// ## POWER UP OBSERVABLE ##
 	PUObservable*			m_pPUObservable;
 	Object*					m_pPad;
@@ -133,6 +140,11 @@ private:
 
 	SInitDataDifficulties	m_sDiffData;
 	SPlayer					m_player;
+
+	// Scenes
+	bool					m_paused;
+	WinScreen*				m_winScene;
+	DeathScreen*			m_deathScene;
 };
 
 #endif	GAME_H
