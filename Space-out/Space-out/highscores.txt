@@ -1,5 +1,7 @@
 s 15000
 n Andre
+s 10880
+n Mr.Nobody
 s 6000
 n Mattias
 s 5030
@@ -16,5 +18,3 @@ s 200
 n Markus
 s 150
 n Peter
-s 50
-n Tommy

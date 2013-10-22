@@ -48,12 +48,6 @@ void WinScreen::keyEvent(unsigned short key)
 {	
 	if(m_active)
 	{
-		if(key == 0x41) // A
-		{
-			m_pHighScore->setActive(true);
-			m_active = false;
-		}
-
 		if(key == 0x1B) //ESC
 			PostQuitMessage(0);
 
@@ -65,6 +59,12 @@ void WinScreen::keyEvent(unsigned short key)
 		if(key == 0x08) //BACKSPACE
 		{
 			m_pMenu->setActive(true);
+			m_active = false;
+		}
+
+		if(key == 0x48) // H
+		{
+			m_pHighScore->setActive(true);
 			m_active = false;
 		}
 	}
