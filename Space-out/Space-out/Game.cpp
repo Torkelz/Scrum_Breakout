@@ -427,10 +427,14 @@ void Game::keyEvent(unsigned short key)
 			((Ball*)m_pBall.front())->setSpeed(vec3(0.0f, 50.0f, 0.0f) * 3.0f);
 		}
 		//DEBUG BALL
-		//if(key == 0x42) // B
-		//{
-		//	spawnBalls(-180,180,8, (Ball*)m_pBall.front());
-		//}
+		if(key == 0x42) // B
+		{
+			int t = m_pBall.size();
+			for(int i = 0; i < t;i++)
+			{
+			spawnBalls(-180,180,8, (Ball*)m_pBall.at(i));
+			}
+		}
 
 
 		if(key == 0x45) // E

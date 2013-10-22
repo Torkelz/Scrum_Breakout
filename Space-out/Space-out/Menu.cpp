@@ -35,9 +35,9 @@ void Menu::update()
 	//m_pTextDevice->updateSentenceAt(3, "Press C to see credits", 330, 330, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
 }
 
-void Menu::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster)
+void Menu::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster, ID3D11BlendState* p_Blend)
 {
-	m_pTextDevice->Render(m_pDeviceContext, p_pWorld, p_pProjection, p_sampler, p_raster);
+	m_pTextDevice->Render(m_pDeviceContext, p_pWorld, p_pProjection, p_sampler, p_raster, p_Blend);
 }
 
 void Menu::keyEvent(unsigned short key)

@@ -37,7 +37,7 @@ public:
 
 	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, HWND hwnd, int screenWidth, int screenHeight);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, XMMATRIX*, XMMATRIX*, ID3D11SamplerState*, ID3D11RasterizerState*);
+	bool Render(ID3D11DeviceContext*, XMMATRIX*, XMMATRIX*, ID3D11SamplerState*, ID3D11RasterizerState*, ID3D11BlendState* p_Blend);
 	void addSentence(char* message, int id, ID3D11Device*, ID3D11DeviceContext*);
 	void removeSentence(int id);
 	void updateSentenceAt(int id, char* newMessage, int, int, float, float, float, ID3D11DeviceContext*);
@@ -45,7 +45,7 @@ private:
 	bool InitializeSentence(SentenceType**, int, ID3D11Device*);
 	bool UpdateSentence(SentenceType*, char*, int, int, float, float, float, ID3D11DeviceContext*);
 	void ReleaseSentence(SentenceType**);
-	bool RenderSentence(ID3D11DeviceContext*, SentenceType*, XMMATRIX*, XMMATRIX*, ID3D11SamplerState*, ID3D11RasterizerState*);
+	bool RenderSentence(ID3D11DeviceContext*, SentenceType*, XMMATRIX*, XMMATRIX*, ID3D11SamplerState*, ID3D11RasterizerState*, ID3D11BlendState* p_Blend);
 
 private:
 	D3DFont*		m_Font;

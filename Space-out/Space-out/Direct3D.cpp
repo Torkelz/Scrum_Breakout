@@ -335,6 +335,7 @@ void Direct3D::initApp()
 	bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	m_pDevice->CreateBlendState(&bd, &m_pPowerBlend);
+
 	//m_powerShader.setBlendState(m_pPowerBlend);
 	
 	m_pBallSampler = nullptr;
@@ -680,9 +681,9 @@ void Direct3D::drawScene()
 		//## DRAW TEXT ##
 		XMMATRIX orthoMatrix;
 		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
-		m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
+		m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState, m_pPowerBlend);
 		if(m_game.paused())
-			m_pauseText->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
+			m_pauseText->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState, m_pPowerBlend);
 		//## DRAW TEXT END ##
 	
 		//## PAD DRAW START ##
@@ -824,11 +825,6 @@ void Direct3D::drawScene()
 
 	if(m_menu.active())
 	{
-		XMMATRIX orthoMatrix;
-		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
-		m_menu.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
-
-		// CURRENTLY BROKEN
 		// SKYBOX DRAW
 
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -853,15 +849,16 @@ void Direct3D::drawScene()
 		m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
 		m_pDeviceContext->RSSetState(NULL);
 		//SKYBOX DRAW END
+		XMMATRIX orthoMatrix;
+		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+		m_menu.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState, m_pPowerBlend);
+
+		// CURRENTLY BROKEN
+		
 	}
 
 	if(m_highScore.active())
 	{
-		XMMATRIX orthoMatrix;
-		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
-		m_highScore.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
-
-		// CURRENTLY BROKEN
 		// SKYBOX DRAW
 
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -886,15 +883,16 @@ void Direct3D::drawScene()
 		m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
 		m_pDeviceContext->RSSetState(NULL);
 		//SKYBOX DRAW END
+		XMMATRIX orthoMatrix;
+		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+		m_highScore.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState, m_pPowerBlend);
+
+		// CURRENTLY BROKEN
+		
 	}
 
 	if(m_winScreen.active())
 	{
-		XMMATRIX orthoMatrix;
-		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
-		m_winScreen.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
-
-		// CURRENTLY BROKEN
 		// SKYBOX DRAW
 
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -919,15 +917,16 @@ void Direct3D::drawScene()
 		m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
 		m_pDeviceContext->RSSetState(NULL);
 		//SKYBOX DRAW END
+		XMMATRIX orthoMatrix;
+		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+		m_winScreen.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState, m_pPowerBlend);
+
+		// CURRENTLY BROKEN
+		
 	}
 
 	if(m_deathScreen.active())
 	{
-		XMMATRIX orthoMatrix;
-		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
-		m_deathScreen.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
-
-		// CURRENTLY BROKEN
 		// SKYBOX DRAW
 
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -952,15 +951,16 @@ void Direct3D::drawScene()
 		m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
 		m_pDeviceContext->RSSetState(NULL);
 		//SKYBOX DRAW END
+		XMMATRIX orthoMatrix;
+		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+		m_deathScreen.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState, m_pPowerBlend);
+
+		// CURRENTLY BROKEN
+		
 	}
 
 	if(m_instructionScreen.active())
 	{
-		XMMATRIX orthoMatrix;
-		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
-		m_instructionScreen.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
-
-		// CURRENTLY BROKEN
 		// SKYBOX DRAW
 
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -985,6 +985,12 @@ void Direct3D::drawScene()
 		m_pDeviceContext->DrawIndexed(m_skyBox->getIndices().size(), 0,0);
 		m_pDeviceContext->RSSetState(NULL);
 		//SKYBOX DRAW END
+		XMMATRIX orthoMatrix;
+		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
+		m_instructionScreen.draw(&XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState, m_pPowerBlend);
+
+		// CURRENTLY BROKEN
+		
 	}
 	
 	m_pSwapChain->Present(0, 0);

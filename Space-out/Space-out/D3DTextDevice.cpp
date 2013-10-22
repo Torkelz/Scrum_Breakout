@@ -79,11 +79,11 @@ void D3DTextDevice::Shutdown()
 	return;
 }
 
-bool D3DTextDevice::Render(ID3D11DeviceContext* deviceContext, XMMATRIX* worldMatrix, XMMATRIX* orthoMatrix, ID3D11SamplerState* pSS, ID3D11RasterizerState* pRS)
+bool D3DTextDevice::Render(ID3D11DeviceContext* deviceContext, XMMATRIX* worldMatrix, XMMATRIX* orthoMatrix, ID3D11SamplerState* pSS, ID3D11RasterizerState* pRS, ID3D11BlendState* p_Blend)
 {
 	for (unsigned int i = 0; i < m_sentence.size(); i++)
 	{
-		RenderSentence(deviceContext, m_sentence.at(i), worldMatrix, orthoMatrix, pSS, pRS);
+		RenderSentence(deviceContext, m_sentence.at(i), worldMatrix, orthoMatrix, pSS, pRS, p_Blend);
 	}
 
 	return true;
@@ -286,7 +286,7 @@ void D3DTextDevice::ReleaseSentence(SentenceType** sentence)
 
 
 bool D3DTextDevice::RenderSentence(ID3D11DeviceContext* deviceContext, SentenceType* sentence, XMMATRIX* worldMatrix, 
-							   XMMATRIX* orthoMatrix, ID3D11SamplerState* pSS, ID3D11RasterizerState* pRS)
+							   XMMATRIX* orthoMatrix, ID3D11SamplerState* pSS, ID3D11RasterizerState* pRS, ID3D11BlendState* p_Blend)
 {
 	unsigned int stride, offset;
 	XMFLOAT4 pixelColor;
@@ -307,7 +307,7 @@ bool D3DTextDevice::RenderSentence(ID3D11DeviceContext* deviceContext, SentenceT
 
 	// Create a pixel color vector with the input sentence color.
 	pixelColor = XMFLOAT4(sentence->red, sentence->green, sentence->blue, 1.0f);
-
+	
 	// Render the text using the font shader.
 
 	m_cb.worldMatrix		= *worldMatrix;
@@ -318,7 +318,7 @@ bool D3DTextDevice::RenderSentence(ID3D11DeviceContext* deviceContext, SentenceT
 	m_FontShader->setShaders();
 	deviceContext->UpdateSubresource(m_cBuffer->getBufferPointer(), 0, NULL, &m_cb, 0, 0);
 	m_cBuffer->apply(0);
-	m_FontShader->setBlendState(NULL);
+	m_FontShader->setBlendState(p_Blend);
 	m_FontShader->setResource(PIXEL_SHADER, 0, 1, m_Font->GetTexture());
 	m_FontShader->setSamplerState(PIXEL_SHADER, 0, 1, pSS);
 	deviceContext->RSSetState(pRS);

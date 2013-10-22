@@ -47,9 +47,9 @@ void InstructionScreen::update()
 	m_pTextDevice->updateSentenceAt(9, "Press BACKSPACE to return to main menu.", 500, 390,  1.0f, 0.0f, 0.0f, m_pDeviceContext);
 }
 
-void InstructionScreen::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster)
+void InstructionScreen::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster, ID3D11BlendState* p_Blend)
 {
-	m_pTextDevice->Render(m_pDeviceContext, p_pWorld, p_pProjection, p_sampler, p_raster);
+	m_pTextDevice->Render(m_pDeviceContext, p_pWorld, p_pProjection, p_sampler, p_raster, p_Blend);
 }
 
 void InstructionScreen::keyEvent(unsigned short key)

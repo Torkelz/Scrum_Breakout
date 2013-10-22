@@ -39,9 +39,9 @@ void WinScreen::update()
 	m_pTextDevice->updateSentenceAt(4, "Press H to see if you managed to enter the high score list, Mr. Nobody", 235, 320,  0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
 }
 
-void WinScreen::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster)
+void WinScreen::draw(XMMATRIX* p_pWorld, XMMATRIX* p_pProjection, ID3D11SamplerState* p_sampler, ID3D11RasterizerState* p_raster, ID3D11BlendState* p_Blend)
 {
-	m_pTextDevice->Render(m_pDeviceContext, p_pWorld, p_pProjection, p_sampler, p_raster);
+	m_pTextDevice->Render(m_pDeviceContext, p_pWorld, p_pProjection, p_sampler, p_raster, p_Blend);
 }
 
 void WinScreen::keyEvent(unsigned short key)
