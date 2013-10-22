@@ -687,8 +687,7 @@ void Direct3D::drawScene()
 		XMMATRIX orthoMatrix;
 		orthoMatrix = mat4ToXMMatrix(m_pCamera->getOrthoMatrix());
 		m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState, m_pPowerBlend);
-		if(m_game.paused())
-			m_pauseText->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState, m_pPowerBlend);
+		
 		//## DRAW TEXT END ##
 	
 		//## PAD DRAW START ##
@@ -827,6 +826,8 @@ void Direct3D::drawScene()
 			m_pDeviceContext->Draw(1, 0);
 		}
 		//## BALL DRAW END ##
+		if(m_game.paused())
+			m_pauseText->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState, m_pPowerBlend);
 	}
 
 	if(m_menu.active())

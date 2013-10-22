@@ -75,7 +75,7 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 
 	loadSounds();
 	m_soundManager.play(m_pSoundList.at(BACKGROUND), 0);
-	m_soundManager.setVolume(0.0f, 0);
+	m_soundManager.setVolume(0.3f, 0);
 	
 	addBorders();
 	int tempPowerUpSize = m_powerUps.size() - 1;
@@ -324,7 +324,7 @@ void Game::update(float p_screenWidth, float p_dt)
 	}
 
 	// SOUND IS OFF HERE REMOVE WHEN NEEDING ZE SOUNDS
-	m_soundManager.setPauseAll(true);
+	//m_soundManager.setPauseAll(true);
 }
 
 vector<int> Game::findBlockWhoWILLDIEByExplosion(int i)
