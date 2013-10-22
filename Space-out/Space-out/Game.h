@@ -23,6 +23,7 @@ using namespace glm;
 class Object;
 class WinScreen;
 class DeathScreen;
+class HighScore;
 
 enum DIFFICULTIES
 {
@@ -99,6 +100,7 @@ public:
 	
 	void					setWinScreen(WinScreen* p_winScene);
 	void					setDeathScreen(DeathScreen* p_deathScene);
+	void					setHighScore(HighScore* p_highScore);
 	bool					paused();
 private:
 	vector<int>				findBlockWhoWILLDIEByExplosion(int i);
@@ -130,7 +132,7 @@ private:
 
 	// EXP BLOCK
 	vec2					m_nrOfBlocksXY;
-	vector<int>	      m_neighbourBlockIndex;
+	vector<int>				m_neighbourBlockIndex;
 
 	vec4					m_screenBorders;
 	
@@ -145,6 +147,7 @@ private:
 	bool					m_paused;
 	WinScreen*				m_winScene;
 	DeathScreen*			m_deathScene;
+	HighScore*				m_highScore;
 };
 
 #endif	GAME_H

@@ -25,6 +25,7 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 
 	m_pObserver = new Observer(this);
 	m_pPad		= new Pad(&vec3(0.0f, 125.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Pad", m_sDiffData.padStartSize);
+	m_pBall.clear();
 	m_pBall.push_back( new Ball(&vec3(50.0f, 100.0f, 0.0f), &vec3(0.56f, 0.56f, 0.56f), "Ball", m_sDiffData.ballStartSpeed));
 	m_loadLevel = LevelGenerator();
 	m_loadLevel.loadFile("Levels/level2.txt");
@@ -61,6 +62,7 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 	((Ball*)m_pBall.back())->init(pf->getOriginalPosition(), pf->getRightDir(), pf->getDownDir());
 	resetBall(pf);
 
+	m_pCamera = nullptr;
 	m_pCamera = new Camera();
 	m_pCamera->init(pf->calculateCameraCenterPos());
 	m_pCamera->setViewMatrix();
@@ -228,6 +230,7 @@ void Game::update(float p_screenWidth, float p_dt)
 							m_playFields[m_activePlayField]->getBlock(m_neighbourBlockIndex.at(exp))->decreaseHP(10);
 						}
 					}
+					m_player.highscore += 10;
 					m_playFields[m_activePlayField]->deleteBlock(i);
 					break;
 				}	
@@ -278,6 +281,7 @@ void Game::update(float p_screenWidth, float p_dt)
 				{
 					//Power Up catch.
 					powerUpCheck(m_powerUps.at(i)->getType());
+					m_player.highscore += 100;
 					m_pPUObservable->broadcastDeath(i);
 					m_powerUps.erase(m_powerUps.begin() + i);
 				}
@@ -302,6 +306,7 @@ void Game::update(float p_screenWidth, float p_dt)
 			{
 					m_active = false;
 					m_deathScene->setActive(true);
+					m_highScore->addHighScore(m_player.highscore);
 			}
 
 			int nrOfRemainingBlocks = 0;
@@ -313,6 +318,7 @@ void Game::update(float p_screenWidth, float p_dt)
 			{
 					m_active = false;
 					m_winScene->setActive(true);
+					m_highScore->addHighScore(m_player.highscore);
 			}
 		}
 	}
@@ -647,6 +653,7 @@ void Game::powerUpCheck(int i)
 	case STICKYPAD:
 		((Pad*)m_pPad)->setSticky(true);
 		m_counter = 10.0f;
+		break;
 	case SPLITBALL:
 		spawnBalls(-45,45,2, (Ball*)m_pBall.front());
 		break;
@@ -931,4 +938,9 @@ void Game::setDeathScreen(DeathScreen* p_deathScene)
 bool Game::paused()
 {
 	return m_paused;
+}
+
+void Game::setHighScore(HighScore* p_pHighScore)
+{
+	m_highScore = p_pHighScore;
 }

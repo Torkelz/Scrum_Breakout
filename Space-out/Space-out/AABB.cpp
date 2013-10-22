@@ -187,7 +187,7 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 	{
 		case TOP:
 		case BOTTOM:
-			if(abs(normSpeed.x) > 0.9f)
+			if(abs(normSpeed.x) > 0.95f)
 			{
 				// Ball is going down and left. After calc it's going up and left.
 				if(p_speed.y < 0.0f && p_speed.x < 0.0f)
@@ -217,7 +217,7 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 		case LEFT:
 		case RIGHT:
 
-			if(abs(normSpeed.y) > 0.9f)
+			if(abs(normSpeed.y) > 0.95f)
 			{
 				// Ball is going down and left. After calc it's going down and right.
 				if(p_speed.y < 0.0f && (p_speed.x + p_speed.z) < 0.0f)
@@ -250,12 +250,13 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 			speed = length(p_speed);
 			p_speed = normalize(p_speed);
 			direction = normalize( t_centerVector + p_speed );
-			if (direction.x < abs(direction.z))
-			{
-				direction.x = -direction.z;
-				direction.z = 0.0f;
-			}
+			//if (direction.x < abs(direction.z))
+			//{
+			//	direction.x = -direction.z;
+			//	direction.z = 0.0f;
+			//}
 			direction = normalize(direction);
+			direction.x = -direction.x;
 			returnVector = speed * direction;
 			speed = length(returnVector);
 			break;
@@ -289,7 +290,7 @@ vec3 AABB::findNewDirection(vec3 p_sphereCenter, vec3 p_speed)
 int AABB::findPlane(vec3 p_sphereCenter)
 {
 	vec3 t_centerVec = p_sphereCenter - m_position;
-	if ( length(t_centerVec) <= 0)
+	if ( length(t_centerVec) <= 0 )
 		return -1;
 
 	t_centerVec = normalize(t_centerVec);
@@ -322,7 +323,7 @@ void AABB::calculateAngle()
 	m_w = (3.14159265358f * 0.5f) - m_v;
 	m_v2 = m_v * 2;
 	m_w2 = m_w * 2;
-	float temp = 0.08727f*3.f; //10.0f degrees
+	float temp = 0.08727f*10.f; //10.0f degrees
 
 	cornerAngles[0] = m_v - temp;
 	cornerAngles[1] = m_v + temp;
