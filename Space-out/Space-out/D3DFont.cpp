@@ -188,9 +188,7 @@ void D3DFont::BuildVertexArray(void* vertices, char* sentence, float drawX, floa
 			vertexPtr[index].position = XMFLOAT3((drawX + m_Font[letter].size), (drawY - 16), 0.0f);  // Bottom right.
 			vertexPtr[index].texture = XMFLOAT2(m_Font[letter].right, 1.0f);
 			index++;
-
-			FontType temp = m_Font[letter];
-
+			
 			// Update the x location for drawing by the size of the letter and one pixel.
 			drawX = drawX + m_Font[letter].size + 1.0f;
 		}

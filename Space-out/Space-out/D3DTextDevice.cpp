@@ -85,7 +85,7 @@ void D3DTextDevice::Shutdown()
 
 bool D3DTextDevice::Render(ID3D11DeviceContext* deviceContext, XMMATRIX* worldMatrix, XMMATRIX* orthoMatrix, ID3D11SamplerState* pSS, ID3D11RasterizerState* pRS)
 {
-	for (int i = 0; i < m_sentence.size(); i++)
+	for (unsigned int i = 0; i < m_sentence.size(); i++)
 	{
 		RenderSentence(deviceContext, m_sentence.at(i), worldMatrix, orthoMatrix, pSS, pRS);
 	}
@@ -347,7 +347,7 @@ void D3DTextDevice::addSentence(char* message, int id, ID3D11Device* device, ID3
 
 void D3DTextDevice::removeSentence(int id)
 {
-	for (int i = 0; i < m_sentence.size(); i++)
+	for (unsigned int i = 0; i < m_sentence.size(); i++)
 	{
 		if(m_sentence.at(i)->id == id)
 		{
@@ -360,7 +360,7 @@ void D3DTextDevice::removeSentence(int id)
 void D3DTextDevice::updateSentenceAt(int id, char* newMessage, int positionX, int positionY, float red, float green, float blue,
 							   ID3D11DeviceContext* deviceContext)
 {
-	for (int i = 0; i < m_sentence.size(); i++)
+	for (unsigned int i = 0; i < m_sentence.size(); i++)
 	{
 		if(m_sentence.at(i)->id == id)
 		{

@@ -98,7 +98,6 @@ void LevelGenerator::loadFile(string p_fileName)
 
 void LevelGenerator::createBlocks(FACE p_face)
 {
-	int size = sizeof(m_loadedData)/sizeof(int);
 	int offset = 0;
 	int row = 0;
 	for (int i = 0; i < m_blockCountY; i++)

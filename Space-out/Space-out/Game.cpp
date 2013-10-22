@@ -114,7 +114,7 @@ void Game::update(float p_screenWidth, float p_dt)
 
 		((Pad*)m_pPad)->update(padTranslation, padRotation);
 
-		for(int b = 0; b < m_pBall.size();b++)
+		for(unsigned int b = 0; b < m_pBall.size();b++)
 		{
 
 			if(!((Ball*)m_pBall.at(b))->getStuck())
@@ -318,7 +318,7 @@ void Game::keyEvent(unsigned short key)
 			ABlock* block = m_playFields[npf]->getLastBlock();
 			if(block != nullptr)
 			{
-				for(int b = 0; b < m_pBall.size();b++)
+				for(unsigned int b = 0; b < m_pBall.size();b++)
 				{
 					if(((Ball*)m_pBall.at(b))->getRealPosition().y > ((Block*)block)->getBlockVertex().pos.y - 5)//5 offset
 					{
@@ -360,7 +360,7 @@ void Game::keyEvent(unsigned short key)
 
 			if(block != nullptr)
 			{
-				for(int b = 0; b < m_pBall.size();b++)
+				for(unsigned int b = 0; b < m_pBall.size();b++)
 				{
 					if(((Ball*)m_pBall.at(b))->getRealPosition().y > ((Block*)block)->getBlockVertex().pos.y - 5)//5 offset
 					{
@@ -411,7 +411,7 @@ void Game::keyEvent(unsigned short key)
 
 void Game::leftMouseClick( vec2 p_mousePosition )
 {
-	for(int i = 0; i < m_pBall.size();i++)
+	for(unsigned int i = 0; i < m_pBall.size();i++)
 	{
 		if(((Ball*)m_pBall.at(i))->getStuck())
 		{
@@ -479,13 +479,13 @@ void Game::powerUpCheck(int i)
 	switch (i)
 	{
 	case FASTERBALL:
-		for(int i = 0; i < m_pBall.size(); i++)
+		for(unsigned int i = 0; i < m_pBall.size(); i++)
 		{
 			((Ball*)m_pBall.at(i))->speedUp();
 		}
 		break;
 	case SLOWERBALL:
-		for(int i = 0; i < m_pBall.size(); i++)
+		for(unsigned int i = 0; i < m_pBall.size(); i++)
 		{
 			((Ball*)m_pBall.at(i))->speedDown();
 		}
@@ -639,7 +639,7 @@ void Game::setScreenBorders(vec4 p_screenBorders)
 
 void Game::resetBall(PlayField* pf)
 {
-	for(int i = 0; i < m_pBall.size(); i++)
+	for(unsigned int i = 0; i < m_pBall.size(); i++)
 	{
 
 		((Ball*)m_pBall.at(i))->setStuck(true);
@@ -718,7 +718,7 @@ void Game::spawnBalls(float p_sAngle, float p_eAngle, unsigned int p_numBalls, B
 	pos = p_ball->getRealPosition();
 	ospeed = p_ball->getSpeed();
 
-	for(int i = 0; i < p_numBalls; i++)
+	for(unsigned int i = 0; i < p_numBalls; i++)
 	{
 		speed = glm::rotate(ospeed, p_sAngle+(stepAngle*i),vec3(0,0,1));
 
