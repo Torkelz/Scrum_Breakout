@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include "Block.h"
+#include "ExpBlock.h"
 #include <glm.hpp>
 
 using namespace glm;
@@ -30,7 +31,6 @@ public:
 
 	vec2			getFieldSize();
 	vec2			getNrBlocks();
-	
 
 private:
 	vector<int>		m_loadedData;
@@ -50,7 +50,8 @@ private:
 	float			m_posYOffset;	//Y-offset all	
 
 	int				stringToNumber(string p_number);
-	void			addBlockToList(int i, int row, FACE p_face);
+	void			addBlockToList(int i, int row, FACE p_face, unsigned int p_blockType);
+	void			addExpBlockToList(int i, int row, FACE p_face, unsigned int p_blockType);
 	void			calcOffsets();
 };
 

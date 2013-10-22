@@ -119,17 +119,20 @@ void PlayField::update()
 
 BlockVertex* PlayField::getBufferData()
 {
-  BlockVertex* temp = NULL;
-  unsigned int size = m_blockList.size();
-  temp				= new BlockVertex[size];
-  for(unsigned int i = 0; i < size; i++)
-  {
-	  temp[i] = m_blockList.at(i)->getBlockVertex();
-  }
-  return temp;
+	unsigned int size = m_blockList.size();
+	BlockVertex* temp;
+	temp				= new BlockVertex[size];
+
+	for(unsigned int i = 0; i < size; i++)
+	{
+		unsigned int type = m_blockList.at(i)->getBlockVertex().blockType;
+		temp[i].blockType = type;
+		temp[i].pos = m_blockList.at(i)->getBlockVertex().pos;
+	}
+	return temp;
 }
 
-int PlayField::getListSize()
+int PlayField::getBlockListSize()
 {
 	return m_blockList.size();
 }

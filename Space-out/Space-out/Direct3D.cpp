@@ -141,19 +141,19 @@ void Direct3D::initApp()
 		BufferInitDesc blockBufferDesc;
 		blockBufferDesc.elementSize		= sizeof(BlockVertex);
 		blockBufferDesc.initData		= m_game.getField(i)->getBufferData();
-		blockBufferDesc.numElements		= m_game.getField(i)->getListSize();
+		blockBufferDesc.numElements		= m_game.getField(i)->getBlockListSize();
 		blockBufferDesc.type			= VERTEX_BUFFER;
 		blockBufferDesc.usage			= BUFFER_CPU_WRITE_DISCARD;
 
 		m_blockBuffers[i].init(m_pDevice, m_pDeviceContext, blockBufferDesc);
 	}
 
-
 	D3D11_INPUT_ELEMENT_DESC blockInputdesc[] = 
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"BLOCKTYPE", 0, DXGI_FORMAT_R16_UINT,			0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
-	m_blockShader.init(m_pDevice, m_pDeviceContext, 1);
+	m_blockShader.init(m_pDevice, m_pDeviceContext, 2);
 	
 	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "VS", "vs_5_0", VERTEX_SHADER, blockInputdesc);
 	m_blockShader.compileAndCreateShaderFromFile(L"BlockShader.fx", "GS", "gs_5_0", GEOMETRY_SHADER, NULL);
@@ -169,8 +169,10 @@ void Direct3D::initApp()
 	cBlockBufferDesc.usage = BUFFER_DEFAULT;
 	
 	m_cBlockBuffer.init(m_pDevice, m_pDeviceContext, cBlockBufferDesc);
-	m_blockTexture = D3DTexture(m_pDevice, m_pDeviceContext);
-	m_blockTexture.createTexture(m_game.getActiveField()->getBlock(0)->getTexturePath(),  0);
+	m_blockTexture[BLOCK] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_blockTexture[BLOCK].createTexture(new std::wstring(L"Picatures/block.png"), 0);
+	m_blockTexture[EXPBLOCK] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_blockTexture[EXPBLOCK].createTexture(new std::wstring(L"Picatures/expBlock.png"), 0);
 
 	//## BLOCK END ##
 	//## BORDERS START ##
@@ -315,6 +317,12 @@ void Direct3D::initApp()
 	m_powerTextures[SPLITBALL].createTexture(new std::wstring(L"Picatures/splitBall.png"), 0);
 	m_powerTextures[SCATTERBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
 	m_powerTextures[SCATTERBALL].createTexture(new std::wstring(L"Picatures/scatterBall.png"), 0);
+	m_powerTextures[EXPLOSIVEBALL] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[EXPLOSIVEBALL].createTexture(new std::wstring(L"Picatures/explosiveBall.png"), 0);
+	m_powerTextures[ONEUP] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[ONEUP].createTexture(new std::wstring(L"Picatures/pluset.png"), 0);
+	m_powerTextures[ONEDOWN] = D3DTexture(m_pDevice, m_pDeviceContext);
+	m_powerTextures[ONEDOWN].createTexture(new std::wstring(L"Picatures/minuset.png"), 0);
 
 	D3D11_BLEND_DESC bd;
 	bd.AlphaToCoverageEnable = false;
@@ -446,7 +454,7 @@ void Direct3D::updateScene(float p_dt)
 		D3D11_MAPPED_SUBRESOURCE* ms = m_blockBuffers[active].getMappedResource();
 		int u = sizeof(BlockVertex);
 
-		memcpy(ms->pData, m_game.getField(active)->getBufferData(), u *m_game.getField(active)->getListSize() );
+		memcpy(ms->pData, m_game.getField(active)->getBufferData(), u *m_game.getField(active)->getBlockListSize() );
 
 		m_blockBuffers[active].unmap();
 		
@@ -541,6 +549,28 @@ void Direct3D::drawScene()
 	m_pTextDevice->Render(m_pDeviceContext, &XMMatrixIdentity(), &orthoMatrix, m_pBallSampler, m_pRasterState);
 	//## DRAW TEXT END ##
 	
+	//## PAD DRAW START ##
+	XMMATRIX translatePadMatrix;
+
+	vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
+	translatePadMatrix = XMMatrixTranslation(padPos.x, padPos.y, padPos.z);
+
+	m_world = XMMatrixIdentity();
+	
+	XMMATRIX t_scaleMatrix = XMMatrixIdentity() * ((Pad*)(m_game.getPad()))->getScale();
+	t_scaleMatrix.r[3].m128_f32[3] = 1.0f;
+	m_WVP = m_world * playFieldRotation * t_scaleMatrix * translatePadMatrix * m_camView * m_camProjection;
+
+	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
+	m_cBuffer.apply(0);
+	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
+	m_shader.setShaders();
+	m_shader.setResource(PIXEL_SHADER, 0, 1, m_padTexture.getResourceView());
+	m_shader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	m_buffer.apply(0);
+	m_pDeviceContext->Draw(4, 0);
+	//## PAD DRAW END ##
 	
 
 	//## BLOCK DRAW START ##
@@ -548,21 +578,21 @@ void Direct3D::drawScene()
 	cBlockBufferStruct.WVP = XMMatrixTranspose(m_WVP);
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 	m_blockShader.setShaders();
-	m_blockShader.setResource(PIXEL_SHADER, 0, 1, m_blockTexture.getResourceView());
+	m_blockShader.setResource(PIXEL_SHADER, 0, 1, m_blockTexture[BLOCK].getResourceView());
+	m_blockShader.setResource(PIXEL_SHADER, 1, 1, m_blockTexture[EXPBLOCK].getResourceView());
 	m_blockShader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
 	cBlockBufferStruct.sizeX = g_bvSize.x;
 	cBlockBufferStruct.sizeY = g_bvSize.y;
 	cBlockBufferStruct.sizeZ = g_bvSize.z;
 	m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 	m_cBlockBuffer.apply(0);
-	unsigned int active = m_game.getActiveFieldNr();
 
 	for(int i = 0; i < 4; i++)
 	{
 		cBlockBufferStruct.rotation = XMMatrixTranspose( mat4ToXMMatrix(m_game.getField(i)->getRotationMatrix()));
 		m_pDeviceContext->UpdateSubresource(m_cBlockBuffer.getBufferPointer(), 0, NULL, &cBlockBufferStruct, 0, 0);
 		m_blockBuffers[i].apply(0);
-		m_pDeviceContext->Draw(m_game.getField(i)->getListSize(), 0);
+		m_pDeviceContext->Draw(m_game.getField(i)->getBlockListSize(), 0);
 	}
 	//## BLOCK DRAW END ##
 	//## BORDERS DRAW START ##
@@ -595,29 +625,7 @@ void Direct3D::drawScene()
 
 	m_pDeviceContext->Draw(4, 4);
 	//## BORDERS DRAW END ##
-	//## PAD DRAW START ##
-	XMMATRIX translatePadMatrix;
-
-	vec3 padPos = ((Pad*)(m_game.getPad()))->getRealPosition();
-	translatePadMatrix = XMMatrixTranslation(padPos.x, padPos.y, padPos.z);
-
-	m_world = XMMatrixIdentity();
-	
-	XMMATRIX t_scaleMatrix = XMMatrixIdentity() * ((Pad*)(m_game.getPad()))->getScale();
-	t_scaleMatrix.r[3].m128_f32[3] = 1.0f;
-	m_WVP = m_world * playFieldRotation * t_scaleMatrix * translatePadMatrix * m_camView * m_camProjection;
-
-	m_cbPad.WVP = XMMatrixTranspose(m_WVP);
-	m_cBuffer.apply(0);
-	m_pDeviceContext->UpdateSubresource(m_cBuffer.getBufferPointer(), 0, NULL, &m_cbPad, 0, 0);
-	m_shader.setShaders();
-	m_shader.setBlendState(m_pPowerBlend);
-	m_shader.setResource(PIXEL_SHADER, 0, 1, m_padTexture.getResourceView());
-	m_shader.setSamplerState(PIXEL_SHADER, 0, 1, m_pBallSampler);
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	m_buffer.apply(0);
-	m_pDeviceContext->Draw(4, 0);
-	//## PAD DRAW END ##
+	//PAD MIGHT BE HERE
 	//## POWERUP DRAW START ##
 	if(m_powerUps.size() > 0)
 	{
@@ -631,6 +639,7 @@ void Direct3D::drawScene()
 		{
 			PowerUp* pu;
 			pu = m_powerUps.at(i);
+			unsigned int active = m_game.getActiveFieldNr();
 			if (active == 0 || active == 2)
 				translatePadMatrix = XMMatrixTranslation(pu->getPos()->x, pu->getPos()->y, padPos.z); // Translate powerup
 			else

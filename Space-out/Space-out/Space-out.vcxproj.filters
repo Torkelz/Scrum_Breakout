@@ -147,6 +147,18 @@
     <ClCompile Include="PUScatterBall.cpp">
       <Filter>Powerups</Filter>
     </ClCompile>
+    <ClCompile Include="PUExplosiveBall.cpp">
+      <Filter>Powerups</Filter>
+    </ClCompile>
+    <ClCompile Include="PUOneDown.cpp">
+      <Filter>Powerups</Filter>
+    </ClCompile>
+    <ClCompile Include="PUOneUp.cpp">
+      <Filter>Powerups</Filter>
+    </ClCompile>
+    <ClCompile Include="ExpBlock.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameTimer.h" />
@@ -271,6 +283,18 @@
     </ClInclude>
     <ClInclude Include="PUScatterBall.h">
       <Filter>Powerups\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="PUOneUp.h">
+      <Filter>Powerups\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="PUOneDown.h">
+      <Filter>Powerups\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="PUExplosiveBall.h">
+      <Filter>Powerups\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ExpBlock.h">
+      <Filter>Object\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

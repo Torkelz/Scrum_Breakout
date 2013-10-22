@@ -19,7 +19,7 @@ public:
 	void update();
 
 	BlockVertex*	getBufferData(); //Transfer to a array of blockvertex structs from blocklist
-	int				getListSize();
+	int			 	getBlockListSize();
 	mat4			getRotationMatrix();
 	ABlock*			getBlock(unsigned int p_id);
 	ABlock*			getLastBlock();

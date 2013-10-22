@@ -17,6 +17,7 @@ private:
 	int	 m_padCounter;
 	int  m_nrOfSpeedUps;
 	int  m_maxSpeedUps;
+	bool m_isExplosive;
 public:
 	Ball(vec3* p_pPos, vec3* p_pColor, std::string p_objectName, vec3 p_speed); // when setting startposition only use x, y not z
 	~Ball();
@@ -31,6 +32,10 @@ public:
 	void			speedDown();
 	void			setStuck(bool p_stuck);
 	bool			getStuck();
+
+	void			setExplosive(bool p_b);
+	bool			getIsExplosive();
+
 	//#### p_origPos = playfield origo ####
 	void			setInternalPosition(vec3 p_position, vec3 p_origPos, vec3 p_right, vec3 p_down);
 	vec3			getRealPosition();

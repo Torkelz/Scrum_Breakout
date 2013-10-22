@@ -5,3 +5,7 @@
 #include "PUStickyPad.h"
 #include "PUSplitBall.h"
 #include "PUScatterBall.h"
+#include "PUOneDown.h"
+#include "PUExplosiveBall.h"
+#include "PUOneUp.h"
+#include "PUOneDown.h"

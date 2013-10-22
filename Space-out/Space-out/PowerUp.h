@@ -7,12 +7,17 @@
 enum PowerUpType
 {
 	FASTERBALL = 0,
-	SLOWERBALL,
 	BIGGERPAD,
-	SMALLERPAD,
 	STICKYPAD,
+	ONEUP,
+	EXPLOSIVEBALL,
 	SPLITBALL,
-	SCATTERBALL
+	SCATTERBALL,
+	POWERUPTYPECOUNT,
+	SLOWERBALL,
+	SMALLERPAD,
+	ONEDOWN,
+	POWERDOWNTYPECOUNT // if adding new poweruptype, keep this at the bottom. Problems? Check maxsize in direct3d.
 };
 
 class PowerUp : public Object

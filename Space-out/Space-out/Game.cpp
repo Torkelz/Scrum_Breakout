@@ -38,6 +38,8 @@ void Game::init(PUObserver* p_pPUObserver, DIFFICULTIES p_diff)
 	size *= 2;
 	float angle = 0;
 
+	m_nrOfBlocksXY = m_loadLevel.getNrBlocks();	
+
 	//Create Fields
 	for(UINT i = 0; i < m_nrPlayFields; i++, angle += 90)
 	{
@@ -141,10 +143,9 @@ void Game::update(float p_screenWidth, float p_dt)
 				}
 
 				// ## BLOCKS ##
-				for(int i = 0; i < m_playFields[m_activePlayField]->getListSize();i++)
+				for(int i = 0; i < m_playFields[m_activePlayField]->getBlockListSize();i++)
 				{
 					AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getBlock(i)->getBoundingVolume());
-
 					if(bv->collide(m_pBall.at(b)->getBoundingVolume()))
 					{
 						m_soundManager.play(m_pSoundList[COLLISION], 1);
@@ -152,12 +153,20 @@ void Game::update(float p_screenWidth, float p_dt)
 						vec3 s = ((Ball*)m_pBall.at(b))->getSpeed();
 						vec3 tempSpeed = bv->findNewDirection(*m_pBall.at(b)->getBoundingVolume()->getPosition(), s);
 						((Ball*)m_pBall.at(b))->setSpeed( tempSpeed );
-						powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
-						m_playFields[m_activePlayField]->deleteBlock(i);
+
+						m_playFields[m_activePlayField]->getBlock(i)->decreaseHP(1);
+					
+						if( ( (Ball*)m_pBall.at(b))->getIsExplosive() )
+						{
+							m_playFields[m_activePlayField]->getBlock(i)->changeBlockType(EXPBLOCK);
+						}
+
 						bv = NULL;
 						break;
 					}
 				}
+				// ## END BLOCKS ##
+
 				// ## WALLS ##
 				for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
 				{
@@ -170,7 +179,8 @@ void Game::update(float p_screenWidth, float p_dt)
 							if(m_pBall.size() == 1)
 							{
 								resetBall(pf);
-								m_sDiffData.lives--;
+								m_player.lives--;
+								( (Ball*)m_pBall.at(b))->setExplosive(false);
 							}
 							else
 							{
@@ -189,9 +199,26 @@ void Game::update(float p_screenWidth, float p_dt)
 			{
 				((Ball*)m_pBall.at(b))->setInternalPosition( *m_pPad->getBoundingVolume()->getPosition() + ((Pad*)m_pPad)->getSavedVector(),pf->getOriginalPosition(),pf->getRightDir(), pf->getDownDir() );
 				((Ball*)m_pBall.at(b))->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
-			}
+			}		
+		}//BALL LOOP END
+		for(int i = 0; i < m_playFields[m_activePlayField]->getBlockListSize();i++)
+		{
+			if(m_playFields[m_activePlayField]->getBlock(i)->isDead())
+			{
+				powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
+					
+				if(m_playFields[m_activePlayField]->getBlock(i)->getBlockType() == EXPBLOCK)
+				{
+					m_neighbourBlockIndex = findBlockWhoWILLDIEByExplosion(i);
+					for(int exp = m_neighbourBlockIndex.size() - 1; exp >= 0; exp--)
+					{
+						m_playFields[m_activePlayField]->getBlock(m_neighbourBlockIndex.at(exp))->decreaseHP(1);
+					}
+				}
+				m_playFields[m_activePlayField]->deleteBlock(i);
+				break;
+			}	
 		}
-
 		//Pad vs Borders NEEDS FINE TUNING
 		for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders()-2; i++)
 		{
@@ -250,7 +277,7 @@ void Game::update(float p_screenWidth, float p_dt)
 		}
 		// ## COLLISION STUFF END ##
 
-		if(pf->getListSize() <= 0) // If playfield is empty move the ball to the pad.
+		if(pf->getBlockListSize() <= 0) // If playfield is empty move the ball to the pad.
 		{
 			resetBall(pf);
 		}
@@ -258,7 +285,7 @@ void Game::update(float p_screenWidth, float p_dt)
 		pf = NULL;
 
 		// TEST LIVES
-		if (m_sDiffData.lives <= 0)
+		if (m_player.lives <= 0)
 		{
 			PostQuitMessage(0);
 		}
@@ -266,7 +293,7 @@ void Game::update(float p_screenWidth, float p_dt)
 		int nrOfRemainingBlocks = 0;
 		for (int pl = 0; pl < 4; pl++)
 		{
-			nrOfRemainingBlocks += m_playFields[pl]->getListSize();
+			nrOfRemainingBlocks += m_playFields[pl]->getBlockListSize();
 		}
 		if(nrOfRemainingBlocks <= 0)
 		{
@@ -276,6 +303,92 @@ void Game::update(float p_screenWidth, float p_dt)
 
 	// SOUND IS OFF HERE REMOVE WHEN NEEDING ZE SOUNDS
 	m_soundManager.setPauseAll(true);
+}
+
+vector<int> Game::findBlockWhoWILLDIEByExplosion(int i)
+{
+	vec2 blockID = m_playFields[m_activePlayField]->getBlock(i)->getBlockID();
+	//vector<vec2> blockIndexToExp;
+	vector<int>	 neighbourBlockIndex;
+
+	// TOP BLOCK
+	if(blockID.y > 0)
+	{
+		for(int blockCount = i - m_nrOfBlocksXY.x; blockCount < i; blockCount++)
+		{
+			if(blockCount > 0)
+			{
+				vec2 temp;
+				temp = m_playFields[m_activePlayField]->getBlock(blockCount)->getBlockID();
+
+				if(temp.x == blockID.x && temp.y == blockID.y - 1)
+				{
+               //if(neighbourBlockIndex[blockCount] != blockCount)
+                  neighbourBlockIndex.push_back(blockCount);
+					//blockIndexToExp.push_back(m_playFields[m_activePlayField]->getBlock(blockCount)->getBlockID());
+					
+					break;
+				}
+			}
+		}
+	}
+
+	// LEFT BLOCK 
+	if(blockID.x > 0)
+	{
+		if( (i) > 0)
+		{
+			vec2 temp;
+			temp = m_playFields[m_activePlayField]->getBlock(i - 1)->getBlockID();
+			if(temp.x == blockID.x - 1 && temp.y == blockID.y)
+			{
+				//blockIndexToExp.push_back(m_playFields[m_activePlayField]->getBlock(i - 1)->getBlockID());
+				neighbourBlockIndex.push_back(i-1);
+			}
+		}
+	}
+
+	//done for destroying THE exploding block ( Block who were hit by ball)
+	neighbourBlockIndex.push_back(i);
+						
+	// RIGHT
+	if(blockID.x < m_nrOfBlocksXY.x - 1)
+	{
+		vec2 temp;
+		if( (i+1) < m_playFields[m_activePlayField]->getBlockListSize())
+		{
+			temp = m_playFields[m_activePlayField]->getBlock(i + 1)->getBlockID();
+			if(temp.x == blockID.x + 1 && temp.y == blockID.y)
+			{
+				//blockIndexToExp.push_back(m_playFields[m_activePlayField]->getBlock(i + 1)->getBlockID());
+				neighbourBlockIndex.push_back(i+1);
+			}
+		}
+	}
+
+
+
+	// BOTTOM BLOCK
+	if(blockID.y < m_nrOfBlocksXY.y - 1)
+	{
+		for(int blockCount = i + m_nrOfBlocksXY.x; blockCount > i; blockCount--)
+		{						
+			if(blockCount < m_playFields[m_activePlayField]->getBlockListSize())
+			{
+				vec2 temp;
+				temp = m_playFields[m_activePlayField]->getBlock(blockCount)->getBlockID();
+
+				if(temp.x == blockID.x && temp.y == blockID.y + 1)
+				{
+					//blockIndexToExp.push_back(m_playFields[m_activePlayField]->getBlock(blockCount)->getBlockID());
+					neighbourBlockIndex.push_back(blockCount);
+					break;
+				}
+			}
+		}
+	}
+
+	return neighbourBlockIndex;
 }
 
 void Game::keyEvent(unsigned short key)
@@ -397,13 +510,13 @@ void Game::keyEvent(unsigned short key)
 		m_pPUObservable->broadcastRebirth(powerUp);
 		m_powerUps.push_back(powerUp);
 	}
-	//if( key == 0x46) // F
-	//{
-	//	//PUBiggerPad* powerUp = new PUBiggerPad(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
-	//	//powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
-	//	//m_pPUObservable->broadcastRebirth(powerUp);
-	//	//m_powerUps.push_back(powerUp);
-	//}
+	if( key == 0x46) // F
+	{
+		PUExplosiveBall* powerUp = new PUExplosiveBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+		powerUp->setPos(vec3(0.0f, m_pPad->getPos()->y, m_pPad->getPos()->z));
+		m_pPUObservable->broadcastRebirth(powerUp);
+		m_powerUps.push_back(powerUp);
+	}
 	//if(key == 0x4C) // L
 	//{
 	//}
@@ -499,7 +612,6 @@ void Game::powerUpCheck(int i)
 	case STICKYPAD:
 		((Pad*)m_pPad)->setSticky(true);
 		m_counter = 10.0f;
-		break;
 	case SPLITBALL:
 		spawnBalls(-45,45,2, (Ball*)m_pBall.front());
 		break;
@@ -508,6 +620,15 @@ void Game::powerUpCheck(int i)
 			spawnBalls(-85,85,8,(Ball*)m_pBall.front());
 		else
 			spawnBalls(-180,180,8,(Ball*)m_pBall.front());
+		break;
+	case EXPLOSIVEBALL:
+		((Ball*)m_pBall.front())->setExplosive(true);
+		break;
+	case ONEUP:
+		m_player.lives++;
+		break;
+	case ONEDOWN:
+		m_player.lives--;
 		break;
 	default:
 		break;
@@ -525,7 +646,7 @@ void Game::powerUpSpawn(vec3 pos)
 		// chance for powerups
 		if(r < chance * m_sDiffData.dropRate)
 		{
-			r = rand() % 7;
+			r = rand() % POWERUPTYPECOUNT;
 			switch (r)
 			{
 			case FASTERBALL:
@@ -573,13 +694,31 @@ void Game::powerUpSpawn(vec3 pos)
 				m_powerUps.push_back(powerUp);
 			}
 			break;
+			case EXPLOSIVEBALL:
+				{
+					PUExplosiveBall* powerUp = new PUExplosiveBall(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
+					m_pPUObservable->broadcastRebirth(powerUp);
+					m_powerUps.push_back(powerUp);
+				}
+				break;
+			case ONEUP:
+				{
+					PUOneUp* powerUp = new PUOneUp(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
+					m_pPUObservable->broadcastRebirth(powerUp);
+					m_powerUps.push_back(powerUp);
+				}
+				break;
 			default:
 				break;
 			}
 		} // Drop chance for powerdowns!
 		else if(r < chance)
 		{
-			r = rand() % 5;
+			r = rand() % (POWERDOWNTYPECOUNT - (POWERUPTYPECOUNT+1)) + POWERUPTYPECOUNT+1 ;
 			switch(r)
 			{
 			case SLOWERBALL:
@@ -600,7 +739,15 @@ void Game::powerUpSpawn(vec3 pos)
 					m_powerUps.push_back(powerUp);
 				}
 				break;
-
+			case ONEDOWN:
+				{
+					PUOneDown* powerUp = new PUOneDown(&vec3(0.0f,0.0f,0.0f), &vec3(1.0f,1.0f,1.0f), "PowerUp");
+					powerUp->setPos(pos);
+					((AABB*)powerUp->getBoundingVolume())->calculateAngle(false, false);
+					m_pPUObservable->broadcastRebirth(powerUp);
+					m_powerUps.push_back(powerUp);
+				}
+				break;
 			default:
 				break;
 			}

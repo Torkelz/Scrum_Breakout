@@ -123,7 +123,7 @@ private:
 	int				 m_blockBufferSizeB;
 	int				 m_blockBufferSizeL;
 	int				 m_blockBufferSizeR;
-	D3DTexture		 m_blockTexture;
+	D3DTexture		 m_blockTexture[3];
 	Camera*			 m_pCamera;
 
 	//border
@@ -165,7 +165,7 @@ private:
 	PUObserver*		 m_pPUObserver;
 	vector<PowerUp*> m_powerUps;
 	Buffer			 m_powerBuffer;
-	D3DTexture		 m_powerTextures[10];
+	D3DTexture		 m_powerTextures[20];
 	Shader			 m_powerShader;
 	ID3D11BlendState* m_pPowerBlend;
 	// DEBUGGING DRAW

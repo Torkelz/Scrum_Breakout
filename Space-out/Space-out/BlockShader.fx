@@ -1,4 +1,5 @@
-Texture2D m_texture : register ( t0 );
+Texture2D m_blockTex : register ( t0 );
+Texture2D m_expBlockTex : register ( t1 );
 SamplerState m_textureSampler : register ( s0 );
 
 cbuffer BlockConstBuffer
@@ -13,12 +14,14 @@ cbuffer BlockConstBuffer
 
 struct VSInput
 {
-	float3 m_posL : POSITION;
+	float3			m_posL : POSITION;
+	unsigned int	m_blockType : BLOCKTYPE;
 };
 
 struct VSOutput
 {
 	float4 m_posH : SV_POSITION;
+	unsigned int m_blockType : BLOCKTYPE;
 };
 
 struct GSOutput
@@ -26,6 +29,7 @@ struct GSOutput
 	float4 m_posH : SV_POSITION;
 	float2 m_tex  : TEXCOORD;
 	float3 m_backColor : POSITION;
+	unsigned int m_blockType : BLOCKTYPE;
 };
 
 VSOutput VS(VSInput p_vIn)
@@ -34,6 +38,7 @@ VSOutput VS(VSInput p_vIn)
 	
 	// Transform to homogeneous clip space.
 	vOut.m_posH = mul(float4(p_vIn.m_posL, 1.0f), m_WVP);
+	vOut.m_blockType = p_vIn.m_blockType;
 
     return vOut;
 }
@@ -56,6 +61,7 @@ void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStrea
 
 
 	GSOutput outVertex = (GSOutput)0;
+	outVertex.m_blockType = p_input[0].m_blockType;
 	outVertex.m_backColor = float3(1,1,1);
 	// Back
 	outVertex.m_posH = vert5;
@@ -152,8 +158,14 @@ void GS( point VSOutput p_input[1], inout TriangleStream<GSOutput> p_outputStrea
 
 float4 PS(GSOutput p_input) : SV_Target
 {
-	float4 temp = m_texture.Sample(m_textureSampler, p_input.m_tex);
-		temp *= float4(p_input.m_backColor,1);
+	float4 temp;
+
+	if(p_input.m_blockType == 0)
+		temp = m_blockTex.Sample(m_textureSampler, p_input.m_tex);
+
+	if(p_input.m_blockType == 1)
+		temp = m_expBlockTex.Sample(m_textureSampler, p_input.m_tex);
+	temp *= float4(p_input.m_backColor,1);
 	return temp;
     //float4(1.0f, 1.0f, 1.0f, 1.0f);
 }

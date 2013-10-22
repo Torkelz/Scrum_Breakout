@@ -95,7 +95,7 @@ public:
 	//borders
 	void					addBorders();
 private:
-	//borders	
+	vector<int>				findBlockWhoWILLDIEByExplosion(int i);
 	vector<Borders>			m_borderList;
 	void					loadSounds();
 	void					powerUpSpawn(vec3 pos);
@@ -120,6 +120,10 @@ private:
 	int						m_activePlayFieldNext;
 	PlayField*				m_playFields[m_nrPlayFields];
 	float					m_counter;
+
+	// EXP BLOCK
+	vec2					m_nrOfBlocksXY;
+	vector<int>	      m_neighbourBlockIndex;
 
 	vec4					m_screenBorders;
 	
