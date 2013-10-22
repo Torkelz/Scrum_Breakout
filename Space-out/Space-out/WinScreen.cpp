@@ -32,7 +32,7 @@ void WinScreen::init(ID3D11Device* p_pDevice, ID3D11DeviceContext* p_pDeviceCont
 void WinScreen::update()
 {
 	m_pTextDevice->updateSentenceAt(0, "Congratulations! You have saved the Earth from the evil invaders!", 245, 200, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
-	std::string message = "Your score was: ";// + IntToString(m_pGame->getScore());
+	std::string message = "Your score was: " + IntToString(m_pGame->getScore());
 	m_pTextDevice->updateSentenceAt(1, &message[0], 330, 220, 0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
 	m_pTextDevice->updateSentenceAt(2, "Press SPACE to try again", 320, 280,  0.29803f, 0.6f, 0.00784f, m_pDeviceContext);
 	m_pTextDevice->updateSentenceAt(3, "Press BACKSPACE to return to the main menu", 275, 300,  0.29803f, 0.6f, 0.00784f, m_pDeviceContext);

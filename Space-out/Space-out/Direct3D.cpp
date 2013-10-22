@@ -475,6 +475,7 @@ void Direct3D::initApp()
 	// Finally give game the scenes it needs
 	m_game.setWinScreen(&m_winScreen);
 	m_game.setDeathScreen(&m_deathScreen);
+	m_game.setHighScore(&m_highScore);
 
 	m_menu.setInstruction(&m_instructionScreen);
 }
@@ -492,6 +493,7 @@ void Direct3D::updateScene(float p_dt)
 		&& !m_winScreen.active() && !m_deathScreen.active() 
 		&& !m_instructionScreen.active() )
 	{	
+		m_pCamera = nullptr;
 		for(int i = 0; i < 4; i++)
 			m_blockBuffers[i]	= Buffer();
 		//m_game = Game();
@@ -523,6 +525,9 @@ void Direct3D::updateScene(float p_dt)
 		{
 			m_game.getField(i)->transBorders(i % 2);
 		}
+
+		m_pCamera = m_game.getCamera();
+		m_pCamera->createOrthoMatrix((float)m_ClientWidth,(float)m_ClientHeight,1.0f, 500.0f);
 	}
 
 	if(m_game.active())
