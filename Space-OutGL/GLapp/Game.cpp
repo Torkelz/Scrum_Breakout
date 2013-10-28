@@ -5,7 +5,7 @@
 #include "Header/Block.h"
 Game::Game(GLFWwindow* p_hMainWnd):m_hMainWnd(p_hMainWnd)
 {
-	deltaSpeed = 50;
+	deltaSpeed = 150;
 }
 Game::~Game(){}
 
@@ -83,7 +83,7 @@ void Game::update(float p_screenWidth, float p_dt)
 //	  m_soundManager.update();
 //
 	                m_pCamera->updateCameraPos(p_dt);
-
+	                globalTime = p_dt;
 	                if(m_pCamera->timeToChange())
 	                {
 	                        m_activePlayField = m_activePlayFieldNext;
@@ -173,32 +173,32 @@ void Game::update(float p_screenWidth, float p_dt)
 	                                        // ## END BLOCKS ##
 
 	                                        // ## WALLS ##
-//	                                        for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
-//	                                        {
-//	                                                AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
-//
-//	                                                if( bv->collide(m_pBall.at(b)->getBoundingVolume()) && !((Ball*)m_pBall.at(b))->getWallCrash())
-//	                                                {
-//	                                                        if (i == 3)
-//	                                                        {
-//	                                                                if(m_pBall.size() == 1)
-//	                                                                {
-//	                                                                        resetBall(pf);
-//	                                                                        m_player.lives--;
-//	                                                                        ( (Ball*)m_pBall.at(b))->setExplosive(false);
-//	                                                                }
-//	                                                                else
-//	                                                                {
-//	                                                                        m_pBall.erase(m_pBall.begin()+b);
-//	                                                                        break;
-//	                                                                }
-//	                                                        }
-//	                                                        vec3 tempSpeed = bv->findNewDirection(*m_pBall.at(b)->getBoundingVolume()->getPosition(), ((Ball*)m_pBall.at(b))->getSpeed());
-//	                                                        ((Ball*)m_pBall.at(b))->setSpeed( tempSpeed );
-//	                                                        ((Ball*)m_pBall.at(b))->resetWallCrash();
-//	                                                        break;
-//	                                                }
-//	                                        }
+	                                        for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders(); i++)
+	                                        {
+	                                                AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
+
+	                                                if( bv->collide(m_pBall.at(b)->getBoundingVolume()) && !((Ball*)m_pBall.at(b))->getWallCrash())
+	                                                {
+	                                                        if (i == 3)
+	                                                        {
+	                                                                if(m_pBall.size() == 1)
+	                                                                {
+	                                                                        resetBall(pf);
+	                                                                        m_player.lives--;
+	                                                                        ( (Ball*)m_pBall.at(b))->setExplosive(false);
+	                                                                }
+	                                                                else
+	                                                                {
+	                                                                        m_pBall.erase(m_pBall.begin()+b);
+	                                                                        break;
+	                                                                }
+	                                                        }
+	                                                        vec3 tempSpeed = bv->findNewDirection(*m_pBall.at(b)->getBoundingVolume()->getPosition(), ((Ball*)m_pBall.at(b))->getSpeed());
+	                                                        ((Ball*)m_pBall.at(b))->setSpeed( tempSpeed );
+	                                                        ((Ball*)m_pBall.at(b))->resetWallCrash();
+	                                                        break;
+	                                                }
+	                                        }
 	                                }
 	                                else
 	                                {
@@ -206,12 +206,12 @@ void Game::update(float p_screenWidth, float p_dt)
 	                                        ((Ball*)m_pBall.at(b))->updateBoundingVolume(pf->getOriginalPosition(),pf->getRightDir(),pf->getDownDir());
 	                                }
 	                        }//BALL LOOP END
-//	                        for(int i = 0; i < m_playFields[m_activePlayField]->getBlockListSize();i++)
-//	                        {
-//	                                if(m_playFields[m_activePlayField]->getBlock(i)->isDead())
-//	                                {
+	                        for(int i = 0; i < m_playFields[m_activePlayField]->getBlockListSize();i++)
+	                        {
+	                                if(m_playFields[m_activePlayField]->getBlock(i)->isDead())
+	                                {
 //	                                        powerUpSpawn(*m_playFields[m_activePlayField]->getBlock(i)->getPos());
-//
+
 //	                                        if(m_playFields[m_activePlayField]->getBlock(i)->getBlockType() == EXPBLOCK)
 //	                                        {
 //	                                                m_neighbourBlockIndex = findBlockWhoWILLDIEByExplosion(i);
@@ -220,39 +220,39 @@ void Game::update(float p_screenWidth, float p_dt)
 //	                                                        m_playFields[m_activePlayField]->getBlock(m_neighbourBlockIndex.at(exp))->decreaseHP(10);
 //	                                                }
 //	                                        }
-//	                                        m_player.highscore += 10;
-//	                                        m_playFields[m_activePlayField]->deleteBlock(i);
-//	                                        break;
-//	                                }
-//	                        }
+	                                        m_player.highscore += 10;
+	                                        m_playFields[m_activePlayField]->deleteBlock(i);
+	                                        break;
+	                                }
+	                        }
 //	                        //Pad vs Borders NEEDS FINE TUNING
-//	                        for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders()-2; i++)
-//	                        {
-//	                                AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
-//
-//	                                if( bv->collide(m_pPad->getBoundingVolume()))
-//	                                {
-//	                                        vec3 Bcenter = *bv->getPosition();
-//	                                        vec3 Pcenter = *m_pPad->getBoundingVolume()->getPosition();
-//	                                        Bcenter.y = Pcenter.y;
-//
-//	                                        vec3 dir = Pcenter - Bcenter;
-//	                                        if(length(dir) > 0.0f)
-//	                                                dir = normalize(dir);
-//
-//	                                        float x = dot(dir, m_playFields[m_activePlayField]->getRightDir());
-//	                                        x *= -1.f;
-//	                                        if(i == 0) //Hit Left side
-//	                                        {
-//	                                                ((Pad*)(m_pPad))->changeXCoordXAmount(x*2); // NEEDS FINE TUNING
-//	                                        }
-//	                                        else //Hit Right side
-//	                                        {
-//	                                                ((Pad*)(m_pPad))->changeXCoordXAmount(x*2);
-//	                                        }
-//	                                        break;
-//	                                }
-//	                        }
+	                        for(unsigned int i = 0; i < m_playFields[m_activePlayField]->getNrBorders()-2; i++)
+	                        {
+	                                AABB* bv = (AABB*)(m_playFields[m_activePlayField]->getCollisionBorder(i));
+
+	                                if( bv->collide(m_pPad->getBoundingVolume()))
+	                                {
+	                                        vec3 Bcenter = *bv->getPosition();
+	                                        vec3 Pcenter = *m_pPad->getBoundingVolume()->getPosition();
+	                                        Bcenter.y = Pcenter.y;
+
+	                                        vec3 dir = Pcenter - Bcenter;
+	                                        if(length(dir) > 0.0f)
+	                                                dir = normalize(dir);
+
+	                                        float x = dot(dir, m_playFields[m_activePlayField]->getRightDir());
+	                                        x *= -1.f;
+	                                        if(i == 0) //Hit Left side
+	                                        {
+	                                                ((Pad*)(m_pPad))->changeXCoordXAmount(x*2); // NEEDS FINE TUNING
+	                                        }
+	                                        else //Hit Right side
+	                                        {
+	                                                ((Pad*)(m_pPad))->changeXCoordXAmount(x*2);
+	                                        }
+	                                        break;
+	                                }
+	                        }
 //
 //	                        padPos = ((Pad*)m_pPad)->getRealPosition();
 //	                        for(unsigned int i = 0; i < m_powerUps.size(); i++)
@@ -350,7 +350,7 @@ void Game::keyEvent(unsigned short key)
 			m_pCamera->startCinematic();
 		}
 	}
-	if(key == 0x51) // Q
+	else if(key == 0x51) // Q
 	{
 		if(!m_pCamera->isCinematic())
 		{
@@ -366,6 +366,7 @@ void Game::keyEvent(unsigned short key)
 			m_pCamera->startCinematic();
 		}
 	}
+	else{}
 	if(key == 0x1B) //ESC
 		glfwSetWindowShouldClose(m_hMainWnd, 1);
 

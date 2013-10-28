@@ -118,10 +118,10 @@ void OpenGL::initApp()
 		data[i].m_position = t_positions->at(i);
 	}
 
-	data[0].m_texCoord = vec2(0.0f, 0.0f);
+	data[0].m_texCoord = vec2(1.0f, 1.0f);
 	data[1].m_texCoord = vec2(0.0f, 1.0f);
 	data[2].m_texCoord = vec2(1.0f, 0.0f);
-	data[3].m_texCoord = vec2(1.0f, 1.0f);
+	data[3].m_texCoord = vec2(0.0f, 0.0f);
 
 	BufferInputDesc* padBufferDesc = new BufferInputDesc[2];
 	padBufferDesc[0].size = 3;
@@ -186,6 +186,10 @@ void OpenGL::initApp()
 
 	m_pHID = new HID(m_hMainWnd);
 
+	for (int i = 0; i  < 4; i ++)
+	{
+		m_game.getField(i)->transBorders(i % 2);
+	}
 //	glfwSetCursorPos(m_hMainWnd, 1024/2, 768/2);
 //	GLint texUnitLoc = glGetUniformLocation(m_triShader.getProgram(),(char*)("textest"));
 
@@ -205,6 +209,17 @@ void OpenGL::updateScene(float p_dt)
 	m_rotation += p_dt;
 	updateFPSCounter();
 	generatingKeyValue();
+
+	unsigned int active = m_game.getActiveFieldNr();
+	if(m_game.getField(active)->getUpdateBuffer())
+	{
+		m_blockBuffer[active].apply();
+		int u = sizeof(BlockVertex);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, u*m_game.getActiveField()->getBlockListSize(), m_game.getActiveField()->getBufferData());
+		m_blockBuffer[active].deApply();
+
+		m_game.getField(active)->setUpdateBuffer(false);
+	}
 }
 
 void OpenGL::drawScene()

@@ -38,7 +38,7 @@ void Pad::setPos(vec2 p_pos)
 {
 	m_mousePos = p_pos;
 	m_mousePos.x *= -1;
-	m_pos.x = p_pos.x*m_mouseOffset;
+	m_pos.x = p_pos.x;
 }
 
 vec2 Pad::getMousePos()
